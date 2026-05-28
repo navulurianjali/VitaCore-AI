@@ -263,7 +263,7 @@ export default function SleepPage() {
     if (active && payload && payload.length) {
       return (
         <div className="p-3 bg-background/95 border border-foreground/10 rounded-xl shadow-xl text-xs font-semibold backdrop-blur-md">
-          <p className="text-foreground/50 mb-1">Telemetry Date: {label}</p>
+          <p className="text-foreground/50 mb-1">Sleep Date: {label}</p>
           {payload.map((pld: any) => (
             <p key={pld.name} style={{ color: pld.color || pld.fill }}>
               {pld.name}: {pld.value} {pld.name.includes("Repair") ? "%" : pld.name.includes("Duration") ? "hrs" : "/ 10"}
@@ -353,7 +353,7 @@ export default function SleepPage() {
                   {latestLog && <div className="progress-bar-fill bg-primary" style={{ width: `${latestLog.quality * 10}%` }} />}
                 </div>
                 {latestLog && (
-                  <p className="text-xs text-[var(--muted)] mt-1.5">REM ~{Math.round(latestLog.quality * 5.2)}% of total</p>
+                  <p className="text-xs text-[var(--muted)] mt-1.5">Deep sleep: ~{Math.round(latestLog.quality * 5.2)}% of total</p>
                 )}
               </GlassCard>
 
@@ -363,7 +363,7 @@ export default function SleepPage() {
                 <div className="progress-bar mt-3">
                   <div className="progress-bar-fill bg-emerald-500" style={{ width: `${consistencyIndex}%` }} />
                 </div>
-                <p className="text-xs text-[var(--muted)] mt-1.5">{Math.round((100 - consistencyIndex) * 0.8)} min wakeup drift</p>
+                <p className="text-xs text-[var(--muted)] mt-1.5">{Math.round((100 - consistencyIndex) * 0.8)} min wakeup difference</p>
               </GlassCard>
 
               <GlassCard glowColor="rose" className="p-4">
@@ -453,7 +453,7 @@ export default function SleepPage() {
                     <BrainCircuit className="h-4 w-4 text-secondary" />
                     Quality, Stress & Recovery
                   </h3>
-                  <p className="text-xs text-[var(--muted)] mt-0.5">Sleep quality vs cortisol load and muscle repair</p>
+                  <p className="text-xs text-[var(--muted)] mt-0.5">Sleep quality, stress, and muscle recovery</p>
                 </div>
 
                 <div className="h-52 w-full">
@@ -474,7 +474,7 @@ export default function SleepPage() {
                         />
                         <Line 
                           type="monotone" 
-                          name="Cortisol Stress" 
+                          name="Stress Level" 
                           dataKey="stress" 
                           stroke="#ef4444" 
                           strokeWidth={2.5}
@@ -482,7 +482,7 @@ export default function SleepPage() {
                         />
                         <Line 
                           type="monotone" 
-                          name="Muscle Repair Index" 
+                          name="Body Recovery Index" 
                           dataKey="muscleRepair" 
                           stroke="#f59e0b" 
                           strokeWidth={2.5}
@@ -511,10 +511,10 @@ export default function SleepPage() {
                 
                 <div className="space-y-0">
                   {[
-                    { label: "Ideal Sleep Onset", value: "9:45 PM – 10:20 PM", color: "text-primary" },
-                    { label: "Melatonin Peak", value: "11:15 PM", color: "text-secondary" },
-                    { label: "Deep Sleep Window", value: "11:30 PM – 2:30 AM", color: "text-amber-500" },
-                    { label: "Wakeup Drift", value: "± 12 min (Excellent)", color: "text-emerald-500" },
+                    { label: "Best Bedtime", value: "9:45 PM – 10:20 PM", color: "text-primary" },
+                    { label: "Deepest Sleep Time", value: "11:15 PM", color: "text-secondary" },
+                    { label: "Rest & Recovery Phase", value: "11:30 PM – 2:30 AM", color: "text-amber-500" },
+                    { label: "Wakeup Difference", value: "± 12 min (Excellent)", color: "text-emerald-500" },
                   ].map((row) => (
                     <div key={row.label} className="flex justify-between items-center py-2.5 border-b border-[var(--border)] last:border-0">
                       <span className="text-sm text-[var(--muted)]">{row.label}</span>

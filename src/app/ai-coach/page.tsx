@@ -34,7 +34,7 @@ export default function AICoachPage() {
       {
         id: "msg-welcome",
         sender: "ai",
-        text: `VitalCore AI Coach: Hello ${profile?.full_name || "Wellness Explorer"}! I have synchronized with your biometric telemetry. Currently, your Wellness Stability Index is at ${base.stabilityScore}% (Healthy) and physical fatigue is at ${base.physicalFatigue}%. You have accumulated a sleep debt of 1.2h. How can I optimize your preventative routine today?`,
+        text: `Hi ${profile?.full_name || "friend"}! I hope you're having a wonderful day. I've had a look at your recent activity – your wellness score is looking great at ${base.stabilityScore}%, but you got slightly less sleep than usual last night. How are you feeling today? What would you like to focus on or chat about?`,
         timestamp: new Date()
       }
     ]);
@@ -114,9 +114,9 @@ export default function AICoachPage() {
 
   const samplePrompts = [
     "I'm feeling very sore from my workout yesterday.",
-    "Can you analyze my sleep debt trends?",
-    "What should I eat to avoid afternoon stress-eating slump?",
-    "Schedule my optimal training timing today based on energy."
+    "Can you help me improve my sleep?",
+    "What should I eat to avoid an afternoon energy slump?",
+    "When is the best time for me to workout today?"
   ];
 
   return (
@@ -128,15 +128,15 @@ export default function AICoachPage() {
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Brain className="h-6 w-6 text-primary animate-pulse" />
-              AI Wellness Life Companion
+              Your Personal Wellness Coach
             </h1>
             <p className="text-xs text-foreground/70 font-semibold">
-              Conversational preventive health assistant
+              A warm, supportive space to chat about your health and daily habits
             </p>
           </div>
           <div className="text-xs font-bold text-foreground/50 flex items-center gap-1.5">
             <Sparkles className="h-4 w-4 text-secondary" />
-            <span>Biometric Memory Synced</span>
+            <span>Wellness Profile Connected</span>
           </div>
         </div>
 
@@ -176,7 +176,7 @@ export default function AICoachPage() {
                 type="text"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
-                placeholder="Query AI Coach (e.g. 'I am feeling sore after coding late...')"
+                placeholder="Ask your coach anything... (e.g., 'I am feeling a bit tired today...')"
                 className="w-full text-xs px-4 py-3 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground placeholder-foreground/45 focus:outline-none focus:border-primary/50"
               />
               <Button variant="primary" type="submit" className="p-3.5 rounded-xl shrink-0">
@@ -194,10 +194,10 @@ export default function AICoachPage() {
               <div className="space-y-2">
                 <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <MessageSquare className="h-4 w-4 text-primary" />
-                  Biomedical Prompts
+                  Suggested Topics
                 </h3>
                 <p className="text-xs text-foreground/60 leading-normal font-semibold">
-                  Select a predefined prompt to instantly query your Coach AI model:
+                  Pick a topic below to start chatting with your coach:
                 </p>
               </div>
 
@@ -216,15 +216,15 @@ export default function AICoachPage() {
 
             {/* AI Companion Memory specs */}
             <GlassCard glowColor="amber" className="p-5 space-y-3">
-              <h3 className="text-xs font-bold text-foreground">Companion Memory</h3>
+              <h3 className="text-xs font-bold text-foreground">Wellness Coach Observations</h3>
               <ul className="space-y-2 text-xs text-foreground/75 font-semibold leading-normal">
                 <li className="flex gap-2">
                   <span className="text-amber-500 font-bold">•</span>
-                  <span>**Active excuse logged**: Skips activity when coding runs past 9:00 PM due to focus inertia.</span>
+                  <span>**Activity patterns**: You tend to skip your evening walks when you're caught up in late-night work projects.</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-amber-500 font-bold">•</span>
-                  <span>**Cognitive stress correlation**: Macro food logs demonstrate a 25% sugar consumption surge when daily anxiety crosses 60%.</span>
+                  <span>**Eating patterns**: We noticed you crave sweet snacks a bit more on high-stress days.</span>
                 </li>
               </ul>
             </GlassCard>

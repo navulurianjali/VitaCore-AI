@@ -8,38 +8,38 @@ import Footer from "@/components/layout/Footer";
 export default function FeaturesPage() {
   const featureList = [
     {
-      title: "Predictive Health Shift Forecasting",
-      description: "Applies multivariate regression analysis to your biological markers (HRV consistency, sleep cycles, steps) to map future wellness patterns.",
+      title: "Your Future Health Trends",
+      description: "Analyzes your heart rate, sleep quality, and daily steps to show you helpful patterns and future health trends.",
       icon: TrendingUp,
       color: "violet"
     },
     {
-      title: "Fatigue & Overtraining Intelligence",
-      description: "Computes physical vs mental fatigue indicators. Prevents exercise burnout by scaling workout difficulty targets down during high cognitive stress phases.",
+      title: "Fatigue & Energy Guides",
+      description: "Checks your physical and mental tiredness to help prevent burnout, suggesting lighter activities on busy or stressful days.",
       icon: Brain,
       color: "rose"
     },
     {
-      title: "Circadian Sleep Rhythm Optimizer",
-      description: "Tracks sleep architecture (Deep, REM durations) and plots ideal circadian phases to match melatonin rises, maximizing sleep efficiency scores.",
+      title: "Sleep Schedule Tracker",
+      description: "Helps you keep a consistent sleep schedule, tracking deep rest and REM sleep so you wake up feeling completely refreshed.",
       icon: Moon,
       color: "emerald"
     },
     {
-      title: "Adaptive Atmospheric AI Integration",
-      description: "Queries real-time meteorological metrics to protect respiratory wellness during excessive summer heatwaves or sub-zero freezing spells.",
+      title: "Weather-Smart Recommendations",
+      description: "Checks local weather, air quality, and temperature to give you smart indoor exercise ideas on too-hot or freezing days.",
       icon: Thermometer,
       color: "amber"
     },
     {
-      title: "Digital Twin Lifestyle Simulation",
-      description: "Renders visual models of your future physical parameters over 3-6 months. Prompts positive daily habit adjustments.",
+      title: "Visualize Your Progress",
+      description: "Shows you a simple visual forecast of how your health and energy can improve over the next 3 to 6 months by staying consistent.",
       icon: Layers,
       color: "violet"
     },
     {
-      title: "Invisible Biometric Decline Radar",
-      description: "Flags creeping trends, like gradual hydration decline or micro sleep deficits, to avoid catastrophic burnout periods.",
+      title: "Burnout Warning Radar",
+      description: "Flags small trends like slipping sleep or low water before they turn into fatigue, helping you stay ahead of burnout.",
       icon: Sparkles,
       color: "rose"
     }
@@ -51,9 +51,9 @@ export default function FeaturesPage() {
         
         {/* Header Title */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Preventative AI Architecture</h1>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">How VitalCore Helps You</h1>
           <p className="text-sm text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-            VitalCore uses state-of-the-art predictive healthcare modeling to optimize longevity, cardiovascular strength, cognitive focus, and active recovery.
+            VitalCore brings together friendly wellness coaching and simple insights to help you build healthy habits, sleep better, and boost your daily energy.
           </p>
         </div>
 

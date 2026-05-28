@@ -108,50 +108,50 @@ export function calculateFutureHealthPredictions(data: TelemetryData): Predictio
   // 8. Generate preventive alerts / reminders
   const preventiveReminders: string[] = [];
   if (data.sleepHours < 6.0) {
-    preventiveReminders.push("Circadian Debt Alert: You slept under 6 hours recently. Reset sleep buffers tonight.");
+    preventiveReminders.push("Rest Reminder: You got less than 6 hours of sleep recently. Let's try winding down early tonight.");
   }
   if (hydrationRatio < 0.7) {
-    preventiveReminders.push("Hydration Deficit Warning: Cell fluid targets were missed. Drink 500ml water immediately.");
+    preventiveReminders.push("Hydration Check: You're a bit behind on your water goal. Let's grab a glass of water now!");
   }
   if (data.stressLevel > 65) {
-    preventiveReminders.push("Stress Accumulation Warning: Elevated central strain detected. Schedule a box-breathing session.");
+    preventiveReminders.push("Take a Breather: We noticed your stress levels are climbing. Let's take a minute to do some slow, relaxing breathing.");
   }
   if (data.sorenessLevel > 6) {
-    preventiveReminders.push("Overtraining Hazard: High muscular soreness logged. Swapping to restorative mobility routine is advised.");
+    preventiveReminders.push("Active Recovery: Since your muscles are quite sore today, we recommend a gentle stretch or a light walk.");
   }
   if (data.physicalFatigue > 60 && data.recoveryPercentage < 50) {
-    preventiveReminders.push("Critical Recovery Warning: Central nervous system battery is depleted. Do not perform heavy presses.");
+    preventiveReminders.push("Time to Recharge: Your energy levels are running low. Let's skip the intense workout today and give your body some rest.");
   }
 
   // Fallback defaults if metrics are optimal
   if (preventiveReminders.length === 0) {
-    preventiveReminders.push("All bodily parameters are synchronized. Ready for sustained physical training!");
+    preventiveReminders.push("You're doing amazing! Your energy is high and your body is ready for a great day.");
   }
 
   // 9. Generate AI future health insights
   const aiInsights: string[] = [];
   if (hydrationRatio < 0.85) {
-    aiInsights.push("Your hydration consistency is dropping this week, which may delay lactate removal.");
+    aiInsights.push("You've been drinking a bit less water this week. Staying hydrated helps your body recover better and keeps you feeling fresh.");
   } else {
-    aiInsights.push("Outstanding hydration stability is active! Hydro-density indices are protecting cell metabolism.");
+    aiInsights.push("Great job keeping up with your water! It's helping your body stay fully energized and healthy.");
   }
 
   if (data.sleepQuality < 70) {
-    aiInsights.push("Poor sleep patterns may reduce recovery quality and increase sympathetic nervous system strain.");
+    aiInsights.push("A few rough nights of sleep can leave you feeling a bit worn out. Let's focus on a calming bedtime routine tonight.");
   } else {
-    aiInsights.push(" Circadian sleep alignment has boosted recovery capacity, accelerating morning focus peaks.");
+    aiInsights.push("Your sleep has been wonderfully consistent! You should feel a great boost in your morning focus and energy.");
   }
 
   if (burnout > 55) {
-    aiInsights.push("Stress accumulation is increasing fatigue risk. Consider reducing workload screen sessions.");
+    aiInsights.push("Your stress is starting to build up, which can make you tired. Try taking a little break from screens this evening.");
   } else {
-    aiInsights.push("Workload stress parameters remain under metabolic control thresholds.");
+    aiInsights.push("Your stress levels are looking good and well under control. Keep up the balanced pace!");
   }
 
   if (data.stabilityScore >= 80) {
-    aiInsights.push("Your current routine is estimated to improve cardiorespiratory energy by 12% within 3 weeks.");
+    aiInsights.push("Your current routine is amazing! Keep this up, and you'll likely feel a wonderful boost in your daily energy soon.");
   } else {
-    aiInsights.push("Inactivity trends or low habit compliance may impact long-term cardiovascular longevity.");
+    aiInsights.push("It looks like you've been a little less active lately. Even a small 10-minute walk today can make a big difference.");
   }
 
   return {

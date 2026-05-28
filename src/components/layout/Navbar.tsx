@@ -56,7 +56,7 @@ export const Navbar: React.FC = () => {
                 VitalCore
               </span>
               <span className="hidden sm:inline-block rounded-full bg-secondary/15 px-2 py-0.5 text-xs font-semibold text-secondary">
-                AI Health
+                Wellness
               </span>
             </Link>
           </div>
@@ -140,7 +140,7 @@ export const Navbar: React.FC = () => {
                 <Link href="/dashboard">
                   <Button variant="glass" size="sm" className="flex items-center gap-1">
                     <User className="h-4 w-4" />
-                    <span>Console</span>
+                    <span>Dashboard</span>
                   </Button>
                 </Link>
                 <button
@@ -228,7 +228,7 @@ export const Navbar: React.FC = () => {
                 {user ? (
                   <>
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="primary" className="w-full">Dashboard Console</Button>
+                      <Button variant="primary" className="w-full">Dashboard</Button>
                     </Link>
                     <Button variant="glass" onClick={handleSignOut} className="w-full">
                       <LogOut className="h-4 w-4 mr-2" /> Log Out

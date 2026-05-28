@@ -256,7 +256,7 @@ export default function RecoveryPage() {
               {/* Workload hours slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold">
-                  <span>Workplace Screen Hours</span>
+                  <span>Daily Screen Time</span>
                   <span className="text-accent">{workHours} hours</span>
                 </div>
                 <input
@@ -272,7 +272,7 @@ export default function RecoveryPage() {
 
             <div className="text-[10px] text-foreground/50 leading-relaxed font-semibold border-t border-foreground/5 pt-4 flex gap-1.5 items-start">
               <Info className="h-3.5 w-3.5 shrink-0 text-primary mt-0.5" />
-              <span>Calculated dynamically to keep you safe under changing environment conditions.</span>
+              <span>Adjusted automatically to help you stay active and feel great in any weather.</span>
             </div>
           </div>
 
@@ -286,11 +286,11 @@ export default function RecoveryPage() {
                 <Wind className="h-4.5 w-4.5 text-secondary animate-pulse" />
                 <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Mind & Recovery</span>
               </div>
-              <h3 className="text-base font-extrabold text-[var(--foreground)] tracking-tight">Calming Breathing & Meditation Coach</h3>
-              <p className="text-xs text-[var(--muted)]">Synchronize your respiration cycles, decrease active sympathetic stress, and restore deep restfulness.</p>
+              <h3 className="text-base font-extrabold text-[var(--foreground)] tracking-tight">Calming Breathing & Mindfulness Coach</h3>
+              <p className="text-xs text-[var(--muted)]">Synchronize your breathing cycles, lower stress levels, and feel deeply rested.</p>
             </div>
             <span className="bg-emerald-500/10 text-emerald-400 text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 animate-pulse">
-              Autonomic Cleared
+              Mind: Calm
             </span>
           </div>
 
@@ -302,9 +302,9 @@ export default function RecoveryPage() {
               
               <div className="space-y-2">
                 {[
-                  { id: "box", label: "Traditional Box Breathing", desc: "4s inhale, 4s hold, 4s exhale, 4s hold. Restores parasympathetic homeostasis.", icon: Wind },
-                  { id: "sleep", label: "Circadian Sleep Relaxation", desc: "4s inhale, 7s hold, 8s exhale. Powerful bedtime neuro-modulator.", icon: Moon },
-                  { id: "cns", label: "Autonomic CNS Stress Relief", desc: "5s inhale, 2s hold, 5s exhale. Releases deep screen and deadline tension.", icon: Brain }
+                  { id: "box", label: "Calming Box Breathing", desc: "Inhale, hold, exhale, hold for 4 seconds each. A classic slow breathing rhythm to help calm your mind and body.", icon: Wind },
+                  { id: "sleep", label: "Relaxing Bedtime Breathing", desc: "Inhale 4s, hold 7s, exhale 8s. A gentle breathing pattern that helps you unwind and drift off to sleep easily.", icon: Moon },
+                  { id: "cns", label: "Deep Tension Release", desc: "Inhale 5s, hold 2s, exhale 5s. Helps let go of stress, relax your muscles, and clear a busy mind.", icon: Brain }
                 ].map(opt => (
                   <button
                     key={opt.id}
@@ -357,7 +357,7 @@ export default function RecoveryPage() {
                     className="w-full py-2.5 text-xs font-bold flex items-center justify-center gap-1 bg-secondary text-white hover:bg-secondary/90 shadow-md shadow-secondary/20"
                   >
                     <Play className="h-4 w-4 fill-white" />
-                    <span>Begin Session</span>
+                    <span>Start Breathing</span>
                   </Button>
                 ) : (
                   <Button 
@@ -369,13 +369,13 @@ export default function RecoveryPage() {
                     className="w-full py-2.5 text-xs font-bold flex items-center justify-center gap-1 border-secondary/20 text-secondary"
                   >
                     <Pause className="h-4 w-4" />
-                    <span>Halt Coach</span>
+                    <span>Pause Session</span>
                   </Button>
                 )}
               </div>
 
               <span className="text-[9px] font-bold text-foreground/40 leading-relaxed text-center block max-w-[280px]">
-                *Follow the rhythm of the sphere to balance your nervous system automatically.
+                *Follow the expanding circle to naturally relax your body.
               </span>
             </div>
 

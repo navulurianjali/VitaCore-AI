@@ -93,7 +93,7 @@ export const getBaseMetrics = (mode: string = "standard"): DailyMetrics => {
   let sustainability = 82;
   let glycemic: "low" | "medium" | "high" = "medium";
   let postureRisk: "low" | "medium" | "critical" = "medium";
-  let deficiencies = ["Vitamin D3 (Optimal sunlight limit crossed)"];
+  let deficiencies = ["Vitamin D3 (Try getting a little more outdoor sunlight)"];
 
   if (mode === "athlete") {
     metabolic = 94;
@@ -105,13 +105,13 @@ export const getBaseMetrics = (mode: string = "standard"): DailyMetrics => {
     sustainability = 70;
     glycemic = "medium";
     postureRisk = "medium";
-    deficiencies.push("Calcium (Recommend custom bio-available synthesis logs)");
+    deficiencies.push("Calcium (Try adding some calcium-rich foods to your meals)");
   } else if (mode === "professional") {
     metabolic = 70;
     sustainability = 58;
     glycemic = "high"; // High processed glycemic load due to convenience eating
     postureRisk = "critical"; // High screen hours
-    deficiencies.push("Vitamin B12 (CNS fatigue indicator)");
+    deficiencies.push("Vitamin B12 (Helps keep your energy high and fight off fatigue)");
   } else if (mode === "wellness") {
     metabolic = 84;
     sustainability = 92;
@@ -164,27 +164,27 @@ export const getEnvironmentAdjustedRoutine = (
   if (env.temperatureCelsius >= 32) {
     hydrationModifier += 600;
     workoutIntensity = mode === "elderly" ? "Very Low" : "Low";
-    workoutRecommendation = "Indoor light dynamic stretching or yoga in cool air conditioning";
-    alerts.push(`High Heat Warning (${env.temperatureCelsius}°C): Workout throttled. Added 600ml hydration buffer.`);
+    workoutRecommendation = "Indoor light stretching or yoga in a cool, air-conditioned room";
+    alerts.push(`It's quite warm today (${env.temperatureCelsius}°C). Let's take it easy and drink a bit more water.`);
   } else if (env.temperatureCelsius < 5) {
     hydrationModifier -= 200;
-    workoutRecommendation = "Warm-up indoors for at least 15 minutes before light outdoor cardio";
-    alerts.push(`Freezing Temp Warning (${env.temperatureCelsius}°C): Focus on detailed cardiovascular warming.`);
+    workoutRecommendation = "Warm up indoors for about 15 minutes before any light outdoor walk or jog";
+    alerts.push(`It's freezing outside (${env.temperatureCelsius}°C). Make sure to warm up thoroughly indoors before your exercise.`);
   }
 
   // Air Pollution Check
   if (env.pollutionIndexAqi > 150) {
-    workoutRecommendation = "Strictly indoor respiratory-safe anaerobic resistance work";
-    alerts.push(`Poor Air Quality (AQI ${env.pollutionIndexAqi}): Exercise OUTDOORS forbidden due to microparticle exposure.`);
+    workoutRecommendation = "A cozy, strength-focused indoor workout";
+    alerts.push(`Air quality is a bit poor today (AQI ${env.pollutionIndexAqi}). Let's stay indoors for our exercise.`);
   } else if (env.pollutionIndexAqi > 100) {
-    alerts.push(`Mild Air Quality issue (AQI ${env.pollutionIndexAqi}): Recommend indoor training for elderly and sensitive groups.`);
+    alerts.push(`Air quality is slightly off today (AQI ${env.pollutionIndexAqi}). It's recommended to train indoors if you have sensitive lungs.`);
   }
 
   // Workload Check
   if (env.workloadHours > 9) {
     workoutIntensity = "Low";
-    workoutRecommendation = "Decompression walk & focus on core stretching, foam rolling recovery";
-    alerts.push(`High Cognitive Strain Alert (${env.workloadHours} hrs work): Workout intensity downgraded to prevent central fatigue.`);
+    workoutRecommendation = "A relaxing walk and some gentle stretching to unwind";
+    alerts.push(`You've worked a long day (${env.workloadHours} hours). Let's do a lighter workout to help you unwind and rest.`);
   }
 
   return {
@@ -242,31 +242,31 @@ export const getEnergyTimeline = (stressLevel: number): EnergyTimelinePoint[] =>
 
     if (h === 7) {
       level = 65;
-      activity = "Morning light sunlight exposure & hydration";
+      activity = "Enjoy some morning sunlight and a glass of water";
     } else if (h === 9) {
       level = 88 - stressLevel * 0.1;
-      activity = "High cognitive focus period: Critical strategic thinking";
+      activity = "Best time for deep focus and important tasks";
     } else if (h === 11) {
       level = 80;
-      activity = "Deep work focus: Core development / problem solving";
+      activity = "Focus on your main projects and creative work";
     } else if (h === 13) {
       level = 45;
-      activity = "Post-lunch light walk or quick 15-minute mindfulness breathing";
+      activity = "A quick post-lunch walk or a few minutes of quiet breathing";
     } else if (h === 15) {
       level = 60;
-      activity = "Collaborative synchronizations & creative planning meetings";
+      activity = "Great time for catching up with others and casual planning";
     } else if (h === 17) {
       level = 75 - stressLevel * 0.15;
-      activity = "Peak athletic performance window: Ideal workout timing";
+      activity = "Perfect time for a workout – your body is warmed up and ready!";
     } else if (h === 19) {
       level = 55;
-      activity = "Mindful dinner logging & recovery review";
+      activity = "A relaxing dinner and a quick check-in on how your day went";
     } else if (h === 21) {
       level = 35;
-      activity = "Blue-light dimming: Evening relaxation & reading";
+      activity = "Wind down, put away the screens, and enjoy a good book";
     } else if (h === 23) {
       level = 15;
-      activity = "Circadian sleep transition phase: Melatonin peak";
+      activity = "Bedtime! Time to drift off for a restful night's sleep";
     }
 
     timeline.push({
@@ -284,32 +284,32 @@ export const getEnergyTimeline = (stressLevel: number): EnergyTimelinePoint[] =>
 export const getDefaultHabits = (): HabitItem[] => [
   {
     id: "habit-1",
-    name: "8,000 Step Cardio Target",
+    name: "Daily Walk (8,000 steps)",
     category: "Fitness",
     streak: 6,
     maxStreak: 12,
-    excuseTrigger: "Rainy outside or tired after complex work hours",
-    habitBreakdown: "AI detected excuse routine: User defaults to skip cardiorespiratory activity when air is wet or cognitive load exceeds 8 hours. Suggestion: Indoor light functional bodyweight complexes.",
+    excuseTrigger: "It's rainy outside or I'm feeling tired after work",
+    habitBreakdown: "We tend to skip walks on rainy days or after long workdays. Tip: Try a quick, fun 10-minute indoor stretching or bodyweight routine instead!",
     consistencyScore: 82
   },
   {
     id: "habit-2",
-    name: "Smart Hydration Logging (2.5L)",
+    name: "Stay Hydrated (2.5L)",
     category: "Hydration",
     streak: 14,
     maxStreak: 21,
-    excuseTrigger: "Forgotten when back-to-back coding",
-    habitBreakdown: "AI breakdown: Habit fails when work focus times exceed 120 minutes without breaks. Recommendation: Link water to cursor activity triggers.",
+    excuseTrigger: "I get so focused on work that I simply forget to drink",
+    habitBreakdown: "It's easy to forget to hydrate when you're in the zone. Tip: Keep a favorite water bottle right next to your keyboard as a visual reminder.",
     consistencyScore: 94
   },
   {
     id: "habit-3",
-    name: "Blue-Light Shutdown by 10PM",
+    name: "Unwind Screens by 10PM",
     category: "Sleep",
     streak: 2,
     maxStreak: 8,
-    excuseTrigger: "Late night debugging / creative hyperfocus",
-    habitBreakdown: "AI breakdown: Habit fails when screen time continues past 9:30 PM. Trigger warning: High caffeine consumption after 3:00 PM overrides fatigue sensors.",
+    excuseTrigger: "Getting caught up in late-night projects or watching shows",
+    habitBreakdown: "Late-night screen time can make it hard to sleep. Tip: Try setting a gentle 'bedtime' alarm at 9:30 PM to remind yourself to shut down.",
     consistencyScore: 58
   }
 ];
@@ -317,8 +317,8 @@ export const getDefaultHabits = (): HabitItem[] => [
 export const getActiveChallenges = (): ChallengeItem[] => [
   {
     id: "challenge-1",
-    title: "Vascular Optimization Circuit",
-    description: "Perform 20 minutes of light metabolic exercises at HSL Peak Energy window for 5 consecutive days.",
+    title: "Daily Energy Booster",
+    description: "Get moving for 20 minutes a day at your peak energy time for 5 days in a row.",
     category: "fitness",
     difficulty: "medium",
     xpReward: 350,
@@ -327,8 +327,8 @@ export const getActiveChallenges = (): ChallengeItem[] => [
   },
   {
     id: "challenge-2",
-    title: "Macro Nutrient Balance Sprint",
-    description: "Log meals with 100% precision keeping protein levels target accurate and avoiding emotional snacking triggers.",
+    title: "Healthy Eating Week",
+    description: "Log your meals for a week and focus on adding fresh, wholesome ingredients to your plate.",
     category: "nutrition",
     difficulty: "hard",
     xpReward: 500,
@@ -337,8 +337,8 @@ export const getActiveChallenges = (): ChallengeItem[] => [
   },
   {
     id: "challenge-3",
-    title: "Anxiety Suppression Breathing",
-    description: "Maintain morning mindfulness logs and log daily recovery metrics before starting work.",
+    title: "Mindful Morning Breathing",
+    description: "Take 5 minutes each morning to check in with how you feel and do a quiet breathing exercise.",
     category: "mental",
     difficulty: "easy",
     xpReward: 200,
@@ -353,24 +353,24 @@ export const parseSimulatedFoodScan = (foodNameOrBarcode: string): ScanResult =>
 
   if (lowercase.includes("salad") || lowercase.includes("salmon") || lowercase.includes("vegetable")) {
     return {
-      foodName: "Premium Atlantic Salmon Avocado Salad",
+      foodName: "Fresh Salmon Avocado Salad",
       calories: 420,
       protein: 34,
       carbs: 18,
       fat: 26,
       sugar: 4,
-      portionSize: "320g regular bowl",
+      portionSize: "320g bowl",
       healthScore: 94,
       sugarAlert: false,
       unhealthyAdditives: [],
       alternatives: ["Greek Salmon Bowl with Quinoa", "Steamed Cod with Spinach"],
-      nutritionRecommendation: "Exceptional macromolecular density! High omega fatty acid profile aligns with cardiorespiratory cell repair. Portions target optimal recovery thresholds."
+      nutritionRecommendation: "This meal is incredibly nourishing! It's packed with healthy fats and lean protein that help your body recover, stay energized, and feel its best."
     };
   }
 
   if (lowercase.includes("pizza") || lowercase.includes("burger") || lowercase.includes("fast")) {
     return {
-      foodName: "Double Cheese Pepperoni Pizza Slice",
+      foodName: "Cheese Pepperoni Pizza",
       calories: 580,
       protein: 18,
       carbs: 64,
@@ -379,15 +379,15 @@ export const parseSimulatedFoodScan = (foodNameOrBarcode: string): ScanResult =>
       portionSize: "2 large slices",
       healthScore: 38,
       sugarAlert: true,
-      unhealthyAdditives: ["Processed sodium nitrites", "Hydrogenated saturated fats"],
-      alternatives: ["Cauliflower Crust Chicken Pizza", "Whole Wheat Turkey Burger wrap"],
-      nutritionRecommendation: "Warning: High glycemic index load detected. Heavy processed trans-fat concentrations delay CNS muscular recovery and surges cardiovascular stress spikes by 14%."
+      unhealthyAdditives: ["Processed sodium preservatives", "Hydrogenated trans fats"],
+      alternatives: ["Cauliflower Crust Chicken Pizza", "Whole Wheat Turkey Wrap"],
+      nutritionRecommendation: "A delicious treat, but keep an eye on refined carbs and fats. Meals like this can cause a quick energy spike followed by a crash, making you feel a bit tired later."
     };
   }
 
   if (lowercase.includes("apple") || lowercase.includes("fruit") || lowercase.includes("banana")) {
     return {
-      foodName: "Organic Fuji Apple",
+      foodName: "Organic Apple",
       calories: 95,
       protein: 0.5,
       carbs: 25,
@@ -397,25 +397,25 @@ export const parseSimulatedFoodScan = (foodNameOrBarcode: string): ScanResult =>
       healthScore: 88,
       sugarAlert: false, // Natural fructose is safe
       unhealthyAdditives: [],
-      alternatives: ["Organic Strawberries", "Fuji Pears"],
-      nutritionRecommendation: "Excellent bio-available micronutrient profile! Combats oxidative stress. Glycemic index is low due to rich soluble dietary fiber blocks."
+      alternatives: ["Organic Strawberries", "Fresh Pears"],
+      nutritionRecommendation: "Apples are a wonderful choice! They are full of vitamins and high in natural fiber, which helps keep your energy levels steady and supports digestion."
     };
   }
 
   // Default barcode scan / package simulation
   return {
-    foodName: "Pre-packaged Energy Nutrition Bar",
+    foodName: "Chewy Granola Bar",
     calories: 280,
     protein: 10,
     carbs: 38,
     fat: 9,
     sugar: 22,
-    portionSize: "60g snack pack",
+    portionSize: "60g bar",
     healthScore: 52,
     sugarAlert: true,
-    unhealthyAdditives: ["High Fructose Corn Syrup", "Artificial Emulsifiers"],
-    alternatives: ["Raw unsalted almonds & dates complex", "Whey isolate dry shake"],
-    nutritionRecommendation: "Glycemic hazard alert: Sugar density exceeds 20g. High syrup additive triggers rapid insulin spikes, leading to an afternoon energy crash."
+    unhealthyAdditives: ["High Fructose Corn Syrup", "Artificial Flavors"],
+    alternatives: ["Raw almonds and dates", "A high-quality protein shake"],
+    nutritionRecommendation: "This bar is a bit high in added sugars. While it gives a quick burst of energy, it might lead to a mid-afternoon crash. Try pairing it with a few nuts for longer-lasting fuel."
   };
 };
 
@@ -444,29 +444,29 @@ export const getAICoachReply = (
   
   // Constructive context injection if user filled onboarding data
   const injuryMention = onboardingData?.previous_injuries && onboardingData.previous_injuries !== "none"
-    ? `Since you noted a health history of "${onboardingData.previous_injuries}", we must be extremely careful to protect those joints during active drills.`
-    : "Let's focus on maintaining functional biomechanics.";
+    ? `Since you've had a previous injury with your ${onboardingData.previous_injuries}, let's make sure to move gently and protect that area.`
+    : "Let's focus on moving with great form and listening to your body.";
 
   const dietMention = onboardingData?.dietary_preferences && onboardingData.dietary_preferences !== "standard"
-    ? `Applying your "${onboardingData.dietary_preferences}" dietary filter for food selections.`
-    : "Let's align your macromolecular thresholds.";
+    ? `I'm keeping your preference for a ${onboardingData.dietary_preferences} diet in mind.`
+    : "Let's make sure you're getting a good balance of nutritious food.";
 
   let reply = "";
 
   if (lowercase.includes("tired") || lowercase.includes("fatigue") || lowercase.includes("sore")) {
-    reply = `VitalCore AI Coach: I see your CNS mental fatigue is at ${baseMetrics.mentalFatigue}%, physical soreness is active, and metabolic efficiency is at ${baseMetrics.metabolicEfficiency}%. ${injuryMention} I highly advise swapping your high-intensity workout today for an active recovery stretching block. Your cumulative recovery score is ${baseMetrics.recoveryPercentage}%, which means overtraining risk is rising. Let's prevent any invisible health decline!`;
+    reply = `Hi there! I noticed you're feeling a bit tired today. Your mental tiredness is at ${baseMetrics.mentalFatigue}%, and your recovery score is at ${baseMetrics.recoveryPercentage}%. ${injuryMention} I highly recommend swapping any intense exercise today for some gentle stretching or a light walk. Taking time to rest now will help you bounce back stronger and prevent fatigue from building up!`;
   }
   else if (lowercase.includes("workout") || lowercase.includes("exercise") || lowercase.includes("gym")) {
-    reply = `VitalCore AI Coach: Based on your current energy profile and posture sedentary risk status (${baseMetrics.sedentaryPostureRisk}), your peak coordination and physical capability hours are scheduled for 5:00 PM today. ${injuryMention} Let's aim for a moderate session of 30 minutes, prioritizing stable form.`;
+    reply = `Hello! Looking at your energy pattern today, you'll likely feel most energized and ready for a workout around 5:00 PM. ${injuryMention} Let's aim for a nice, moderate 30-minute session, keeping our focus on smooth, comfortable movements. How does that sound?`;
   }
   else if (lowercase.includes("hungry") || lowercase.includes("eat") || lowercase.includes("nutrition") || lowercase.includes("diet")) {
-    reply = `VitalCore AI Coach: Analyzing your calories: consumed ${baseMetrics.caloriesConsumed} kcal. ${dietMention} Your macro stability score is solid, but I suggest adding a handful of omega-rich walnuts to combat afternoon stress-eating. Your cognitive focus is in a high-demand phase.`;
+    reply = `Hi! I just looked over your meals today (you've had ${baseMetrics.caloriesConsumed} calories so far). ${dietMention} You're doing a great job! If you get a bit hungry later, try having a handful of walnuts or an apple. It's a wonderful, healthy way to keep your energy steady while you're focusing on your work.`;
   }
   else if (lowercase.includes("sleep") || lowercase.includes("insomnia") || lowercase.includes("rest")) {
-    reply = `VitalCore AI Coach: Your average sleep consistency is ${baseMetrics.sleepQuality}%. Yesterday, you accumulated a minor sleep debt of 1.2 hours. To reset your circadian rhythm tonight, I recommend complete screen lockout by 9:45 PM and introducing a cool ambient room temperature (around 19°C) to accelerate melatonin onset.`;
+    reply = `Hi! Let's talk about your sleep. Your sleep score is around ${baseMetrics.sleepQuality}%, and you got slightly less rest than usual last night. To help you catch up tonight, I'd suggest putting screens away by 9:45 PM and keeping your bedroom nice and cool. It works wonders for falling asleep easily and getting deep, restful sleep!`;
   }
   else {
-    reply = `VitalCore AI Coach: Hello! I'm tracking your health stability parameters. Currently, your Wellness Stability is at ${baseMetrics.stabilityScore}% (Healthy). I have optimized your fluid intake targets and focus zones for the day. ${injuryMention} What part of your preventive routine would you like to refine?`;
+    reply = `Hi! I hope you're having a wonderful day. Your overall wellness score is at ${baseMetrics.stabilityScore}%, which is looking very healthy and strong! I've set up some friendly reminders for your water and active breaks today. ${injuryMention} What would you like to focus on or chat about next?`;
   }
 
   return reply;

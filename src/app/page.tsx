@@ -29,38 +29,38 @@ export default function LandingPage() {
 
   const features = [
     {
-      title: "Predictive Health Evolution",
-      description: "AI-driven algorithms process time-series metrics to forecast obesity, cardiovascular decline, and muscle overload risks 3–6 months in advance.",
+      title: "Your Future Health Trends",
+      description: "Simple wellness insights that look at your habits to help you see patterns and stay healthy 3 to 6 months ahead.",
       icon: TrendingUp,
       color: "violet"
     },
     {
-      title: "Invisible Decline Detection",
-      description: "Identifies creeping cardiovascular and recovery stress markers that users normally ignore before they develop into chronic fatigue.",
+      title: "Burnout Warning Radar",
+      description: "Flags small shifts in your sleep and recovery patterns early, helping you avoid fatigue before it starts.",
       icon: ShieldAlert,
       color: "rose"
     },
     {
-      title: "Fatigue Intelligence System",
-      description: "Measures central nervous system and metabolic fatigue by crossing sleep debt, stress levels, and muscle soreness zones.",
+      title: "Daily Fatigue & Energy Guide",
+      description: "Checks your sleep quality, daily stress, and physical fatigue to guide you toward perfect rest.",
       icon: HeartPulse,
       color: "emerald"
     },
     {
-      title: "Conversational AI Life Coach",
-      description: "An adaptive wellness companion that remembers excuses, schedules focus periods based on hydration, and optimizes energy timelines.",
+      title: "Your Personal Wellness Coach",
+      description: "A friendly wellness companion that checks in on your daily routine, prompts you to stay hydrated, and helps you organize your energy.",
       icon: Brain,
       color: "amber"
     },
     {
-      title: "Adaptive Environment Modifiers",
-      description: "Translates external environmental variables (heatwaves, sub-zero cold, poor AQI air pollution indices) into dynamic routine throttling rules.",
+      title: "Weather-Smart Recommendations",
+      description: "Checks local weather, temperatures, and air quality to automatically suggest perfect indoor alternatives when needed.",
       icon: Thermometer,
       color: "violet"
     },
     {
-      title: "Cognitive Wellness Tracker",
-      description: "Integrates screen-lock focus spans and mental fatigue metrics to protect developer and corporate athlete productivity.",
+      title: "Focus & Mind Relaxer",
+      description: "Tracks screen time and mental fatigue to help you take timely breaks, unwind, and clear your mind.",
       icon: Zap,
       color: "rose"
     }
@@ -70,44 +70,44 @@ export default function LandingPage() {
     {
       name: "VitalCore Standard",
       price: "0",
-      description: "Core biometric loggers and baseline sleep hygiene monitoring.",
+      description: "Basic wellness logging and daily step tracking.",
       features: [
         "Interactive Daily Wellness Dashboard",
-        "Standard Calorie & Macro logs",
-        "Baseline Sleep & Hydration meters",
-        "Manual Biometric integrations"
+        "Calorie & food logging",
+        "Sleep & water tracking",
+        "Simple health logs"
       ],
-      cta: "Get Started",
+      cta: "Get Started Free",
       highlighted: false
     },
     {
       name: "VitalCore Professional",
       price: "19",
-      description: "Full AI predictions, fatigue intelligence, and dynamic environment adjustments.",
+      description: "Complete daily energy predictions, stress insights, and smart weather recommendations.",
       features: [
         "All Standard capabilities",
-        "Preventative AI Predictions Engine",
-        "Active Fatigue Intelligence metrics",
-        "Circadian Rhythm Sleep tracking",
-        "Adaptation environment weather offsets",
-        "Elderly & Beginner custom mode profiles"
+        "Smart daily predictions & trend alerts",
+        "Stress & fatigue tracking",
+        "Sleep schedule trends",
+        "Weather-smart recommendations",
+        "Elderly & beginner modes"
       ],
-      cta: "Activate AI Pro",
+      cta: "Unlock Pro Features",
       highlighted: true
     },
     {
       name: "VitalCore Enterprise / Elite",
       price: "49",
-      description: "Deep continuous digital twin health forecasting & advanced team accountability circles.",
+      description: "Explore your future health patterns and build healthy habits with family and friends.",
       features: [
         "All Pro capabilities",
-        "3-6 Month Digital Twin simulations",
-        "Advanced Biological Age estimators",
-        "Family & Friend Accountability circles",
-        "Admin developer HIPAA portal logs",
-        "Dedicated preventive coaching integrations"
+        "Visual 3-6 month health forecasts",
+        "Body age estimates",
+        "Family & friends tracking circles",
+        "Secure developer API tools",
+        "Dedicated wellness coaching"
       ],
-      cta: "Access Elite System",
+      cta: "Unlock Elite Features",
       highlighted: false
     }
   ];
@@ -117,19 +117,19 @@ export default function LandingPage() {
   const faqs = [
     {
       question: "How does VitalCore predict future health changes?",
-      answer: "VitalCore uses advanced time-series predictive modeling. By comparing your sleep quality consistency, baseline heart rate variability (HRV) trends, physical exertion, stress levels, and macro food logging over time, the system forecasts metabolic stability and chronic fatigue patterns up to 6 months before symptoms manifest."
+      answer: "VitalCore looks at your daily habits – like sleep quality, heart rate trends, active steps, stress levels, and meals. By noticing small changes in these numbers over time, we can show you how your energy is trending and help you stay ahead of burnout before you even start feeling tired."
     },
     {
-      question: "What is the Invisible Decline Alert?",
-      answer: "Most users ignore small daily declines, like sleeping 20 minutes less each day or minor increases in resting heart rate. VitalCore isolates these slow micro-declines from daily noise, sending proactive alerts (e.g. 'Sleep quality down 6% over 14 days; overtraining risk has increased by 15%') to prevent clinical burnout."
+      question: "What is the Burnout Warning Radar?",
+      answer: "It's easy to miss tiny daily shifts, like sleeping 15 minutes less each night or having slightly higher stress. The warning radar spots these slow, creeping patterns early, letting you know with friendly tips (like: 'Your sleep has been a little short this week, let's take it easy today!') so you can recharge before feeling drained."
     },
     {
-      question: "How do the Elderly and Beginner Modes adapt the platform?",
-      answer: "You can toggle modes directly in the top navigation bar. Beginner Mode simplifies charts and provides lighter exercise suggestions, while Elderly Mode scales up all typography for high contrast, removes complex data dashboards, and focuses strictly on simple metrics like step consistency, gentle stretching, and daily hydration reminders."
+      question: "How do the Elderly and Beginner Modes work?",
+      answer: "You can easily switch modes in the top navigation bar! Beginner Mode makes charts simpler and offers daily activity tips, while Elderly Mode uses larger, high-contrast text, simplifies the screen, and focuses entirely on easy, important goals like gentle stretching, water reminders, and daily walks."
     },
     {
       question: "How secure is my wellness data?",
-      answer: "Security is built directly into our database architecture. We use PostgreSQL with Row-Level Security (RLS) enabled on all tables via Supabase. If you run in local mock mode, all data is stored purely within your own browser's LocalStorage. If you connect to real Supabase, all transactions are secured using JWT validation, matching industry-standard healthcare HIPAA inspired practices."
+      answer: "Your privacy is our top priority. If you're using our standard Mock Mode, everything you track stays completely private on your own device – none of your data ever leaves your browser. If you choose to connect an account to our secure cloud, your personal logs are strictly locked to you, ensuring nobody else can ever access them."
     }
   ];
 
@@ -151,7 +151,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/15 px-3 py-1 text-xs font-semibold text-primary"
           >
             <Sparkles className="h-3.5 w-3.5 animate-pulse" />
-            <span>Next-Generation Preventive Healthcare Platform</span>
+            <span>Your Friendly Personal Wellness Companion</span>
           </motion.div>
 
           <motion.h1
@@ -159,9 +159,9 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl font-semibold tracking-tight sm:text-4xl max-w-4xl mx-auto"
           >
-            Predict. Prevent.{" "}
+            Live Healthier. Feel Better.{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary">
-              Perform.
+              Sleep Deeper.
             </span>
           </motion.h1>
 
@@ -171,7 +171,7 @@ export default function LandingPage() {
             transition={{ delay: 0.1 }}
             className="text-xs sm:text-sm text-foreground/75 max-w-2xl mx-auto leading-relaxed font-normal"
           >
-            AI-powered wellness intelligence that maps your biometrics, forecasts fatigue decay, detects invisible health decline, and adapts with your lifestyle environment.
+            Get warm, personalized wellness coaching and simple insights to help you build healthy habits, stay hydrated, and feel energized every single day.
           </motion.p>
 
           <motion.div
@@ -182,12 +182,12 @@ export default function LandingPage() {
           >
             <Link href="/auth/signup">
               <Button variant="primary" size="lg" className="flex items-center gap-2">
-                <span>Access Console</span>
+                <span>Get Started</span>
                 <ArrowRight className="h-4.5 w-4.5" />
               </Button>
             </Link>
             <Link href="/features">
-              <Button variant="glass" size="lg">Explore Biometric Models</Button>
+              <Button variant="glass" size="lg">See How It Works</Button>
             </Link>
           </motion.div>
 
@@ -200,15 +200,15 @@ export default function LandingPage() {
           >
             <div className="px-4 py-2.5 rounded-xl glass-panel border-foreground/5 flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />
-              <span>Biometric Forecasting Model V2.4 Active</span>
+              <span>Wellness Assistant Connected</span>
             </div>
             <div className="px-4 py-2.5 rounded-xl glass-panel border-foreground/5 flex items-center gap-2">
               <HeartPulse className="h-4 w-4 text-secondary" />
-              <span>HRV Recovery Mapping</span>
+              <span>Heart Rate & Rest Insights</span>
             </div>
             <div className="px-4 py-2.5 rounded-xl glass-panel border-foreground/5 flex items-center gap-2">
               <Brain className="h-4 w-4 text-accent" />
-              <span>Burnout Simulation Enabled</span>
+              <span>Burnout Prevention Alerts</span>
             </div>
           </motion.div>
 
@@ -278,7 +278,7 @@ export default function LandingPage() {
               AI Preventive Architecture Features
             </motion.h2>
             <p className="text-sm text-foreground/75 leading-relaxed">
-              VitalCore replaces fragmented trackers with unified, adaptive wellness intelligence designed for longevity and peak capability.
+              VitalCore replaces complicated trackers with a single, simple wellness companion designed to help you stay healthy and feel energized.
             </p>
           </div>
 
@@ -305,28 +305,28 @@ export default function LandingPage() {
       <section className="py-20 bg-background/50 relative border-t border-foreground/5">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 space-y-3">
-            <h2 className="text-3xl font-bold">Longevity Success Stories</h2>
-            <p className="text-sm text-foreground/60 font-semibold">biometric optimization validation</p>
+            <h2 className="text-3xl font-bold">Real Success Stories</h2>
+            <p className="text-sm text-foreground/60 font-semibold">what our members say</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             <GlassCard glowColor="violet" className="flex flex-col justify-between min-h-[220px]">
               <p className="text-xs text-foreground/75 leading-relaxed font-medium italic">
-                "As a lead software architect doing 10-hour days, I was constantly suffering from fatigue. VitalCore's Fatigue Intelligence and burnout indicators caught a massive decline in my HRV trends. Swapping to active recovery routines saved my sanity."
+                "As a lead software developer working long hours, I was always feeling tired. VitalCore's fatigue checks noticed when my energy was dropping and gently suggested a lighter routine. Swapping to active recovery saved my energy!"
               </p>
               <div className="border-t border-foreground/5 pt-4 mt-6 flex items-center gap-3">
                 <div className="h-8 w-8 rounded-full bg-primary/25 font-bold text-xs flex items-center justify-center text-primary">DR</div>
                 <div>
                   <h4 className="text-xs font-bold">David R.</h4>
-                  <p className="text-xs text-foreground/50">Lead Developer & Hyper-exertion user</p>
+                  <p className="text-xs text-foreground/50">Lead Developer</p>
                 </div>
               </div>
             </GlassCard>
 
             <GlassCard glowColor="emerald" className="flex flex-col justify-between min-h-[220px]">
               <p className="text-xs text-foreground/75 leading-relaxed font-medium italic">
-                "I activate the Elderly Mode for my grandfather. The scaled typography, highly visible hydration meters, and simple joint stretching guidance are beautifully customized. He finds it easily readable, and it notifies me of step consistency drops."
+                "I turned on the Elderly Mode for my grandfather. The large text, bright water meters, and gentle joint stretching routines are perfect for him. It's so easy to read, and it helps our family stay connected and look out for him."
               </p>
               <div className="border-t border-foreground/5 pt-4 mt-6 flex items-center gap-3">
                 <div className="h-8 w-8 rounded-full bg-secondary/25 font-bold text-xs flex items-center justify-center text-secondary">LK</div>
@@ -415,8 +415,8 @@ export default function LandingPage() {
       <section className="py-20 bg-background/30 relative border-t border-foreground/5">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div className="text-center mb-14 space-y-3">
-            <h2 className="text-3xl font-bold">Preventative Intelligence FAQ</h2>
-            <p className="text-sm text-foreground/60 font-semibold">understanding the biometric engine</p>
+            <h2 className="text-3xl font-bold">Frequently Asked Questions</h2>
+            <p className="text-sm text-foreground/60 font-semibold">answers to common questions</p>
           </div>
 
           <div className="space-y-4">
@@ -456,16 +456,16 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05),transparent_60%)]" />
             
             <h2 className="text-2xl font-bold sm:text-4xl relative z-10">
-              Ready to secure your wellness longevity?
+              Ready to start your wellness journey?
             </h2>
             <p className="text-sm text-foreground/75 max-w-2xl mx-auto leading-relaxed relative z-10">
-              Initialize your health simulation parameters now. Access fatigue tracking, environment-adapted cardiovascular optimization, and AI Coach support instantly.
+              Join today to start building healthy habits, track your daily energy and sleep quality, and get warm, supportive guidance from your AI Coach.
             </p>
             
             <div className="flex justify-center pt-2 relative z-10">
               <Link href="/auth/signup">
                 <Button variant="primary" size="lg" className="flex items-center gap-2 px-8">
-                  <span>Open Biometrics Console</span>
+                  <span>Get Started</span>
                   <ArrowRight className="h-4.5 w-4.5" />
                 </Button>
               </Link>

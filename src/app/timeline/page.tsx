@@ -88,10 +88,10 @@ export default function TimelinePage() {
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Milestone className="h-6 w-6 text-primary animate-pulse" />
-              AI Future Health Evolution
+              Your Health Journey
             </h1>
             <p className="text-xs text-foreground/70 font-semibold">
-              Visualize how your daily sleep quality, hydration logs, and workloads map out your biological longevity and risk forecasts
+              See how your sleep, water, and work habits shape your daily energy and future health trends.
             </p>
           </div>
         </div>
@@ -102,10 +102,10 @@ export default function TimelinePage() {
           {/* Consistency Score Card */}
           <GlassCard glowColor="violet" className="p-5 flex justify-between items-center min-h-[130px]">
             <div className="space-y-2 pr-4">
-              <span className="text-xs font-bold text-foreground/60">Lifestyle Consistency Score</span>
+              <span className="text-xs font-bold text-foreground/60">Your Habit Score</span>
               <h2 className="text-3xl font-black text-primary">{metrics.stabilityScore}% (Excellent)</h2>
               <p className="text-xs text-foreground/60 leading-relaxed font-semibold">
-                Your regular sleep routines and stable hydration parameters are actively protecting your cells and daily energy.
+                Your regular sleep routines and water habits are keeping you fully energized and feeling great.
               </p>
             </div>
             <div className="h-12 w-12 rounded-2xl bg-primary/15 text-primary flex items-center justify-center font-bold text-lg shrink-0">
@@ -116,12 +116,12 @@ export default function TimelinePage() {
           {/* Health Age Card */}
           <GlassCard glowColor="emerald" className="p-5 flex justify-between items-center min-h-[130px]">
             <div className="space-y-2 pr-4">
-              <span className="text-xs font-bold text-foreground/60">Predicted Health Age</span>
+              <span className="text-xs font-bold text-foreground/60">Your Body's Age</span>
               <h2 className="text-3xl font-black text-secondary">
                 {metrics.biologicalAge + predictions.biologicalAgeShift} years
               </h2>
               <p className="text-xs text-foreground/60 leading-relaxed font-semibold">
-                Outstanding! Your active habits keep you functioning younger than your calendar age (Shift: {predictions.biologicalAgeShift} yrs).
+                Amazing! Your good habits are helping you feel and stay younger than your calendar age.
               </p>
             </div>
             <div className="h-12 w-12 rounded-2xl bg-secondary/15 text-secondary flex items-center justify-center font-bold text-lg shrink-0">
@@ -141,14 +141,14 @@ export default function TimelinePage() {
               <div className="flex justify-between items-center">
                 <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-widest">
                   <Layers className="h-4.5 w-4.5 text-primary animate-pulse" />
-                  7-Day Circadian Energy Forecast
+                  7-Day Energy Forecast
                 </h3>
                 <span className="bg-secondary/15 text-secondary text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">
-                  Circadian Twin Active
+                  Energy Forecast Active
                 </span>
               </div>
               <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
-                Circadian prediction modeling your peak cognitive focus energy and trough recovery hours over the next 7 days:
+                Our simple daily forecast showing your expected energy and peak focus times over the next week:
               </p>
 
               {/* Chart container */}
@@ -159,9 +159,9 @@ export default function TimelinePage() {
                     <XAxis dataKey="name" stroke="#666" fontSize={9} tickLine={false} />
                     <YAxis stroke="#666" fontSize={9} domain={[0, 100]} tickLine={false} />
                     <Tooltip contentStyle={{ background: "#111", border: "1px solid #333", fontSize: "10px", borderRadius: "8px" }} />
-                    <Line type="monotone" dataKey="Energy" stroke="#8b5cf6" strokeWidth={2.5} activeDot={{ r: 5 }} name="Median Energy" />
-                    <Line type="monotone" dataKey="CircadianPeak" stroke="#10b981" strokeWidth={1.5} strokeDasharray="3 3" name="Peak State" />
-                    <Line type="monotone" dataKey="CircadianTrough" stroke="#f43f5e" strokeWidth={1.5} strokeDasharray="3 3" name="Recovery Floor" />
+                    <Line type="monotone" dataKey="Energy" stroke="#8b5cf6" strokeWidth={2.5} activeDot={{ r: 5 }} name="Expected Energy" />
+                    <Line type="monotone" dataKey="CircadianPeak" stroke="#10b981" strokeWidth={1.5} strokeDasharray="3 3" name="Peak Focus" />
+                    <Line type="monotone" dataKey="CircadianTrough" stroke="#f43f5e" strokeWidth={1.5} strokeDasharray="3 3" name="Rest Time" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -169,19 +169,19 @@ export default function TimelinePage() {
               {/* Predictive Risk Gauges */}
               <div className="grid grid-cols-3 gap-3 border-t border-foreground/5 pt-4 text-center">
                 <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 block">BURNOUT RISK</span>
+                  <span className="text-[9px] font-bold text-foreground/50 block">TIREDNESS RISK</span>
                   <span className={`text-sm font-black block ${predictions.burnoutRisk > 60 ? "text-rose-400" : "text-emerald-400"}`}>
                     {predictions.burnoutRisk}%
                   </span>
                 </div>
                 <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 block">FATIGUE ACCUM</span>
+                  <span className="text-[9px] font-bold text-foreground/50 block">FATIGUE RISK</span>
                   <span className={`text-sm font-black block ${predictions.fatigueBuildup > 65 ? "text-rose-400" : "text-emerald-400"}`}>
                     {predictions.fatigueBuildup}%
                   </span>
                 </div>
                 <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 block">SLEEP DEBT DECREASE</span>
+                  <span className="text-[9px] font-bold text-foreground/50 block">REST QUALITY</span>
                   <span className={`text-sm font-black block ${predictions.sleepDeteriorationRisk > 60 ? "text-rose-400" : "text-emerald-400"}`}>
                     {100 - predictions.sleepDeteriorationRisk}%
                   </span>
@@ -239,14 +239,14 @@ export default function TimelinePage() {
           <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 space-y-6 flex flex-col justify-between">
             <div className="space-y-6">
               <h3 className="text-xs font-bold text-foreground uppercase tracking-widest">
-                Preventive Warnings & Milestones
+                Healthy Reminders & Achievements
               </h3>
 
               {/* Warnings panel */}
               <div className="space-y-2.5">
                 <span className="text-[10px] font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
                   <ShieldAlert className="h-3.5 w-3.5" />
-                  Active Telemetry Warnings
+                  Daily Observations
                 </span>
                 <div className="space-y-2 text-xs font-semibold text-[var(--foreground)]">
                   {predictions.preventiveReminders.map((reminder, idx) => (
@@ -261,7 +261,7 @@ export default function TimelinePage() {
               {/* Milestones timeline */}
               <div className="space-y-4 pt-4 border-t border-foreground/5">
                 <span className="text-[10px] font-bold text-foreground/50 uppercase tracking-widest block">
-                  Bio-Compliance Milestones
+                  Your Wellness Achievements
                 </span>
                 <div className="space-y-6 relative pl-4 border-l border-foreground/5">
                   {timelineEvents.map((ev, idx) => {
@@ -287,7 +287,7 @@ export default function TimelinePage() {
             </div>
 
             <div className="text-[10px] text-foreground/45 leading-relaxed font-bold border-t border-foreground/5 pt-4">
-              *Predictions updated continuously based on circadian stability indices.
+              *Predictions are updated continuously based on your daily habit consistency.
             </div>
           </div>
 

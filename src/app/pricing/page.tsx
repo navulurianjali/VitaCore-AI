@@ -12,43 +12,43 @@ export default function PricingPage() {
     {
       name: "VitalCore Standard",
       price: "0",
-      description: "Basic biometric loggers and step consistency trackers.",
+      description: "Basic wellness logging and daily step tracking.",
       features: [
         "Interactive Daily Wellness Dashboard",
-        "Calorie & Macro logs",
-        "Sleep & Hydration tracking",
-        "Manual Biometric integrations"
+        "Calorie & food logging",
+        "Sleep & water tracking",
+        "Simple health logs"
       ],
       cta: "Get Started Free"
     },
     {
       name: "VitalCore Professional",
       price: "19",
-      description: "Full AI predictions, fatigue models, and atmospheric adaptation filters.",
+      description: "Complete daily energy predictions, stress insights, and smart weather recommendations.",
       features: [
         "All Standard capabilities",
-        "AI Predictions & Trend alerts",
-        "Fatigue score index logging",
-        "Atmospheric meteorological adaptation",
-        "Circadian Phase mapping",
-        "Elderly & Beginner accessibility profiles"
+        "Smart daily predictions & trend alerts",
+        "Stress & fatigue tracking",
+        "Weather-smart recommendations",
+        "Sleep schedule trends",
+        "Elderly & beginner modes"
       ],
       highlighted: true,
-      cta: "Activate Pro Engine"
+      cta: "Unlock Pro Features"
     },
     {
       name: "VitalCore Elite",
       price: "49",
-      description: "Advanced 6-month digital twin models and family accountability circles.",
+      description: "Explore your future health patterns and build healthy habits with family and friends.",
       features: [
         "All Professional capabilities",
-        "3-6 Month Digital Twin simulations",
-        "Advanced Biological Age modeling",
-        "Social Accountability circles",
-        "Admin HIPAA-inspired developers portal",
-        "Integrated custom metrics tracking"
+        "Visual 3-6 month health forecasts",
+        "Body age estimates",
+        "Family & friends tracking circles",
+        "Secure developer API tools",
+        "Custom metrics tracking"
       ],
-      cta: "Access Elite Systems"
+      cta: "Unlock Elite Features"
     }
   ];
 
@@ -58,9 +58,9 @@ export default function PricingPage() {
         
         {/* Header Title */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Transparent Biometric Plans</h1>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Simple, Friendly Pricing</h1>
           <p className="text-sm text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-            Choose the depth of preventative health simulation that matches your lifestyle complexity.
+            Choose the plan that best fits your wellness journey.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export default function PricingPage() {
             >
               {plan.highlighted && (
                 <span className="absolute -top-3 right-6 rounded-full bg-primary px-3 py-1 text-[9px] font-bold text-white">
-                  Recommended AI Mode
+                  Most Popular
                 </span>
               )}
               

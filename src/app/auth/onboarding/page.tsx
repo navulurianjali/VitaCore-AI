@@ -146,21 +146,21 @@ export default function OnboardingPage() {
         
         {/* Header Title */}
         <div className="text-center space-y-2">
-          <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white">
-            <Activity className="h-5 w-5 animate-pulse" />
+          <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white shadow-sm shadow-primary/20">
+            <Activity className="h-4.5 w-4.5 animate-pulse" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Onboarding Diagnostic Console</h2>
-          <p className="text-xs text-foreground/50 font-bold tracking-widest flex items-center gap-1 justify-center">
+          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Setting up VitalCore</h2>
+          <p className="text-xs text-[var(--muted)] font-semibold tracking-wide flex items-center gap-1 justify-center">
             <ShieldCheck className="h-3.5 w-3.5 text-secondary" />
-            Biometric Personalization Protocol (Step {step} / 6)
+            Let's customize your experience (Step {step} of 6)
           </p>
         </div>
 
-        <GlassCard glowColor="violet">
+        <GlassCard glowColor="violet" className="rounded-3xl p-6">
           
           <AnimatePresence mode="wait">
             
-            {/* STEP 1: Basic Biometrics */}
+            {/* STEP 1: Basic Details */}
             {step === 1 && (
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -168,14 +168,14 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <h3 className="text-xs font-bold text-primary flex items-center gap-1">
-                  <Sparkles className="h-4 w-4 animate-bounce" />
-                  Basic Telemetry Parameters
+                <h3 className="text-xs font-bold text-primary flex items-center gap-1.5 uppercase tracking-wider">
+                  <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                  Your basic details
                 </h3>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Chronological Age</label>
+                    <label className="text-xs font-semibold text-foreground">Your age</label>
                     <input
                       type="number"
                       value={age === 0 ? "" : age}
@@ -188,7 +188,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Biological Gender</label>
+                    <label className="text-xs font-semibold text-foreground">Gender</label>
                     <select
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
@@ -202,7 +202,7 @@ export default function OnboardingPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Chronological Weight (kg)</label>
+                    <label className="text-xs font-semibold text-foreground">Weight (kg)</label>
                     <input
                       type="number"
                       value={weight === 0 ? "" : weight}
@@ -215,7 +215,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Chronological Height (cm)</label>
+                    <label className="text-xs font-semibold text-foreground">Height (cm)</label>
                     <input
                       type="number"
                       value={height === 0 ? "" : height}
@@ -228,13 +228,13 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-foreground/5 bg-foreground/5 p-3 flex justify-between items-center text-xs font-semibold">
+                <div className="rounded-2xl border border-foreground/5 bg-foreground/5 p-4 flex justify-between items-center text-xs font-semibold">
                   <div>
-                    <span className="text-foreground/50 block text-[9px]">BMI Score</span>
+                    <span className="text-[10px] text-[var(--muted)] block uppercase tracking-wider">BMI</span>
                     <span className="text-primary font-bold text-sm">{bmi}</span>
                   </div>
                   <div>
-                    <span className="text-foreground/50 block text-[9px]">Body Fat Est.</span>
+                    <span className="text-[10px] text-[var(--muted)] block uppercase tracking-wider">Estimated Body Fat</span>
                     <span className="text-secondary font-bold text-sm">{bodyFat}%</span>
                   </div>
                 </div>
@@ -249,10 +249,10 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <h3 className="text-xs font-bold text-primary">Lifestyle Activity Telemetry</h3>
+                <h3 className="text-xs font-bold text-primary uppercase tracking-wider">Your daily routine</h3>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Main Occupation</label>
+                  <label className="text-xs font-semibold text-foreground">Main job / Occupation</label>
                   <input
                     type="text"
                     value={occupation}
@@ -263,7 +263,7 @@ export default function OnboardingPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Screen time (hours / day)</label>
+                    <label className="text-xs font-semibold text-foreground">Screen time (hours / day)</label>
                     <input
                       type="number"
                       value={screenTime === 0 ? "" : screenTime}
@@ -276,7 +276,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Sedentary sitting hours</label>
+                    <label className="text-xs font-semibold text-foreground">Sitting hours</label>
                     <input
                       type="number"
                       value={sittingHours === 0 ? "" : sittingHours}
@@ -299,29 +299,29 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <h3 className="text-xs font-bold text-primary">Fitness & Longevity Goals</h3>
+                <h3 className="text-xs font-bold text-primary uppercase tracking-wider">Your goals</h3>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Active Goal</label>
+                    <label className="text-xs font-semibold text-foreground">Active Focus Goal</label>
                     <select
                       value={goal}
                       onChange={(e) => setGoal(e.target.value)}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
                     >
-                      <option value="burnout_protection">CNS Burnout Protection</option>
-                      <option value="stamina_optimization">Cardiovascular Stamina</option>
-                      <option value="longevity_maintenance">Biological Longevity</option>
-                      <option value="weight_management">Healthy Weight Management</option>
-                      <option value="muscle_hypertrophy">Strength & Muscle Hypertrophy</option>
-                      <option value="stress_resilience">Mind-Body Stress Resilience</option>
-                      <option value="sleep_restoration">Deep Sleep & Circadian Restoration</option>
-                      <option value="posture_mobility">Posture, Flexibility & Mobility</option>
+                      <option value="burnout_protection">Avoid burnout</option>
+                      <option value="stamina_optimization">Improve stamina</option>
+                      <option value="longevity_maintenance">Long-term wellness</option>
+                      <option value="weight_management">Healthy weight management</option>
+                      <option value="muscle_hypertrophy">Strength & muscle gain</option>
+                      <option value="stress_resilience">Stress resilience</option>
+                      <option value="sleep_restoration">Better sleep quality</option>
+                      <option value="posture_mobility">Posture & mobility stretch</option>
                     </select>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Current Level</label>
+                    <label className="text-xs font-semibold text-foreground">Current Level</label>
                     <select
                       value={fitnessLevel}
                       onChange={(e) => setFitnessLevel(e.target.value)}
@@ -329,13 +329,13 @@ export default function OnboardingPage() {
                     >
                       <option value="beginner">Beginner</option>
                       <option value="intermediate">Intermediate</option>
-                      <option value="advanced">Advanced Athlete</option>
+                      <option value="advanced">Advanced</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Workout Duration Preference (minutes)</label>
+                  <label className="text-xs font-semibold text-foreground">Preferred workout length (minutes)</label>
                   <input
                     type="number"
                     value={workoutDuration === 0 ? "" : workoutDuration}
@@ -357,11 +357,11 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <h3 className="text-xs font-bold text-primary">Injuries & Health Impediments</h3>
+                <h3 className="text-xs font-bold text-primary uppercase tracking-wider">Injuries and conditions</h3>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Previous Injuries</label>
+                    <label className="text-xs font-semibold text-foreground">Previous Injuries</label>
                     <input
                       type="text"
                       value={injuries}
@@ -371,7 +371,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Surgeries History</label>
+                    <label className="text-xs font-semibold text-foreground">Surgeries History</label>
                     <input
                       type="text"
                       value={surgeries}
@@ -382,7 +382,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Chronic Conditions</label>
+                  <label className="text-xs font-semibold text-foreground">Chronic Conditions</label>
                   <input
                     type="text"
                     value={conditions}
@@ -392,7 +392,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="flex items-center justify-between p-3 bg-foreground/5 rounded-xl border border-foreground/5">
-                  <label className="text-xs font-bold text-foreground">Do you suffer from sleep problems?</label>
+                  <label className="text-xs font-semibold text-foreground">Do you have sleep issues?</label>
                   <input
                     type="checkbox"
                     checked={sleepProblems}
@@ -411,17 +411,17 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <h3 className="text-xs font-bold text-primary">Dietary Preferences & Wearable Sync</h3>
+                <h3 className="text-xs font-bold text-primary uppercase tracking-wider">Dietary Preferences & Wearable Sync</h3>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Dietary Preferences</label>
+                    <label className="text-xs font-semibold text-foreground">Dietary Focus</label>
                     <select
                       value={diet}
                       onChange={(e) => setDiet(e.target.value)}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
                     >
-                      <option value="standard">Standard Mixed</option>
+                      <option value="standard">Standard Balanced</option>
                       <option value="vegetarian">Vegetarian</option>
                       <option value="vegan">Vegan</option>
                       <option value="keto">Keto</option>
@@ -429,7 +429,7 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">Allergies / Restrictions</label>
+                    <label className="text-xs font-semibold text-foreground">Allergies / Restrictions</label>
                     <input
                       type="text"
                       value={allergies}
@@ -440,16 +440,16 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Wearable Smartwatch Sync Integration</label>
+                  <label className="text-xs font-semibold text-foreground">Smartwatch Connection</label>
                   <select
                     value={wearableType}
                     onChange={(e) => setWearableType(e.target.value)}
                     className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
                   >
-                    <option value="apple_health">Apple Health Sync</option>
-                    <option value="google_fit">Google Fit Sync</option>
-                    <option value="fitbit">Fitbit Integration</option>
-                    <option value="none">No smartwatch (Manual entries)</option>
+                    <option value="apple_health">Connect Apple Health</option>
+                    <option value="google_fit">Connect Google Fit</option>
+                    <option value="fitbit">Connect Fitbit</option>
+                    <option value="none">No smartwatch (Manual logs)</option>
                   </select>
                 </div>
               </motion.div>
@@ -463,19 +463,19 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <h3 className="text-xs font-bold text-primary flex items-center gap-1.5">
+                <h3 className="text-xs font-bold text-primary flex items-center gap-1.5 uppercase tracking-wider">
                   <LayoutGrid className="h-4 w-4 text-primary" />
-                  Select Active Optimization Path
+                  Choose your focus mode
                 </h3>
-                <p className="text-xs text-foreground/70 leading-relaxed font-medium">
-                  VitalCore scales its visuals, features, and accessibility layout to align with your health focus. Select the mode that governs your telemetry terminal.
+                <p className="text-xs text-[var(--muted)] leading-relaxed font-normal">
+                  VitalCore scales its visuals, features, and accessibility layout to align with your health focus. Choose the mode that governs your experience.
                 </p>
 
                 <div className="space-y-3 pt-1">
                   {/* Everyday Wellness Card */}
                   <div
                     onClick={() => setChosenMode("wellness")}
-                    className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
+                    className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                       chosenMode === "wellness"
                         ? "bg-emerald-500/10 border-emerald-500 shadow-md shadow-emerald-500/10 scale-[1.01]"
                         : "bg-foreground/5 border-foreground/10 hover:bg-foreground/10"
@@ -489,13 +489,13 @@ export default function OnboardingPage() {
                         <div className="flex justify-between items-center">
                           <h4 className="text-xs font-bold text-foreground">Everyday Wellness</h4>
                           {chosenMode === "wellness" && (
-                            <span className="text-[9px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[9px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                               Active Mode
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-foreground/60 mt-0.5 leading-relaxed font-medium">
-                          Stress resilience, pranayama box breathing cycles, sleep tracking, and steady recovery balance.
+                        <p className="text-xs text-[var(--muted)] mt-0.5 leading-relaxed font-normal">
+                          Calming breath exercises, easy sleep tracking, and daily recovery balance.
                         </p>
                       </div>
                     </div>
@@ -504,7 +504,7 @@ export default function OnboardingPage() {
                   {/* Athletic Performance Card */}
                   <div
                     onClick={() => setChosenMode("performance")}
-                    className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
+                    className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                       chosenMode === "performance"
                         ? "bg-violet-500/10 border-violet-500 shadow-md shadow-violet-500/10 scale-[1.01]"
                         : "bg-foreground/5 border-foreground/10 hover:bg-foreground/10"
@@ -518,13 +518,13 @@ export default function OnboardingPage() {
                         <div className="flex justify-between items-center">
                           <h4 className="text-xs font-bold text-foreground">Athletic Performance</h4>
                           {chosenMode === "performance" && (
-                            <span className="text-[9px] font-bold text-violet-400 bg-violet-400/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[9px] font-bold text-violet-500 bg-violet-500/10 px-2 py-0.5 rounded-full">
                               Active Mode
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-foreground/60 mt-0.5 leading-relaxed font-medium">
-                          CNS fatigue thresholds, precise macro indicators, metabolic efficiency, and strength indexing.
+                        <p className="text-xs text-[var(--muted)] mt-0.5 leading-relaxed font-normal">
+                          Track muscle tiredness, protein targets, and metabolic strength.
                         </p>
                       </div>
                     </div>
@@ -533,7 +533,7 @@ export default function OnboardingPage() {
                   {/* Elderly Care & Longevity Card */}
                   <div
                     onClick={() => setChosenMode("elderly")}
-                    className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
+                    className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                       chosenMode === "elderly"
                         ? "bg-amber-500/10 border-amber-500 shadow-md shadow-amber-500/10 scale-[1.01]"
                         : "bg-foreground/5 border-foreground/10 hover:bg-foreground/10"
@@ -545,15 +545,15 @@ export default function OnboardingPage() {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center">
-                          <h4 className="text-xs font-bold text-foreground">Elderly Care & Longevity</h4>
+                          <h4 className="text-xs font-bold text-foreground">Elderly Mode</h4>
                           {chosenMode === "elderly" && (
-                            <span className="text-[9px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">
                               Active Mode
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-foreground/60 mt-0.5 leading-relaxed font-medium">
-                          AAA high-contrast readability, safety medical widgets, medication alerts, and low-impact posture.
+                        <p className="text-xs text-[var(--muted)] mt-0.5 leading-relaxed font-normal">
+                          Easy-to-read layout, helpful medication reminders, and light flexibility stretch tips.
                         </p>
                       </div>
                     </div>
@@ -582,7 +582,7 @@ export default function OnboardingPage() {
               </Button>
             ) : (
               <Button variant="primary" onClick={handleCompleteOnboarding} isLoading={loading} className="flex items-center gap-1.5 ml-auto">
-                <span>Complete Protocol</span>
+                <span>Finish setup</span>
                 <ShieldCheck className="h-4 w-4" />
               </Button>
             )}

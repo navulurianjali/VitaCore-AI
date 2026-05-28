@@ -31,7 +31,7 @@ export default function CommunityPage() {
         streak: 14,
         stabilityScore: 92,
         lastActive: "4 mins ago",
-        status: "Active stretching completed. Hydration logs synced!"
+        status: "Completed stretching routine. Stayed hydrated today!"
       },
       {
         id: "member-2",
@@ -40,7 +40,7 @@ export default function CommunityPage() {
         streak: 8,
         stabilityScore: 84,
         lastActive: "1 hr ago",
-        status: "Throttling active under heatwave overrides (35°C)."
+        status: "Taking it easy today because of the summer heatwave (35°C)."
       },
       {
         id: "member-3",
@@ -49,7 +49,7 @@ export default function CommunityPage() {
         streak: 2,
         stabilityScore: 58,
         lastActive: "Just now",
-        status: "Late coding hyperfocus logged. Sleep debt accumulated."
+        status: "Worked late on programming projects tonight. Got a bit less sleep."
       }
     ]);
   }, []);
@@ -75,10 +75,10 @@ export default function CommunityPage() {
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Users className="h-6 w-6 text-primary animate-pulse" />
-              Social Accountability Circles
+              Family & Friends Circles
             </h1>
             <p className="text-xs text-foreground/70 font-semibold">
-              Motivate family, track elderly routines & secure community sharing
+              Motivate each other, stay connected, and build healthy habits together.
             </p>
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function CommunityPage() {
           <div className="lg:col-span-8 space-y-4">
             <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
               <HeartPulse className="h-4.5 w-4.5 text-primary" />
-              Circle Activity Telemetry Feeds
+              Circle Activity Feed
             </h3>
 
             <div className="space-y-4">
@@ -117,7 +117,7 @@ export default function CommunityPage() {
                       <span className="text-secondary font-bold">{m.streak} days</span>
                     </div>
                     <div>
-                      <span className="text-[9px] text-foreground/50 block font-semibold">Stability</span>
+                      <span className="text-[9px] text-foreground/50 block font-semibold">Habit Score</span>
                       <span className={`font-bold ${m.stabilityScore < 60 ? "text-red-500" : "text-secondary"}`}>
                         {m.stabilityScore}%
                       </span>
@@ -133,12 +133,12 @@ export default function CommunityPage() {
             <div className="space-y-4">
               <h3 className="text-xs font-bold text-foreground">Invite to Circle</h3>
               <p className="text-xs text-foreground/60 leading-normal font-semibold">
-                Transmit encrypted accountability circle invites to family or coaches:
+                Invite family or friends to join your wellness circle:
               </p>
 
               {inviteSent ? (
                 <div className="rounded-xl border border-secondary/15 bg-secondary/5 px-3 py-2.5 text-xs text-secondary font-semibold">
-                  ✓ Encryption parameters generated! Invitation link sent successfully.
+                  ✓ Invitation sent successfully! They'll receive an email shortly.
                 </div>
               ) : (
                 <form onSubmit={handleSendInvite} className="space-y-3">
@@ -161,10 +161,10 @@ export default function CommunityPage() {
             <GlassCard glowColor="violet" className="p-4 space-y-2">
               <h4 className="text-xs font-bold text-primary flex items-center gap-1">
                 <Award className="h-3.5 w-3.5" />
-                Longevity Leadership
+                Circle Progress
               </h4>
               <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
-                Your circle holds an average Wellness Stability Score of <span className="text-secondary font-bold">78%</span>. Keep sharing hydration consistency milestones!
+                Your circle has an average Habit Score of <span className="text-secondary font-bold">78%</span>. Great job keeping each other motivated!
               </p>
             </GlassCard>
           </div>
