@@ -90,31 +90,31 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
   const SidebarContent = () => (
     <>
       {/* Logo / Brand */}
-      <div className="flex items-center gap-2 px-5 py-4 shrink-0">
-        <div className="h-5.5 w-5.5 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm shadow-primary/10">
+      <div className="flex items-center gap-2.5 px-6 py-5 shrink-0">
+        <div className="h-6 w-6 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm shadow-primary/10">
           <Activity className="h-3.5 w-3.5 text-white" />
         </div>
-        <span className="font-semibold text-xs tracking-tight text-[var(--foreground)]">VitalCore</span>
+        <span className="font-semibold text-[13.5px] tracking-tight text-[var(--foreground)]">VitalCore</span>
       </div>
 
-      {/* Minimal Profile Tag */}
-      <div className="px-4 pb-3">
-        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-[var(--muted-bg)]/35 transition-colors duration-200">
-          <div className="h-5.5 w-5.5 rounded-md bg-primary/8 text-primary flex items-center justify-center font-semibold text-[9px] shrink-0">
+      {/* Premium Profile Section */}
+      <div className="px-4 pb-4 shrink-0">
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-[var(--muted-bg)]/45 border border-[var(--border)] transition-all duration-300">
+          <div className="h-7 w-7 rounded-xl bg-primary/8 text-primary flex items-center justify-center font-bold text-xs shrink-0">
             {profile?.full_name?.charAt(0)?.toUpperCase() || "U"}
           </div>
-          <div className="overflow-hidden min-w-0">
-            <p className="text-xs font-semibold text-[var(--foreground)] truncate leading-tight">{profile?.full_name?.split(" ")[0] || "User"}</p>
-            <p className="text-[9px] text-[var(--muted)] capitalize leading-none mt-1">{activeMode} mode</p>
+          <div className="overflow-hidden min-w-0 flex-1">
+            <p className="text-xs font-bold text-[var(--foreground)] truncate leading-tight">{profile?.full_name || "User"}</p>
+            <p className="text-[9.5px] text-[var(--muted)] capitalize leading-none mt-1.5 font-semibold">{activeMode} Mode</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3.5 py-2 space-y-4 scrollbar-none">
+      <nav className="flex-1 overflow-y-auto px-4 py-2 space-y-4 scrollbar-none">
         {navGroups.map((group) => (
           <div key={group.label} className="space-y-0.5">
-            <p className="px-3 text-[10.5px] font-bold text-[var(--muted)] uppercase tracking-wider opacity-60">
+            <p className="px-3 text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider opacity-60">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -126,14 +126,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileSidebarOpen(false)}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all duration-200 ${
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 ${
                       isActive
                         ? "bg-primary/5 text-primary font-semibold"
                         : "text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted-bg)]/25"
                     }`}
                   >
-                    <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-primary" : "opacity-75"}`} />
-                    <span>{link.name}</span>
+                    <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-primary" : "opacity-75"}`} />
+                    <span className="truncate">{link.name}</span>
                   </Link>
                 );
               })}
@@ -143,7 +143,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       </nav>
 
       {/* Footer links */}
-      <div className="px-3.5 py-3 space-y-0.5 border-t border-[var(--border)]/50 shrink-0">
+      <div className="px-4 py-3 space-y-0.5 border-t border-[var(--border)]/50 shrink-0">
         {footerLinks.map((link) => {
           const Icon = link.icon;
           const isActive = pathname === link.href;
@@ -152,13 +152,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
               key={link.href}
               href={link.href}
               onClick={() => setMobileSidebarOpen(false)}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all duration-200 ${
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 ${
                 isActive
                   ? "bg-primary/5 text-primary font-semibold"
                   : "text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted-bg)]/25"
               }`}
             >
-              <Icon className="h-3.5 w-3.5 shrink-0" />
+              <Icon className="h-4 w-4 shrink-0" />
               <span>{link.name}</span>
             </Link>
           );
@@ -171,7 +171,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
     <div className="flex h-screen w-screen overflow-hidden bg-[var(--background)]">
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-48 border-r border-[var(--border)] bg-[var(--card-bg)] shrink-0 select-none">
+      <aside className="hidden lg:flex flex-col w-64 border-r border-[var(--border)] bg-[var(--card-bg)] shrink-0 select-none">
         <SidebarContent />
       </aside>
 
