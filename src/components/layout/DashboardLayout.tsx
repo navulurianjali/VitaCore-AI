@@ -20,7 +20,8 @@ import {
   Activity,
   Menu,
   X,
-  Scan
+  Scan,
+  Dumbbell
 } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -64,6 +65,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       links: [
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
         { name: "AI Coach", href: "/ai-coach", icon: Brain, highlight: true },
+        { name: "Fitness", href: "/fitness", icon: Dumbbell, highlight: true },
         { name: "Food Scanner", href: "/scanner", icon: Scan, highlight: true },
       ]
     },
