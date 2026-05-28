@@ -1070,10 +1070,10 @@ export default function FitnessPage() {
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Dumbbell className="h-6 w-6 text-primary animate-pulse" />
-              AI Adaptive Fitness Coach
+              My Workout Companion
             </h1>
             <p className="text-xs text-foreground/70 font-semibold">
-              Recovery-aware personalized daily routines, live guided training, and visual strength progress
+              Your guided workout sessions and companion tools designed for your daily rhythm.
             </p>
           </div>
         </div>
@@ -1081,12 +1081,12 @@ export default function FitnessPage() {
         {/* Tab navigation */}
         <div className="flex border-b border-foreground/5 pb-1 gap-2 overflow-x-auto scrollbar-none">
           {[
-            { id: "coach", label: "AI Workout Coach", icon: Dumbbell },
-            { id: "posture_check", label: "Daily Posture Check", icon: Activity },
-            { id: "history", label: "Workout History", icon: Calendar },
-            { id: "progress", label: "Progress Tracking", icon: TrendingUp },
-            { id: "routines", label: "Saved Routines", icon: BookOpen },
-            { id: "recovery", label: "Recovery Guidance", icon: Heart }
+            { id: "coach", label: "Guided Workouts", icon: Dumbbell },
+            { id: "posture_check", label: "Posture & Stretch", icon: Activity },
+            { id: "history", label: "My History", icon: Calendar },
+            { id: "progress", label: "My Progress", icon: TrendingUp },
+            { id: "routines", label: "My Routines", icon: BookOpen },
+            { id: "recovery", label: "Rest & Recharge", icon: Heart }
           ].map((tab) => {
             const TabIcon = tab.icon;
             return (

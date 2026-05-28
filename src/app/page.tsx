@@ -146,107 +146,117 @@ export default function LandingPage() {
       </div>
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden z-10">
-        
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/15 px-3.5 py-1 text-xs font-bold text-primary"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-secondary animate-pulse" />
-            <span>Your Friendly Personal Wellness Companion</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.15] text-[var(--foreground)]"
-          >
-            Live Healthier. Feel Better.{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[var(--color-primary-light)] via-[var(--color-accent)] to-[var(--color-secondary-light)]">
-              Sleep Deeper.
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm sm:text-base text-foreground/80 max-w-2xl mx-auto leading-relaxed font-semibold"
-          >
-            Get warm, personalized wellness coaching and simple insights to help you build healthy habits, stay hydrated, and feel energized every single day.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-4 pt-4"
-          >
-            <Link href="/auth/signup">
-              <Button variant="primary" size="lg" className="flex items-center gap-2 px-6 py-3 font-semibold shadow-md shadow-primary/20 hover:scale-[1.02] transition-transform">
-                <span>Get Started</span>
-                <ArrowRight className="h-4.5 w-4.5" />
-              </Button>
-            </Link>
-            <Link href="/features">
-              <Button variant="glass" size="lg" className="px-6 py-3 font-semibold hover:bg-foreground/5 hover:scale-[1.02] transition-transform">See How It Works</Button>
-            </Link>
-          </motion.div>
-
-          {/* Quick Hero metrics review */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="pt-10 flex flex-wrap justify-center gap-4 text-xs font-bold text-foreground/80 max-w-3xl mx-auto"
-          >
-            <div className="px-4 py-2.5 rounded-2xl glass-panel border-foreground/5 flex items-center gap-2 hover:border-primary/20 transition-all">
-              <Activity className="h-4 w-4 text-primary animate-pulse" />
-              <span>Wellness Assistant Connected</span>
-            </div>
-            <div className="px-4 py-2.5 rounded-2xl glass-panel border-foreground/5 flex items-center gap-2 hover:border-secondary/20 transition-all">
-              <HeartPulse className="h-4 w-4 text-secondary" />
-              <span>Heart Rate & Rest Insights</span>
-            </div>
-            <div className="px-4 py-2.5 rounded-2xl glass-panel border-foreground/5 flex items-center gap-2 hover:border-accent/20 transition-all">
-              <Brain className="h-4 w-4 text-accent" />
-              <span>Burnout Prevention Alerts</span>
-            </div>
-          </motion.div>
-
-          {/* Centered Premium App Mockup illustration */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
-            className="pt-12 max-w-4xl mx-auto"
-          >
-            <div className="rounded-[32px] overflow-hidden border border-foreground/5 bg-[var(--card-bg)] shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-2.5 relative group">
-              {/* Decorative premium gradients */}
-              <div className="absolute -inset-1 bg-gradient-to-tr from-primary/15 via-secondary/15 to-accent/10 rounded-[34px] blur-xl opacity-45 group-hover:opacity-75 transition-opacity duration-500" />
-              
-              <div 
-                className="relative rounded-[24px] overflow-hidden border border-foreground/5 aspect-[16/10] sm:aspect-[16/9] flex items-center justify-center bg-cover bg-center shadow-inner"
-                style={{ backgroundImage: "url('/images/saas_background.png')" }}
+      <section className="relative pt-20 pb-20 md:pt-28 md:pb-24 overflow-hidden z-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* LEFT SIDE: Hero text copy */}
+            <div className="lg:col-span-6 text-left space-y-6">
+              <motion.div
+                initial={{ opacity: 0, y: -15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary/8 border border-primary/12 px-3 py-1 text-xs font-semibold text-primary"
               >
-                {/* Visual Glassmorphic Accent overlay for dramatic depth and organic feeling */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none z-1" />
-                <div className="absolute bottom-6 left-6 right-6 p-4 sm:p-5 rounded-[20px] bg-background/60 backdrop-blur-xl border border-white/10 text-left space-y-1.5 shadow-2xl max-w-sm select-none z-2 hover:scale-[1.01] transition-transform duration-300">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-[9px] font-bold text-foreground/80 uppercase tracking-widest">Active Companion Twin</span>
-                  </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-foreground tracking-tight">Today is optimized for rest and recovery</h3>
-                  <p className="text-[10px] sm:text-xs text-foreground/70 leading-normal font-semibold">
-                    Gentle movement recommended. Your companion has loaded joint stretches and increased hydration targets.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+                <Sparkles className="h-3.5 w-3.5 text-secondary animate-pulse" />
+                <span>Your Friendly Personal Wellness Companion</span>
+              </motion.div>
 
+              <motion.h1
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[var(--foreground)] leading-[1.1]"
+              >
+                Understand your health before{" "}
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary">
+                  problems begin.
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-sm sm:text-base text-foreground/75 leading-relaxed font-semibold max-w-xl"
+              >
+                Track fitness, sleep, nutrition, stress, and recovery in one simple, beautiful wellness platform designed for real people.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-wrap gap-4 pt-2"
+              >
+                <Link href="/auth/signup">
+                  <Button variant="primary" size="lg" className="flex items-center gap-2 px-6 py-3 font-semibold shadow-sm hover:scale-[1.01] transition-transform">
+                    <span>Start Free</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/features">
+                  <Button variant="glass" size="lg" className="px-6 py-3 font-semibold hover:bg-foreground/5 hover:scale-[1.01] transition-transform">
+                    See How It Works
+                  </Button>
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* RIGHT SIDE: Visual representation */}
+            <div className="lg:col-span-6">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 80 }}
+                className="relative mx-auto max-w-xl lg:max-w-none"
+              >
+                <div className="rounded-[28px] overflow-hidden border border-foreground/5 bg-[var(--card-bg)] shadow-[0_12px_40px_rgba(0,0,0,0.03)] p-2 relative group">
+                  {/* Subtle soft gradient */}
+                  <div className="absolute -inset-1 bg-gradient-to-tr from-primary/8 via-secondary/8 to-accent/5 rounded-[30px] blur-lg opacity-40" />
+                  
+                  <div 
+                    className="relative rounded-[22px] overflow-hidden border border-foreground/5 aspect-[16/10] bg-cover bg-center"
+                    style={{ backgroundImage: "url('/images/saas_background.png')" }}
+                  >
+                    {/* Dark gradient visual layer for professional depth */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+                    
+                    {/* Floating elegant glass panel */}
+                    <div className="absolute bottom-4 left-4 right-4 p-4 rounded-[16px] bg-background/70 backdrop-blur-xl border border-white/5 text-left space-y-1 shadow-xl max-w-xs">
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                        <span className="text-[8px] font-bold text-foreground/75 uppercase tracking-widest">Wellness Twin</span>
+                      </div>
+                      <h3 className="text-xs font-bold text-foreground">Today's Energy Balance</h3>
+                      <p className="text-[10px] text-foreground/60 leading-normal font-semibold">
+                        Rest routine successfully applied. Your body is recharging beautifully today.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Thin horizontal minimal feature bar for breathing room and startup-like trust */}
+      <section className="border-y border-foreground/5 py-8 bg-background/25">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap justify-between items-center gap-6 text-xs font-bold text-foreground/60">
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4 text-primary" />
+              <span>Smart Wellness Companion</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <HeartPulse className="h-4 w-4 text-secondary" />
+              <span>Adaptive Rest & Recovery Guidance</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Brain className="h-4 w-4 text-accent" />
+              <span>Burnout Warning Radar</span>
+            </div>
+          </div>
         </div>
       </section>
 

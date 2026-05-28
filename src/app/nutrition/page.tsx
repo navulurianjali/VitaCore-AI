@@ -549,10 +549,10 @@ export default function SmartAINutritionPlansPage() {
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Utensils className="h-6 w-6 text-primary animate-pulse" />
-              Smart Nutrition Plans
+              My Nutrition Companion
             </h1>
             <p className="text-xs text-foreground/70 font-semibold">
-              An intelligent, responsive AI dietitian that pairs meal recipes, checkable grocery checklists, and future fatigue warnings.
+              Plan your meals, compile grocery lists, and get simple recipes tailored for your body.
             </p>
           </div>
           {plannerStep === "ready" && (
