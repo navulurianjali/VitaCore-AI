@@ -664,7 +664,25 @@ export default function SmartAINutritionPlansPage() {
 
         {/* ACTIVE NUTRITION PLATFORM */}
         {plannerStep === "ready" && activePlan && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+
+            {/* Premium Illustration Header Card */}
+            <div className="rounded-[28px] overflow-hidden relative min-h-[160px] bg-[var(--muted-bg)]/45 border border-[var(--border)] flex items-center shadow-sm p-6 sm:p-8">
+              <img 
+                src="/images/meal_illustration.png" 
+                alt="Meal illustration" 
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-44 sm:w-52 object-contain pointer-events-none opacity-95 hidden sm:block"
+              />
+              <div className="space-y-2 relative z-10 max-w-full sm:max-w-[65%]">
+                <span className="text-[9px] font-bold text-primary uppercase tracking-widest block">Daily Nutrition Plan</span>
+                <h2 className="text-lg font-semibold text-[var(--foreground)] tracking-tight leading-tight">
+                  Meals Personalized for Your Goals
+                </h2>
+                <p className="text-xs text-[var(--muted)] leading-relaxed font-normal">
+                  Your meals are synchronized with your target recovery goals. Click any card below to view custom recipes and checkable ingredients lists.
+                </p>
+              </div>
+            </div>
 
             {/* QUICK FILTER CONTROL BAR */}
             <div className="flex items-center gap-3 p-3 bg-foreground/5 rounded-2xl border border-foreground/5">
@@ -815,10 +833,10 @@ export default function SmartAINutritionPlansPage() {
                   </div>
                 </div>
 
-                {/* AI HABITS OBSERVED ENGINE */}
-                <div className="rounded-2xl glass-panel p-5 border-foreground/5 space-y-4">
+                {/* SUPPORTIVE HABITS */}
+                <div className="rounded-3xl glass-panel p-5 border-foreground/5 space-y-4">
                   <span className="text-[10px] font-bold text-primary uppercase tracking-widest block">
-                    Observed AI Habit Recommendation
+                    Supportive wellness habits
                   </span>
                   <div className="space-y-2.5">
                     {activePlan.habits.map((h, idx) => (
@@ -834,21 +852,21 @@ export default function SmartAINutritionPlansPage() {
 
             </div>
 
-            {/* FUTURE HEALTH CONNECTION SIMULATOR */}
-            <div className="rounded-2xl glass-panel p-6 border-foreground/5 space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-foreground/5">
-                <div className="space-y-1">
+            {/* DAILY ENERGY DYNAMICS */}
+            <div className="rounded-3xl glass-panel p-6 border-foreground/5 space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-foreground/5">
+                <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <ShieldAlert className="h-4.5 w-4.5 text-primary animate-pulse" />
-                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Future Health Forecast Simulator</span>
+                    <ShieldAlert className="h-4 w-4 text-primary animate-pulse" />
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Daily energy dynamics</span>
                   </div>
-                  <h3 className="text-base font-extrabold text-[var(--foreground)] tracking-tight">AI 72-Hour Circadian Fatigue Forecast</h3>
+                  <h3 className="text-base font-semibold text-[var(--foreground)] tracking-tight">How your routine may affect tomorrow's energy</h3>
                   <p className="text-xs text-[var(--muted)]">
                     “Your current routine is improving recovery consistency. Continue prioritizing hydration and sleep.”
                   </p>
                 </div>
-                <span className="text-[8px] bg-primary/10 text-primary border border-primary/20 font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 animate-pulse">
-                  Twin Connected
+                <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 animate-pulse">
+                  Active
                 </span>
               </div>
 

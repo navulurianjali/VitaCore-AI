@@ -18,25 +18,25 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const base =
-    "relative inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer select-none";
+    "relative inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer select-none active:scale-[0.98]";
 
   const variants = {
     primary:
-      "bg-primary hover:bg-primary-hover text-white shadow-sm border border-primary/20",
+      "bg-primary hover:bg-primary-hover text-white shadow-md shadow-primary/10 border border-primary/10",
     secondary:
-      "bg-secondary hover:bg-secondary-hover text-white shadow-sm border border-secondary/20",
+      "bg-secondary hover:bg-secondary-hover text-white shadow-md shadow-secondary/10 border border-secondary/10",
     glass:
-      "bg-[var(--muted-bg)] text-[var(--foreground)] hover:bg-[var(--border)] border border-[var(--border)]",
+      "bg-[var(--muted-bg)] text-[var(--foreground)] hover:bg-[var(--border)] border border-[var(--border)] hover:shadow-sm",
     accent:
-      "bg-accent hover:bg-accent/90 text-white shadow-sm border border-accent/20",
+      "bg-accent hover:bg-accent/95 text-white shadow-md shadow-accent/10 border border-accent/10",
     danger:
-      "bg-red-500 hover:bg-red-600 text-white shadow-sm border border-red-500/20",
+      "bg-red-500 hover:bg-red-600 text-white shadow-md shadow-red-500/10 border border-red-500/10",
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-xs h-8",
-    md: "px-4 py-2 text-sm h-9",
-    lg: "px-5 py-2.5 text-sm h-10",
+    sm: "px-3 py-1.5 text-xs h-8 rounded-lg",
+    md: "px-4 py-2 text-sm h-9.5",
+    lg: "px-5 py-2.5 text-sm h-11",
   };
 
   return (

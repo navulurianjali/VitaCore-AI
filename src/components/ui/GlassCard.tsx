@@ -22,10 +22,10 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   // Subtle, professional accent borders — no neon glows
   const accents = {
     none: "",
-    violet: "hover:border-violet-500/20",
-    emerald: "hover:border-emerald-500/20",
-    rose: "hover:border-rose-500/20",
-    amber: "hover:border-amber-500/20",
+    violet: "hover:border-secondary/30",
+    emerald: "hover:border-primary/30",
+    rose: "hover:border-accent/30",
+    amber: "hover:border-warning/30",
   };
 
   return (
