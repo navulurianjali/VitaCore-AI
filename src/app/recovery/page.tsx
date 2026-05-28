@@ -84,10 +84,10 @@ export default function RecoveryPage() {
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <HeartPulse className="h-6 w-6 text-primary animate-pulse" />
-              Your Body's Recovery & Energy
+              Energy & Rest Insights
             </h1>
             <p className="text-xs text-foreground/70 font-semibold">
-              See how well your body is recovering and get simple tips for your day.
+              See how well your body is resting and get simple, friendly tips for your day.
             </p>
           </div>
         </div>
@@ -117,9 +117,9 @@ export default function RecoveryPage() {
             <div className="space-y-1">
               <div className="flex items-center gap-1.5">
                 <Footprints className="h-4 w-4 text-rose-400" />
-                <span className="text-xs font-bold text-foreground/60">Physical Recovery</span>
+                <span className="text-xs font-bold text-foreground/60">Physical Rest & Energy</span>
               </div>
-              <div className="text-2xl font-bold mt-1.5">{bodyRecoveryPercentage}% Recovered</div>
+              <div className="text-2xl font-bold mt-1.5">{bodyRecoveryPercentage}% Charged</div>
             </div>
             <div className="w-full bg-foreground/10 h-2 rounded-full overflow-hidden my-3">
               <div className="bg-rose-500 h-full rounded-full" style={{ width: `${bodyRecoveryPercentage}%` }} />
@@ -134,7 +134,7 @@ export default function RecoveryPage() {
             <div className="space-y-1">
               <div className="flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4 text-secondary" />
-                <span className="text-xs font-bold text-foreground/60">Daily Stress</span>
+                <span className="text-xs font-bold text-foreground/60">Stress Level</span>
               </div>
               <div className="text-2xl font-bold mt-1.5">Low (28%)</div>
             </div>
@@ -156,24 +156,24 @@ export default function RecoveryPage() {
             <div className="space-y-5">
               <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <CloudSun className="h-4.5 w-4.5 text-primary" />
-                Your Daily Tips
+                Today's Suggestions
               </h3>
               
               <div className="space-y-3 pt-1">
                 <div className="p-3.5 bg-foreground/5 rounded-xl border border-foreground/5 text-xs font-semibold flex justify-between items-center">
-                  <span className="text-foreground/65">Recommended Activity Level</span>
+                  <span className="text-foreground/65">Suggested Effort</span>
                   <span className="text-rose-500 font-bold bg-rose-500/10 px-2.5 py-1 rounded-lg">
                     {adjustedRoutine.workoutIntensity}
                   </span>
                 </div>
 
                 <div className="p-3.5 bg-foreground/5 rounded-xl border border-foreground/5 text-xs font-semibold flex flex-col gap-1.5">
-                  <span className="text-foreground/65">Suggested Exercise</span>
+                  <span className="text-foreground/65">Suggested Movement / Exercise</span>
                   <span className="text-primary font-bold">{adjustedRoutine.workoutRecommendation}</span>
                 </div>
 
                 <div className="p-3.5 bg-foreground/5 rounded-xl border border-foreground/5 text-xs font-semibold flex justify-between items-center">
-                  <span className="text-foreground/65">Water Goal</span>
+                  <span className="text-foreground/65">Water Target</span>
                   <span className="text-secondary font-bold bg-secondary/10 px-2.5 py-1 rounded-lg">
                     {adjustedRoutine.hydrationTarget} ml
                   </span>
@@ -185,7 +185,7 @@ export default function RecoveryPage() {
             <div className="pt-4 border-t border-foreground/5 space-y-3">
               <h4 className="text-xs font-bold text-primary flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4 text-primary animate-spin" />
-                Coach Observations
+                Coach's Observations & Advice
               </h4>
               <div className="p-4 rounded-xl border border-primary/10 bg-primary/5 text-xs font-semibold text-foreground/85 leading-relaxed">
                 {getAICoachInsight()}
@@ -197,7 +197,7 @@ export default function RecoveryPage() {
               <div className="space-y-2.5 pt-4 border-t border-foreground/5">
                 <h4 className="text-xs font-bold text-red-500 flex items-center gap-1">
                   <ShieldAlert className="h-4 w-4" />
-                  Daily Reminders
+                  Things to Keep in Mind
                 </h4>
                 {adjustedRoutine.alerts.map((al, idx) => (
                   <p key={idx} className="text-xs text-foreground/75 leading-relaxed font-semibold pl-1.5 border-l-2 border-red-500">

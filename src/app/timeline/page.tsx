@@ -141,14 +141,14 @@ export default function TimelinePage() {
               <div className="flex justify-between items-center">
                 <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-widest">
                   <Layers className="h-4.5 w-4.5 text-primary animate-pulse" />
-                  7-Day Energy Forecast
+                  Your 7-Day Energy Forecast
                 </h3>
                 <span className="bg-secondary/15 text-secondary text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">
-                  Energy Forecast Active
+                  Active
                 </span>
               </div>
               <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
-                Our simple daily forecast showing your expected energy and peak focus times over the next week:
+                A simple weekly outlook to help you see when you'll have the most energy and focus:
               </p>
 
               {/* Chart container */}
@@ -159,9 +159,9 @@ export default function TimelinePage() {
                     <XAxis dataKey="name" stroke="#666" fontSize={9} tickLine={false} />
                     <YAxis stroke="#666" fontSize={9} domain={[0, 100]} tickLine={false} />
                     <Tooltip contentStyle={{ background: "#111", border: "1px solid #333", fontSize: "10px", borderRadius: "8px" }} />
-                    <Line type="monotone" dataKey="Energy" stroke="#8b5cf6" strokeWidth={2.5} activeDot={{ r: 5 }} name="Expected Energy" />
-                    <Line type="monotone" dataKey="CircadianPeak" stroke="#10b981" strokeWidth={1.5} strokeDasharray="3 3" name="Peak Focus" />
-                    <Line type="monotone" dataKey="CircadianTrough" stroke="#f43f5e" strokeWidth={1.5} strokeDasharray="3 3" name="Rest Time" />
+                    <Line type="monotone" dataKey="Energy" stroke="#8b5cf6" strokeWidth={2.5} activeDot={{ r: 5 }} name="My Energy" />
+                    <Line type="monotone" dataKey="CircadianPeak" stroke="#10b981" strokeWidth={1.5} strokeDasharray="3 3" name="Best Focus" />
+                    <Line type="monotone" dataKey="CircadianTrough" stroke="#f43f5e" strokeWidth={1.5} strokeDasharray="3 3" name="Wind Down" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -169,13 +169,13 @@ export default function TimelinePage() {
               {/* Predictive Risk Gauges */}
               <div className="grid grid-cols-3 gap-3 border-t border-foreground/5 pt-4 text-center">
                 <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 block">TIREDNESS RISK</span>
+                  <span className="text-[9px] font-bold text-foreground/50 block">TIREDNESS LEVEL</span>
                   <span className={`text-sm font-black block ${predictions.burnoutRisk > 60 ? "text-rose-400" : "text-emerald-400"}`}>
                     {predictions.burnoutRisk}%
                   </span>
                 </div>
                 <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 block">FATIGUE RISK</span>
+                  <span className="text-[9px] font-bold text-foreground/50 block">BURNOUT RISK</span>
                   <span className={`text-sm font-black block ${predictions.fatigueBuildup > 65 ? "text-rose-400" : "text-emerald-400"}`}>
                     {predictions.fatigueBuildup}%
                   </span>
@@ -193,7 +193,7 @@ export default function TimelinePage() {
                 <GlassCard glowColor="violet" className="p-4 border border-primary/10 bg-primary/5">
                   <h4 className="text-xs font-bold text-primary flex items-center gap-1.5 mb-2 uppercase tracking-widest">
                     <TrendingUp className="h-4 w-4" />
-                    AI Future Habit Insights
+                    Friendly Wellness Tips
                   </h4>
                   <ul className="space-y-2 text-xs text-foreground/75 leading-relaxed font-semibold">
                     {predictions.aiInsights.map((insight, idx) => (
@@ -239,14 +239,14 @@ export default function TimelinePage() {
           <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 space-y-6 flex flex-col justify-between">
             <div className="space-y-6">
               <h3 className="text-xs font-bold text-foreground uppercase tracking-widest">
-                Healthy Reminders & Achievements
+                Reminders & Achievements
               </h3>
 
               {/* Warnings panel */}
               <div className="space-y-2.5">
                 <span className="text-[10px] font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
                   <ShieldAlert className="h-3.5 w-3.5" />
-                  Daily Observations
+                  Today's Notes
                 </span>
                 <div className="space-y-2 text-xs font-semibold text-[var(--foreground)]">
                   {predictions.preventiveReminders.map((reminder, idx) => (
