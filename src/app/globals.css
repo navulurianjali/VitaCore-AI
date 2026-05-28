@@ -1,61 +1,62 @@
+@import "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap";
 @import "tailwindcss";
 
 @theme {
-  --color-primary: hsl(142, 28%, 36%); /* Calming organic Forest Sage */
-  --color-primary-hover: hsl(142, 28%, 42%);
-  --color-secondary: hsl(262, 35%, 62%); /* Muted luxury lavender/lilac */
-  --color-secondary-hover: hsl(262, 35%, 68%);
-  --color-warning: hsl(32, 60%, 50%); /* warm apricot */
-  --color-accent: hsl(18, 55%, 52%); /* warm clay terracotta */
+  --color-primary: hsl(168, 80%, 36%); /* Calming organic MediBudget Teal */
+  --color-primary-hover: hsl(168, 80%, 42%);
+  --color-secondary: hsl(168, 30%, 95%);
+  --color-secondary-hover: hsl(168, 30%, 90%);
+  --color-warning: hsl(32, 60%, 50%);
+  --color-accent: hsl(210, 90%, 55%); /* Accent electric blue */
 
-  --color-primary-light: hsl(142, 28%, 56%);
-  --color-secondary-light: hsl(262, 35%, 75%);
+  --color-primary-light: hsl(168, 80%, 56%);
+  --color-secondary-light: hsl(168, 30%, 97%);
 }
 
 :root {
-  --background: #fdfdfb; /* Warm lifestyle cream */
-  --foreground: #262923; /* soft dark charcoal neutral */
+  --background: #fcfdfc; /* Clean minty white background */
+  --foreground: #0e1412; /* deep organic slate */
   --card-bg: #ffffff;
-  --border: rgba(40, 45, 35, 0.04); /* extremely thin soft organic borders */
-  --muted: #707567;
-  --muted-bg: #f5f6f2; /* warm limestone stone */
+  --border: rgba(13, 148, 136, 0.08); /* ultra-soft teal borders */
+  --muted: #536b66;
+  --muted-bg: #f0f5f3; /* soft organic stone background */
   --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(40, 45, 35, 0.04);
+  --glass-border: rgba(13, 148, 136, 0.08);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0e100c; /* Deep warm carbon-forest */
-    --foreground: #f1f3ee;
-    --card-bg: #151713; /* Warm limestone slate */
-    --border: rgba(241, 243, 238, 0.05);
-    --muted: #8b9084;
-    --muted-bg: rgba(241, 243, 238, 0.04);
-    --glass-bg: rgba(21, 23, 19, 0.9);
-    --glass-border: rgba(241, 243, 238, 0.05);
+    --background: #090e11; /* Deep carbon midnight green/teal */
+    --foreground: #f4faf8;
+    --card-bg: #12181c; /* Premium dark card background */
+    --border: rgba(20, 184, 166, 0.1);
+    --muted: #86a29e;
+    --muted-bg: rgba(20, 184, 166, 0.05);
+    --glass-bg: rgba(18, 24, 28, 0.9);
+    --glass-border: rgba(20, 184, 166, 0.1);
   }
 }
 
 .dark {
-  --background: #0e100c;
-  --foreground: #f1f3ee;
-  --card-bg: #151713;
-  --border: rgba(241, 243, 238, 0.05);
-  --muted: #8b9084;
-  --muted-bg: rgba(241, 243, 238, 0.04);
-  --glass-bg: rgba(21, 23, 19, 0.9);
-  --glass-border: rgba(241, 243, 238, 0.05);
+  --background: #090e11;
+  --foreground: #f4faf8;
+  --card-bg: #12181c;
+  --border: rgba(20, 184, 166, 0.1);
+  --muted: #86a29e;
+  --muted-bg: rgba(20, 184, 166, 0.05);
+  --glass-bg: rgba(18, 24, 28, 0.9);
+  --glass-border: rgba(20, 184, 166, 0.1);
 }
 
 .light {
-  --background: #fdfdfb;
-  --foreground: #262923;
+  --background: #fcfdfc;
+  --foreground: #0e1412;
   --card-bg: #ffffff;
-  --border: rgba(40, 45, 35, 0.04);
-  --muted: #707567;
-  --muted-bg: #f5f6f2;
+  --border: rgba(13, 148, 136, 0.08);
+  --muted: #536b66;
+  --muted-bg: #f0f5f3;
   --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(40, 45, 35, 0.04);
+  --glass-border: rgba(13, 148, 136, 0.08);
 }
 
 /* ==================== BASE ==================== */
@@ -64,8 +65,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Times New Roman', Times, Georgia, serif;
-  font-size: 1.03rem; /* warm, highly readable human scale */
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 0.96rem; /* comfortable modern premium scale */
   line-height: 1.6;
   letter-spacing: -0.01em;
   overflow-x: hidden;
@@ -76,35 +77,35 @@ body {
 /* ==================== TYPOGRAPHY — Premium responsive system ==================== */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Times New Roman', Times, Georgia, serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   color: var(--foreground);
-  font-weight: 550; /* soft, warm human headings */
+  font-weight: 600; /* soft, premium headings */
   line-height: 1.3;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
 h1 {
-  font-size: 2.25rem;
+  font-size: 2.15rem;
 }
 
 h2 {
-  font-size: 1.75rem;
+  font-size: 1.65rem;
   letter-spacing: -0.015em;
 }
 
 h3 {
-  font-size: 1.3rem;
-  font-weight: 550;
+  font-size: 1.25rem;
+  font-weight: 600;
   letter-spacing: -0.01em;
 }
 
 h4 {
-  font-size: 1.05rem;
-  font-weight: 550;
+  font-size: 1.02rem;
+  font-weight: 600;
 }
 
 p {
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   line-height: 1.6;
   font-weight: 400;
   color: var(--muted);
