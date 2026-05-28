@@ -140,9 +140,14 @@ export default function ProfilePage() {
                   onChange={(e) => setGoal(e.target.value)}
                   className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none focus:border-primary/50"
                 >
-                  <option value="stamina_optimization">Cardiovascular Stamina Optimization</option>
-                  <option value="burnout_protection">Central Nervous Burnout Protection</option>
-                  <option value="metabolic_balance">Metabolic Obesogenic Risk Suppression</option>
+                  <option value="burnout_protection">CNS Burnout Protection</option>
+                  <option value="stamina_optimization">Cardiovascular Stamina</option>
+                  <option value="longevity_maintenance">Biological Longevity</option>
+                  <option value="weight_management">Healthy Weight Management</option>
+                  <option value="muscle_hypertrophy">Strength & Muscle Hypertrophy</option>
+                  <option value="stress_resilience">Mind-Body Stress Resilience</option>
+                  <option value="sleep_restoration">Deep Sleep & Circadian Restoration</option>
+                  <option value="posture_mobility">Posture, Flexibility & Mobility</option>
                 </select>
               </div>
 
