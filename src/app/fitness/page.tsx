@@ -249,11 +249,23 @@ export default function FitnessPage() {
     const focusKey = focus === "yoga" || focus === "recovery" ? "mobility" : focus;
     const originalList = EXERCISE_DATABASE[focusKey] || EXERCISE_DATABASE["full_body"];
     
-    let filteredList = originalList.filter(ex => {
-      if (equipment === "none") return ex.equipment === "Bodyweight";
-      if (equipment === "dumbbells") return ex.equipment === "Bodyweight" || ex.equipment === "Dumbbells";
-      return true;
-    });
+    let filteredList = originalList;
+    if (equipment === "bodyweight" || equipment === "none") {
+      filteredList = originalList.filter(ex => ex.equipment === "Bodyweight");
+    } else if (equipment === "dumbbells") {
+      filteredList = originalList.filter(ex => ex.equipment === "Bodyweight" || ex.equipment === "Dumbbells");
+    } else if (equipment === "bands") {
+      filteredList = originalList.filter(ex => ex.equipment === "Bodyweight" || ex.equipment === "Bands" || ex.equipment === "Resistance Bands");
+    } else if (equipment === "yoga_mobility") {
+      const mobilityList = EXERCISE_DATABASE["mobility"] || originalList;
+      filteredList = mobilityList.filter(ex => ex.equipment === "Bodyweight");
+    } else if (equipment === "outdoor") {
+      filteredList = originalList.filter(ex => ex.equipment === "Bodyweight");
+    } else if (equipment === "home_gym") {
+      filteredList = originalList.filter(ex => ex.equipment === "Bodyweight" || ex.equipment === "Dumbbells" || ex.equipment === "Bands");
+    } else if (equipment === "commercial_gym") {
+      filteredList = originalList;
+    }
 
     if (filteredList.length === 0) {
       filteredList = originalList;
@@ -630,22 +642,27 @@ export default function FitnessPage() {
                         <h2 className="text-base font-bold text-foreground tracking-tight leading-snug">
                           What equipment is available?
                         </h2>
-                        <div className="flex flex-col gap-2">
+                        <div className="grid grid-cols-2 gap-3">
                           {[
-                            { value: "none", label: "🤸 Bodyweight Only (No Gear)" },
-                            { value: "dumbbells", label: "🏋️ Dumbbells Only" },
-                            { value: "bands", label: "🧬 Resistance Bands / Gym Equipment" }
+                            { value: "bodyweight", label: "🤸 Bodyweight Only", desc: "No weights or machines" },
+                            { value: "dumbbells", label: "🏋️ Dumbbells Only", desc: "Dumbbells or kettlebells" },
+                            { value: "bands", label: "🧬 Resistance Bands", desc: "Elastic loops or tubes" },
+                            { value: "home_gym", label: "🏡 Home Gym Setup", desc: "Dumbbells, bands & bench" },
+                            { value: "commercial_gym", label: "🏢 Full Commercial Gym", desc: "Barbells, cables & machines" },
+                            { value: "yoga_mobility", label: "🧘 Yoga & Mobility Props", desc: "Foam roller, mat, straps" },
+                            { value: "outdoor", label: "🌳 Outdoor Setup", desc: "Bodyweight, stairs & tracks" }
                           ].map((opt) => (
                             <button
                               key={opt.value}
                               onClick={() => handleSelectOption("equipment", opt.value)}
-                              className={`w-full text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 ${
+                              className={`text-left p-3.5 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 flex flex-col gap-1.5 cursor-pointer ${
                                 equipment === opt.value
-                                  ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/5"
+                                  ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/5 scale-[1.02]"
                                   : "border-foreground/5 bg-foreground/5 text-foreground/80"
                               }`}
                             >
-                              {opt.label}
+                              <span className="text-sm font-bold block">{opt.label}</span>
+                              <span className="text-[10px] text-foreground/45 block font-semibold leading-normal">{opt.desc}</span>
                             </button>
                           ))}
                         </div>

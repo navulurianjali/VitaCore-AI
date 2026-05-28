@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { HeartPulse, CloudSun, Sparkles, Thermometer, ShieldAlert, Brain, Footprints, Info } from "lucide-react";
+import { HeartPulse, CloudSun, Sparkles, Thermometer, ShieldAlert, Brain, Footprints, Info, Wind, Play, Pause, RefreshCw, Smile, Moon } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
@@ -17,6 +17,27 @@ export default function RecoveryPage() {
   const [temp, setTemp] = useState(34); // High heat to trigger adaptive override
   const [aqi, setAqi] = useState(165); // High pollution to trigger respiratory warning
   const [workHours, setWorkHours] = useState(10); // Overtime focus hours
+
+  // Breathing Coach states
+  const [breathingActive, setBreathingActive] = useState(false);
+  const [breathPhase, setBreathPhase] = useState("Ready");
+  const [selectedSession, setSelectedSession] = useState<"box" | "sleep" | "cns">("box");
+
+  // Box breathing timer
+  useEffect(() => {
+    if (!breathingActive) return;
+    let count = 0;
+    const interval = setInterval(() => {
+      count = (count + 1) % 4;
+      const phases = selectedSession === "box"
+        ? ["Inhale (4s)", "Hold (4s)", "Exhale (4s)", "Hold (4s)"]
+        : selectedSession === "sleep"
+        ? ["Inhale (4s)", "Hold (7s)", "Exhale (8s)", "Rest (2s)"]
+        : ["Inhale (5s)", "Hold (2s)", "Exhale (5s)", "Rest (2s)"];
+      setBreathPhase(phases[count]);
+    }, selectedSession === "box" ? 4000 : selectedSession === "sleep" ? 5250 : 3500);
+    return () => clearInterval(interval);
+  }, [breathingActive, selectedSession]);
 
   useEffect(() => {
     setMetrics(getBaseMetrics(activeMode));
@@ -256,6 +277,110 @@ export default function RecoveryPage() {
           </div>
 
         </div>
+
+        {/* 3. MIND & RECOVERY INTERACTIVE MINDFULNESS SECTION */}
+        <GlassCard glowColor="emerald" className="p-6 space-y-6 mt-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-foreground/5">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Wind className="h-4.5 w-4.5 text-secondary animate-pulse" />
+                <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Mind & Recovery</span>
+              </div>
+              <h3 className="text-base font-extrabold text-[var(--foreground)] tracking-tight">Calming Breathing & Meditation Coach</h3>
+              <p className="text-xs text-[var(--muted)]">Synchronize your respiration cycles, decrease active sympathetic stress, and restore deep restfulness.</p>
+            </div>
+            <span className="bg-emerald-500/10 text-emerald-400 text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 animate-pulse">
+              Autonomic Cleared
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            
+            {/* Left Column: Preset meditation selector cards */}
+            <div className="md:col-span-6 space-y-3">
+              <span className="text-[10px] font-bold text-foreground/50 uppercase block">Select Calm Protocol</span>
+              
+              <div className="space-y-2">
+                {[
+                  { id: "box", label: "Traditional Box Breathing", desc: "4s inhale, 4s hold, 4s exhale, 4s hold. Restores parasympathetic homeostasis.", icon: Wind },
+                  { id: "sleep", label: "Circadian Sleep Relaxation", desc: "4s inhale, 7s hold, 8s exhale. Powerful bedtime neuro-modulator.", icon: Moon },
+                  { id: "cns", label: "Autonomic CNS Stress Relief", desc: "5s inhale, 2s hold, 5s exhale. Releases deep screen and deadline tension.", icon: Brain }
+                ].map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => {
+                      setSelectedSession(opt.id as any);
+                      setBreathingActive(false);
+                      setBreathPhase("Ready");
+                    }}
+                    className={`w-full text-left p-3.5 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 flex items-start gap-3 cursor-pointer ${
+                      selectedSession === opt.id
+                        ? "border-secondary bg-secondary/5 shadow-md shadow-secondary/5"
+                        : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                    }`}
+                  >
+                    <span className="text-xl shrink-0 mt-0.5"><opt.icon className="h-4.5 w-4.5 text-secondary" /></span>
+                    <div className="space-y-0.5 min-w-0">
+                      <span className="text-xs font-bold block">{opt.label}</span>
+                      <span className="text-[10px] text-foreground/50 block font-semibold leading-normal">{opt.desc}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: Visual Breath Sphere and Controls */}
+            <div className="md:col-span-6 flex flex-col items-center justify-center p-4 bg-foreground/5 rounded-2xl border border-foreground/5 space-y-4">
+              <span className="text-[9px] font-bold text-foreground/45 uppercase tracking-wider block">Breath Synchronization Sphere</span>
+              
+              {/* Expanding/Contracting Breathing Indicator */}
+              <div className="relative flex items-center justify-center h-28 w-28 rounded-full border-4 border-secondary/20 bg-secondary/5 shadow-inner shrink-0">
+                <div
+                  className={`absolute rounded-full bg-secondary/15 transition-all duration-[4000ms] ${
+                    breathingActive ? "h-24 w-24 opacity-100 animate-pulse" : "h-12 w-12 opacity-60"
+                  }`}
+                />
+                <span className="relative z-10 text-xs font-black text-secondary text-center leading-tight">
+                  {breathingActive ? breathPhase : "Ready"}
+                </span>
+              </div>
+
+              {/* Start / Stop Trigger controls */}
+              <div className="flex gap-2 w-full pt-2">
+                {!breathingActive ? (
+                  <Button 
+                    variant="primary" 
+                    onClick={() => {
+                      setBreathingActive(true);
+                      setBreathPhase(selectedSession === "box" ? "Inhale (4s)" : selectedSession === "sleep" ? "Inhale (4s)" : "Inhale (5s)");
+                    }}
+                    className="w-full py-2.5 text-xs font-bold flex items-center justify-center gap-1 bg-secondary text-white hover:bg-secondary/90 shadow-md shadow-secondary/20"
+                  >
+                    <Play className="h-4 w-4 fill-white" />
+                    <span>Begin Session</span>
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="glass" 
+                    onClick={() => {
+                      setBreathingActive(false);
+                      setBreathPhase("Ready");
+                    }}
+                    className="w-full py-2.5 text-xs font-bold flex items-center justify-center gap-1 border-secondary/20 text-secondary"
+                  >
+                    <Pause className="h-4 w-4" />
+                    <span>Halt Coach</span>
+                  </Button>
+                )}
+              </div>
+
+              <span className="text-[9px] font-bold text-foreground/40 leading-relaxed text-center block max-w-[280px]">
+                *Follow the rhythm of the sphere to balance your nervous system automatically.
+              </span>
+            </div>
+
+          </div>
+        </GlassCard>
 
       </div>
     </DashboardLayout>

@@ -413,50 +413,41 @@ export default function DashboardPage() {
               </div>
             </GlassCard>
 
+            {/* PR Tracker */}
+            <GlassCard glowColor="rose" className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-[var(--muted)] flex items-center gap-1">
+                  <Award className="h-4 w-4 text-rose-500" /> 
+                  Athlete Personal Records (PR)
+                </span>
+                <span className="text-[10px] bg-rose-500/10 text-rose-400 font-bold px-2 py-0.5 rounded-full uppercase">Peak State Active</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 text-center text-xs font-bold">
+                <div className="p-2 bg-foreground/5 rounded-lg border border-foreground/5">
+                  <span className="text-[9px] text-foreground/50 block uppercase">Deadlift</span>
+                  <span className="text-base text-foreground font-black">160 kg</span>
+                </div>
+                <div className="p-2 bg-foreground/5 rounded-lg border border-foreground/5">
+                  <span className="text-[9px] text-foreground/50 block uppercase">Squat</span>
+                  <span className="text-base text-foreground font-black">135 kg</span>
+                </div>
+                <div className="p-2 bg-foreground/5 rounded-lg border border-foreground/5">
+                  <span className="text-[9px] text-foreground/50 block uppercase">Bench Press</span>
+                  <span className="text-base text-foreground font-black">105 kg</span>
+                </div>
+                <div className="p-2 bg-foreground/5 rounded-lg border border-foreground/5">
+                  <span className="text-[9px] text-foreground/50 block uppercase">5K Run</span>
+                  <span className="text-base text-foreground font-black">19:42 m</span>
+                </div>
+              </div>
+            </GlassCard>
+
           </div>
         )}
 
         {/* ======= WELLNESS MODE ======= */}
         {activeMode === "wellness" && (
           <div className="space-y-4">
-
-            {/* Box Breathing Widget */}
-            <GlassCard glowColor="emerald" className="p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Wind className="h-4 w-4 text-secondary" />
-                <h3 className="font-semibold text-[var(--foreground)] text-sm">Box Breathing</h3>
-                <span className="text-xs text-[var(--muted)]">· Lower cortisol, improve focus</span>
-              </div>
-
-              <div className="flex items-center gap-6">
-                {/* Breathing sphere */}
-                <div className="relative flex items-center justify-center h-20 w-20 rounded-full border-2 border-secondary/25 bg-secondary/8 shrink-0">
-                  <div
-                    className={`absolute rounded-full bg-secondary/15 transition-all duration-[4000ms] ${
-                      breathingActive ? "h-16 w-16 opacity-100" : "h-10 w-10 opacity-60"
-                    }`}
-                  />
-                  <span className="relative z-10 text-xs font-semibold text-secondary text-center leading-tight">
-                    {breathingActive ? breathPhase : "Ready"}
-                  </span>
-                </div>
-
-                <div className="flex-1 space-y-2">
-                  <p className="text-sm text-[var(--muted)]">
-                    4-4-4-4 box breathing pattern. Follow the expanding sphere to synchronize with your breath.
-                  </p>
-                  {!breathingActive ? (
-                    <Button variant="secondary" size="sm" onClick={() => { setBreathingActive(true); setBreathPhase("Inhale (4s)"); }}>
-                      Start Session
-                    </Button>
-                  ) : (
-                    <Button variant="glass" size="sm" onClick={() => { setBreathingActive(false); setBreathPhase("Ready"); }}>
-                      Stop Session
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </GlassCard>
 
             {/* Wellness indicators */}
             <div className="grid grid-cols-2 gap-3">
