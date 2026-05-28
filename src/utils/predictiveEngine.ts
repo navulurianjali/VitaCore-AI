@@ -1,4 +1,5 @@
-// Centralized AI Wellness Prediction Engine for VitalCore
+// Centralized Future Health Prediction Engine for VitalCore
+// Warm, simple, human language only. No complex wellness jargon.
 
 export interface TelemetryData {
   sleepHours: number;
@@ -30,11 +31,10 @@ export interface PredictionResult {
 
 /**
  * Calculates a complete suite of future health predictions and alerts
- * based on user habits and daily telemetry registers.
+ * based on user habits and daily lifestyle inputs.
  */
 export function calculateFutureHealthPredictions(data: TelemetryData): PredictionResult {
   // 1. Compute Burnout Risk
-  // High stress, poor sleep quality, and high cumulative fatigue fuel burnout
   let burnout = Math.round(
     data.stressLevel * 0.45 + 
     (100 - data.sleepQuality) * 0.35 + 
@@ -43,7 +43,6 @@ export function calculateFutureHealthPredictions(data: TelemetryData): Predictio
   burnout = Math.min(100, Math.max(0, burnout));
 
   // 2. Compute Fatigue Buildup
-  // Derived from active physical and mental fatigue indicators, amplified by sleep debt
   const sleepDebtHrs = Math.max(0, 8.0 - data.sleepHours);
   let fatigue = Math.round(
     data.physicalFatigue * 0.35 + 
@@ -60,7 +59,6 @@ export function calculateFutureHealthPredictions(data: TelemetryData): Predictio
   stressOverload = Math.min(100, Math.max(0, stressOverload));
 
   // 4. Compute Sleep Deterioration Risk
-  // Screen time and stress indicators directly threaten sleep onset latency
   const screenTimeImpact = data.screenTimeHours && data.screenTimeHours > 8 ? 15 : 0;
   const caffeineImpact = data.caffeineIntake === "high" ? 20 : data.caffeineIntake === "moderate" ? 8 : 0;
   let sleepDecline = Math.round(
@@ -72,7 +70,6 @@ export function calculateFutureHealthPredictions(data: TelemetryData): Predictio
   sleepDecline = Math.min(100, Math.max(0, sleepDecline));
 
   // 5. Compute Recovery Decline Risk
-  // Low hydration levels and soreness delay muscular repair
   const hydrationRatio = data.hydrationMl / data.hydrationTarget;
   const hydrationDebtImpact = hydrationRatio < 0.8 ? (1.0 - hydrationRatio) * 40 : 0;
   let recoveryDecline = Math.round(
@@ -83,7 +80,6 @@ export function calculateFutureHealthPredictions(data: TelemetryData): Predictio
   recoveryDecline = Math.min(100, Math.max(0, recoveryDecline));
 
   // 6. Biological Age Shift
-  // Constructive lifestyle stability makes the digital twin younger
   let ageShift = 0.0;
   if (data.stabilityScore >= 85) {
     ageShift = -1.5 - ((data.stabilityScore - 85) * 0.1);
@@ -92,66 +88,64 @@ export function calculateFutureHealthPredictions(data: TelemetryData): Predictio
   } else {
     ageShift = -0.5;
   }
-  ageShift = Math.round(ageShift * 10) / 10; // Round to 1 decimal
+  ageShift = Math.round(ageShift * 10) / 10;
 
   // 7. Future 7-day energy trends simulation
   const futureEnergyTrends: number[] = [];
   const baseEnergy = 100 - (fatigue * 0.5 + data.stressLevel * 0.2);
   for (let i = 0; i < 7; i++) {
-    // Incorporate positive growth if stability score is high, or default decline if low
     const growthFactor = data.stabilityScore >= 75 ? (i * (data.stabilityScore - 75) * 0.4) : (i * (data.stabilityScore - 75) * 0.5);
-    const dayNoise = Math.sin(i * 1.2) * 5; // circadian noise
+    const dayNoise = Math.sin(i * 1.2) * 5;
     const estVal = Math.round(baseEnergy + growthFactor + dayNoise);
     futureEnergyTrends.push(Math.min(95, Math.max(15, estVal)));
   }
 
-  // 8. Generate preventive alerts / reminders
+  // 8. Generate preventive alerts / reminders (strictly using simple, friendly words)
   const preventiveReminders: string[] = [];
   if (data.sleepHours < 6.0) {
-    preventiveReminders.push("Rest Reminder: You got less than 6 hours of sleep recently. Let's try winding down early tonight.");
+    preventiveReminders.push("Rest Reminder: Your recent late-night sleep pattern may reduce recovery quality over the next week.");
   }
   if (hydrationRatio < 0.7) {
-    preventiveReminders.push("Hydration Check: You're a bit behind on your water goal. Let's grab a glass of water now!");
+    preventiveReminders.push("Hydration Check: Consistent hydration is essential to improve your workout recovery.");
   }
   if (data.stressLevel > 65) {
-    preventiveReminders.push("Take a Breather: We noticed your stress levels are climbing. Let's take a minute to do some slow, relaxing breathing.");
+    preventiveReminders.push("Take a Breath: High stress and low sleep together may increase fatigue. Let's take a 2-minute relaxation break.");
   }
   if (data.sorenessLevel > 6) {
-    preventiveReminders.push("Active Recovery: Since your muscles are quite sore today, we recommend a gentle stretch or a light walk.");
+    preventiveReminders.push("Muscle Care: Your body is feeling quite tight. A light stretch or warm walk today will help you recover faster.");
   }
   if (data.physicalFatigue > 60 && data.recoveryPercentage < 50) {
-    preventiveReminders.push("Time to Recharge: Your energy levels are running low. Let's skip the intense workout today and give your body some rest.");
+    preventiveReminders.push("Recharge Mode: Your energy is running a bit low. Let's focus on simple rest today to bounce back stronger.");
   }
 
-  // Fallback defaults if metrics are optimal
   if (preventiveReminders.length === 0) {
-    preventiveReminders.push("You're doing amazing! Your energy is high and your body is ready for a great day.");
+    preventiveReminders.push("Your current habits support stable energy levels. Keep up this beautiful daily rhythm!");
   }
 
   // 9. Generate AI future health insights
   const aiInsights: string[] = [];
   if (hydrationRatio < 0.85) {
-    aiInsights.push("You've been drinking a bit less water this week. Staying hydrated helps your body recover better and keeps you feeling fresh.");
+    aiInsights.push("Drinking a little less water recently might slow down your muscle repair. Keeping your cup full helps you feel fresh and less sore.");
   } else {
-    aiInsights.push("Great job keeping up with your water! It's helping your body stay fully energized and healthy.");
+    aiInsights.push("Your consistent water drinking is doing wonders! It is actively keeping your muscles hydrated and speeding up your workout recovery.");
   }
 
   if (data.sleepQuality < 70) {
-    aiInsights.push("A few rough nights of sleep can leave you feeling a bit worn out. Let's focus on a calming bedtime routine tonight.");
+    aiInsights.push("A few restless nights can start building up fatigue. Winding down without screens 30 minutes before bed will help you get deeper rest.");
   } else {
-    aiInsights.push("Your sleep has been wonderfully consistent! You should feel a great boost in your morning focus and energy.");
+    aiInsights.push("Your sleep has been wonderfully regular! This consistent rest is the reason you are feeling so focused and energetic in the mornings.");
   }
 
   if (burnout > 55) {
-    aiInsights.push("Your stress is starting to build up, which can make you tired. Try taking a little break from screens this evening.");
+    aiInsights.push("Your body is carrying a bit of stress lately. Slowing down your evening routine will help prevent you from feeling burnt out next week.");
   } else {
-    aiInsights.push("Your stress levels are looking good and well under control. Keep up the balanced pace!");
+    aiInsights.push("Your stress and work levels are in perfect balance. You're doing a fantastic job managing your daily pace.");
   }
 
   if (data.stabilityScore >= 80) {
-    aiInsights.push("Your current routine is amazing! Keep this up, and you'll likely feel a wonderful boost in your daily energy soon.");
+    aiInsights.push("Your current lifestyle decisions are supporting great long-term health! You will likely notice even better stamina if you keep this up.");
   } else {
-    aiInsights.push("It looks like you've been a little less active lately. Even a small 10-minute walk today can make a big difference.");
+    aiInsights.push("It looks like you've been a little less active this week. Just a quick 10-minute walk today can significantly boost your energy tomorrow.");
   }
 
   return {

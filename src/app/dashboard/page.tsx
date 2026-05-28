@@ -38,6 +38,16 @@ export default function DashboardPage() {
   const [totalCalories, setTotalCalories] = useState(0);
   const [sleepHrs, setSleepHrs] = useState(0);
 
+  // Simulation states
+  const [simulating, setSimulating] = useState(false);
+  const [simSleep, setSimSleep] = useState(8);
+  const [simWater, setSimWater] = useState(2000);
+  const [simStress, setSimStress] = useState(30);
+
+  // Quick Logging visual feedback
+  const [loggingInProgress, setLoggingInProgress] = useState(false);
+  const [logStatus, setLogStatus] = useState<string | null>(null);
+
   // Breathing (wellness mode)
   const [breathPhase, setBreathPhase] = useState("Ready");
   const [breathingActive, setBreathingActive] = useState(false);
@@ -123,6 +133,63 @@ export default function DashboardPage() {
     }
   };
 
+  // Real quick-logging handlers connected to Supabase
+  const handleLogWater = async (amount: number) => {
+    setLoggingInProgress(true);
+    setLogStatus("Logging hydration...");
+    try {
+      if (supabase && profile) {
+        const { error } = await supabase.from("hydration_logs").insert({
+          user_id: profile.id,
+          amount_ml: amount
+        });
+        if (error) throw error;
+        
+        await fetchDashboardMetrics();
+      } else {
+        // Fallback for unauthenticated/offline
+        setWaterLogged(w => w + amount);
+      }
+      setLogStatus("Hydration logged! Enjoy your day! 💧");
+      setTimeout(() => setLogStatus(null), 3000);
+    } catch (e) {
+      console.error("Hydration logging error:", e);
+      setWaterLogged(w => w + amount);
+      setLogStatus("Logged locally.");
+      setTimeout(() => setLogStatus(null), 3000);
+    } finally {
+      setLoggingInProgress(false);
+    }
+  };
+
+  const handleLogSleep = async (hours: number, quality: number) => {
+    setLoggingInProgress(true);
+    setLogStatus("Logging sleep patterns...");
+    try {
+      if (supabase && profile) {
+        const { error } = await supabase.from("sleep_logs").insert({
+          user_id: profile.id,
+          sleep_hours: hours,
+          recovery_quality: quality
+        });
+        if (error) throw error;
+        
+        await fetchDashboardMetrics();
+      } else {
+        setSleepHrs(hours);
+      }
+      setLogStatus("Sleep logged successfully! 🛌");
+      setTimeout(() => setLogStatus(null), 3000);
+    } catch (e) {
+      console.error("Sleep logging error:", e);
+      setSleepHrs(hours);
+      setLogStatus("Logged locally.");
+      setTimeout(() => setLogStatus(null), 3000);
+    } finally {
+      setLoggingInProgress(false);
+    }
+  };
+
   useEffect(() => {
     if (profile?.id) {
       fetchDashboardMetrics();
@@ -173,16 +240,16 @@ export default function DashboardPage() {
   const stepsPct = Math.min(100, (metrics.steps / metrics.stepsTarget) * 100);
 
   const predictions = calculateFutureHealthPredictions({
-    sleepHours: sleepHrs || metrics.sleepHours,
-    sleepQuality: sleepHrs > 0 ? 80 : metrics.sleepQuality,
-    hydrationMl: waterLogged || metrics.hydrationMl,
+    sleepHours: simulating ? simSleep : (sleepHrs || metrics.sleepHours),
+    sleepQuality: simulating ? (simSleep >= 8 ? 90 : simSleep >= 6 ? 70 : 45) : (sleepHrs > 0 ? 80 : metrics.sleepQuality),
+    hydrationMl: simulating ? simWater : (waterLogged || metrics.hydrationMl),
     hydrationTarget: metrics.hydrationTarget,
-    stressLevel: metrics.stressLevel,
-    fatigueScore: metrics.fatigueScore,
-    physicalFatigue: metrics.physicalFatigue,
-    mentalFatigue: metrics.mentalFatigue,
+    stressLevel: simulating ? simStress : metrics.stressLevel,
+    fatigueScore: simulating ? (simStress > 60 ? 70 : 30) : metrics.fatigueScore,
+    physicalFatigue: simulating ? (simStress > 60 ? 60 : 25) : metrics.physicalFatigue,
+    mentalFatigue: simulating ? (simStress > 60 ? 75 : 35) : metrics.mentalFatigue,
     sorenessLevel: profile?.soreness_level || 0,
-    recoveryPercentage: metrics.recoveryPercentage,
+    recoveryPercentage: simulating ? (simSleep >= 8 ? 85 : 45) : metrics.recoveryPercentage,
     stabilityScore: metrics.stabilityScore,
     screenTimeHours: profile?.screen_time_hours || 6,
     caffeineIntake: profile?.caffeine_intake || 'moderate'
@@ -235,16 +302,30 @@ export default function DashboardPage() {
             </GlassCard>
 
             {/* Hydration */}
-            <GlassCard glowColor="emerald" className="p-5 flex flex-col justify-between min-h-[140px] hover:scale-[1.01]">
-              <div className="flex items-center justify-between mb-2">
+            <GlassCard glowColor="emerald" className="p-5 flex flex-col justify-between min-h-[160px] hover:scale-[1.01]">
+              <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">Water</span>
                 <div className="h-6 w-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                   <Droplet className="h-3.5 w-3.5 text-emerald-500" />
                 </div>
               </div>
               <div>
-                <div className="analytics-number text-[var(--foreground)]">{waterLogged}</div>
-                <div className="text-[10px] text-[var(--muted)] mt-0.5">/ {metrics.hydrationTarget} ml</div>
+                <div className="analytics-number text-[var(--foreground)]">{waterLogged} ml</div>
+                <div className="text-[10px] text-[var(--muted)] mt-0.5">/ {metrics.hydrationTarget} ml goal</div>
+              </div>
+              <div className="flex gap-1.5 mt-2">
+                <button
+                  onClick={(e) => { e.preventDefault(); handleLogWater(250); }}
+                  className="flex-1 py-1 rounded bg-emerald-500/10 border border-emerald-500/15 hover:bg-emerald-500/20 text-emerald-400 font-bold text-[9px] cursor-pointer"
+                >
+                  +250ml
+                </button>
+                <button
+                  onClick={(e) => { e.preventDefault(); handleLogWater(500); }}
+                  className="flex-1 py-1 rounded bg-emerald-500/10 border border-emerald-500/15 hover:bg-emerald-500/20 text-emerald-400 font-bold text-[9px] cursor-pointer"
+                >
+                  +500ml
+                </button>
               </div>
               <div className="progress-bar mt-3">
                 <div className="progress-bar-fill bg-emerald-500/80" style={{ width: `${hydrationPct}%` }} />
@@ -252,8 +333,8 @@ export default function DashboardPage() {
             </GlassCard>
 
             {/* Sleep */}
-            <GlassCard glowColor="violet" className="p-5 flex flex-col justify-between min-h-[140px] hover:scale-[1.01]">
-              <div className="flex items-center justify-between mb-2">
+            <GlassCard glowColor="violet" className="p-5 flex flex-col justify-between min-h-[160px] hover:scale-[1.01]">
+              <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">Sleep</span>
                 <div className="h-6 w-6 rounded-lg bg-violet-500/10 flex items-center justify-center">
                   <Moon className="h-3.5 w-3.5 text-violet-500" />
@@ -261,7 +342,21 @@ export default function DashboardPage() {
               </div>
               <div>
                 <div className="analytics-number text-[var(--foreground)]">{sleepHrs > 0 ? `${sleepHrs}h` : "—"}</div>
-                <div className="text-[10px] text-[var(--muted)] mt-0.5">Target: {metrics.sleepTarget}h</div>
+                <div className="text-[10px] text-[var(--muted)] mt-0.5">Quality: {metrics.sleepQuality}%</div>
+              </div>
+              <div className="flex gap-1.5 mt-2">
+                <button
+                  onClick={(e) => { e.preventDefault(); handleLogSleep(8, 90); }}
+                  className="flex-1 py-1 rounded bg-violet-500/10 border border-violet-500/15 hover:bg-violet-500/20 text-violet-400 font-bold text-[9px] cursor-pointer"
+                >
+                  Log 8h
+                </button>
+                <button
+                  onClick={(e) => { e.preventDefault(); handleLogSleep(6, 60); }}
+                  className="flex-1 py-1 rounded bg-violet-500/10 border border-violet-500/15 hover:bg-violet-500/20 text-violet-400 font-bold text-[9px] cursor-pointer"
+                >
+                  Log 6h
+                </button>
               </div>
               <div className="progress-bar mt-3">
                 <div className="progress-bar-fill bg-violet-500/80" style={{ width: `${sleepPct}%` }} />
@@ -488,22 +583,98 @@ export default function DashboardPage() {
         {/* ======= LIFESTYLE FORECASTS & TIMELINE ======= */}
         {predictions && (
           <GlassCard glowColor="violet" className="p-6 space-y-6 rounded-[28px]">
+            {logStatus && (
+              <div className="p-3 bg-secondary/15 border border-secondary/20 rounded-2xl text-xs font-semibold text-secondary text-center animate-bounce shadow-md">
+                {logStatus}
+              </div>
+            )}
+            
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-[var(--border)]">
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Insights for your week</span>
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Future Health Prediction Engine</span>
                 </div>
                 <h3 className="text-base font-semibold text-[var(--foreground)] tracking-tight">Looking ahead at tomorrow's energy</h3>
-                <p className="text-xs text-[var(--muted)]">Calculated from your sleep regularity, water intake, and neural activity logs.</p>
+                <p className="text-xs text-[var(--muted)]">Calculated from your sleep regularity, water intake, and active neural stress logs.</p>
               </div>
-              <Link href="/timeline">
-                <Button variant="glass" size="sm" className="gap-1 text-xs shrink-0 rounded-xl">
-                  <Milestone className="h-3.5 w-3.5" />
-                  <span>Interactive Engine</span>
-                </Button>
-              </Link>
+              
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSimulating(!simulating)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                    simulating 
+                      ? "bg-secondary text-white border-secondary shadow-md shadow-secondary/15" 
+                      : "bg-foreground/5 text-foreground/70 border-foreground/10 hover:border-secondary/30"
+                  }`}
+                >
+                  🔮 {simulating ? "Close Sandbox" : "Try Lifestyle Simulator"}
+                </button>
+                <Link href="/timeline">
+                  <Button variant="glass" size="sm" className="gap-1 text-xs shrink-0 rounded-xl">
+                    <Milestone className="h-3.5 w-3.5" />
+                    <span>Interactive Engine</span>
+                  </Button>
+                </Link>
+              </div>
             </div>
+
+            {/* Simulated sliders panel */}
+            {simulating && (
+              <div className="p-4 bg-secondary/5 rounded-2xl border border-secondary/15 space-y-4 animate-[fadeIn_0.3s_ease-out]">
+                <div className="flex justify-between items-center text-xs font-bold text-secondary">
+                  <span>🔮 Lifestyle Prediction Simulator Active</span>
+                  <span className="text-[10px] uppercase bg-secondary text-white px-2 py-0.5 rounded-full">Interactive Sandbox</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between font-bold">
+                      <span>Simulated Sleep Hours</span>
+                      <span className="text-primary font-black">{simSleep}h</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="4"
+                      max="10"
+                      step="0.5"
+                      value={simSleep}
+                      onChange={(e) => setSimSleep(Number(e.target.value))}
+                      className="w-full h-1 bg-foreground/10 rounded-lg appearance-none cursor-pointer accent-primary"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between font-bold">
+                      <span>Simulated Water Target</span>
+                      <span className="text-secondary font-black">{simWater} ml</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="500"
+                      max="4000"
+                      step="250"
+                      value={simWater}
+                      onChange={(e) => setSimWater(Number(e.target.value))}
+                      className="w-full h-1 bg-foreground/10 rounded-lg appearance-none cursor-pointer accent-secondary"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between font-bold">
+                      <span>Simulated Daily Stress</span>
+                      <span className="text-rose-400 font-black">{simStress}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="10"
+                      max="95"
+                      step="5"
+                      value={simStress}
+                      onChange={(e) => setSimStress(Number(e.target.value))}
+                      className="w-full h-1 bg-foreground/10 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Rhythm Gauges Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

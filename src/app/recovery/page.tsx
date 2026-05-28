@@ -8,10 +8,13 @@ import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { getBaseMetrics, getEnvironmentAdjustedRoutine, DailyMetrics, EnvironmentInfo } from "@/utils/mockData";
+import { supabase } from "@/utils/supabase";
 
 export default function RecoveryPage() {
+  const { profile } = useAuth();
   const { activeMode } = useTheme();
   const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
+  const [recentWorkouts, setRecentWorkouts] = useState(0);
   
   // Lifestyle atmospheric factors
   const [temp, setTemp] = useState(34); // High heat to trigger adaptive override
@@ -39,9 +42,69 @@ export default function RecoveryPage() {
     return () => clearInterval(interval);
   }, [breathingActive, selectedSession]);
 
+  const fetchRecoveryMetrics = async () => {
+    if (!supabase || !profile) return;
+    try {
+      const todayStr = new Date().toISOString().split("T")[0];
+
+      // 1. Fetch Hydration
+      const { data: waterData } = await supabase
+        .from("hydration_logs")
+        .select("amount_ml")
+        .eq("user_id", profile.id)
+        .gte("created_at", `${todayStr}T00:00:00Z`);
+      let water = 0;
+      if (waterData) {
+        water = waterData.reduce((sum, log: { amount_ml: number }) => sum + Number(log.amount_ml), 0);
+      }
+
+      // 2. Fetch Sleep
+      const { data: sleepData } = await supabase
+        .from("sleep_logs")
+        .select("sleep_hours, recovery_quality")
+        .eq("user_id", profile.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      let sleep = 0;
+      let recovery = 0;
+      if (sleepData && sleepData.length > 0) {
+        sleep = Number(sleepData[0].sleep_hours);
+        recovery = Number(sleepData[0].recovery_quality || 0);
+      }
+
+      // 3. Fetch recent workouts (last 3 days) to estimate muscle soreness
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+      const { data: workoutData } = await supabase
+        .from("workouts")
+        .select("id")
+        .eq("user_id", profile.id)
+        .gte("created_at", threeDaysAgo.toISOString());
+      if (workoutData) {
+        setRecentWorkouts(workoutData.length);
+      }
+
+      const base = getBaseMetrics(activeMode);
+      setMetrics({
+        ...base,
+        hydrationMl: water,
+        sleepHours: sleep,
+        recoveryPercentage: recovery > 0 ? recovery : base.recoveryPercentage
+      });
+    } catch (e) {
+      console.error("Recovery supabase fetch error:", e);
+    }
+  };
+
+  // profile is declared at top of component via useAuth()
+
   useEffect(() => {
-    setMetrics(getBaseMetrics(activeMode));
-  }, [activeMode]);
+    if (profile?.id) {
+      fetchRecoveryMetrics();
+    } else {
+      setMetrics(getBaseMetrics(activeMode));
+    }
+  }, [activeMode, profile]);
 
   if (!metrics) return null;
 
@@ -58,8 +121,16 @@ export default function RecoveryPage() {
   // Compute positive, user-friendly equivalents of fatigue scores
   const mentalEnergy = Math.max(0, 100 - metrics.mentalFatigue);
   
-  // Format soreness details in friendly language
-  const bodyRecoveryPercentage = 60; // Equivalent to Grade 4/10 soreness
+  // Derive body recovery from actual data: sleep, hydration, recent workouts
+  const hydrationRatio = Math.min(1, metrics.hydrationMl / metrics.hydrationTarget);
+  const sleepRatio = Math.min(1, metrics.sleepHours / metrics.sleepTarget);
+  const workoutLoad = Math.min(1, recentWorkouts / 5); // 5 workouts in 3 days = fully loaded
+  const bodyRecoveryPercentage = Math.round(
+    (sleepRatio * 40 + hydrationRatio * 30 + (1 - workoutLoad) * 20 + (metrics.recoveryPercentage / 100) * 10)
+  );
+  
+  // Derive stress from actual metrics
+  const computedStress = Math.round(metrics.stressLevel * 0.6 + metrics.mentalFatigue * 0.4);
 
   // Generate dynamic, supportive AI coaching advice based on current lifestyle sliders
   const getAICoachInsight = () => {
@@ -136,13 +207,17 @@ export default function RecoveryPage() {
                 <Sparkles className="h-4 w-4 text-secondary" />
                 <span className="text-xs font-bold text-foreground/60">Stress Level</span>
               </div>
-              <div className="text-2xl font-bold mt-1.5">Low (28%)</div>
+              <div className="text-2xl font-bold mt-1.5">{computedStress <= 35 ? "Low" : computedStress <= 60 ? "Moderate" : "High"} ({computedStress}%)</div>
             </div>
             <div className="w-full bg-foreground/10 h-2 rounded-full overflow-hidden my-3">
-              <div className="bg-secondary h-full rounded-full" style={{ width: "28%" }} />
+              <div className={`h-full rounded-full ${computedStress <= 35 ? "bg-secondary" : computedStress <= 60 ? "bg-amber-500" : "bg-red-500"}`} style={{ width: `${computedStress}%` }} />
             </div>
             <p className="text-xs text-foreground/60 leading-relaxed font-medium">
-              Your stress is low and your energy is high. You're ready for any light activity or a fun workout today.
+              {computedStress <= 35
+                ? "Your stress is low and your energy is high. You're ready for any light activity or a fun workout today."
+                : computedStress <= 60
+                ? "You're carrying some stress today. A short walk or quiet breathing can help bring things back into balance."
+                : "Stress is running high today. Let's take it easy — try a calming breathing exercise and skip anything intense."}
             </p>
           </GlassCard>
 
