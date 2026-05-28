@@ -46,24 +46,24 @@ export default function TimelinePage() {
   const timelineEvents = [
     {
       date: "May 24, 2026",
-      title: "Sleep Consistency Milestone",
-      description: "Wonderful progress! You completed 14 consecutive nights of stable sleep timing, increasing your daytime recovery index by 8%.",
+      title: "Great Sleep Routine!",
+      description: "Wonderful progress! You went to bed at the same time for 14 nights in a row, which is helping you feel much more energized during the day.",
       type: "milestone",
       color: "border-emerald-500 text-emerald-500 bg-emerald-500/10",
       icon: Award
     },
     {
       date: "May 18, 2026",
-      title: "Active Wellness Notification",
-      description: "We detected a slight 4.5% uptick in your resting heart rate over two weeks, likely due to late-night snacking. Try keeping a 3-hour buffer before bedtime!",
+      title: "Bedtime Snack Tip",
+      description: "We noticed your heart rate was slightly higher at night lately, which might be from eating late. Try having your last snack a few hours before bedtime so your body can rest fully.",
       type: "decline",
       color: "border-amber-500 text-amber-500 bg-amber-500/10",
       icon: ShieldAlert
     },
     {
       date: "May 10, 2026",
-      title: "Adaptive Routine Integration",
-      description: "Smart adjustment! Swapped outdoor jogging for an indoor dynamic stretching routine during cold weather to protect your throat and keep lungs safe.",
+      title: "Smart Weather Switch",
+      description: "Smart move! Swapping your outdoor run for an indoor stretch when it's freezing outside helps keep your body warm and protects your lungs.",
       type: "adaptation",
       color: "border-primary text-primary bg-primary/10",
       icon: Sparkles

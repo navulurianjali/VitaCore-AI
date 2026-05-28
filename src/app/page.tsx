@@ -137,7 +137,7 @@ export default function LandingPage() {
     <div className="flex-1 flex flex-col bg-background relative overflow-hidden">
       {/* Soft Ambient Cinematic Background Asset */}
       <div 
-        className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-45 dark:opacity-20 z-0"
+        className="absolute top-0 left-0 right-0 h-[1000px] bg-cover bg-center pointer-events-none opacity-85 dark:opacity-40 z-0"
         style={{ backgroundImage: "url('/images/saas_background.png')" }}
       />
       
@@ -223,7 +223,7 @@ export default function LandingPage() {
               {/* Decorative premium gradients */}
               <div className="absolute -inset-1 bg-gradient-to-tr from-primary/10 via-secondary/10 to-accent/5 rounded-[34px] blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
               
-              <div className="relative rounded-[24px] overflow-hidden bg-background border border-foreground/5 aspect-[16/10] sm:aspect-[16/9] flex items-center justify-center p-6 sm:p-12 bg-cover bg-center" style={{ backgroundImage: "url('/images/saas_background.png')" }}>
+              <div className="relative rounded-[24px] overflow-hidden border border-foreground/5 aspect-[16/10] sm:aspect-[16/9] flex items-center justify-center p-6 sm:p-12 bg-gradient-to-tr from-[var(--muted-bg)]/80 to-[var(--card-bg)]/80 shadow-inner">
                 
                 {/* Embedded Illustrative Mockup Content */}
                 <div className="w-full max-w-lg bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] rounded-[24px] p-5 sm:p-6 text-left space-y-4 shadow-xl select-none">

@@ -190,7 +190,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 max-w-4xl mx-auto">
+      <div className="space-y-8 max-w-7xl mx-auto">
 
         {/* Page Header Welcome */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
