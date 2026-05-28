@@ -31,7 +31,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`glass-panel transition-all duration-200 ${accents[glowColor]} ${
+      className={`glass-panel p-4 md:p-5 transition-all duration-200 ${accents[glowColor]} ${
         onClick ? "cursor-pointer" : ""
       } ${hoverEffect ? "hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]" : ""} ${className}`}
     >

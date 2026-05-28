@@ -444,8 +444,8 @@ export const getAICoachReply = (
   
   const cloudActive = isLLMCloudActive();
   const cloudWarning = !cloudActive
-    ? "\n\n⚠️ [AI Engine running on Local Simulator mode. Supply OPENAI_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY to activate cloud neural cognitive models.]"
-    : "\n\n🌐 [AI Engine running on Cloud Neural Cognitive Mode]";
+    ? "\n\n💡 [Tip: Connect an AI API key in your settings to unlock deeper, personalized wellness guidance!]"
+    : "\n\n🌐 [AI Coach running in premium Cloud Mode]";
 
   // Constructive context injection if user filled onboarding data
   const injuryMention = onboardingData?.previous_injuries && onboardingData.previous_injuries !== "none"

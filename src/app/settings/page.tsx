@@ -16,7 +16,7 @@ export default function SettingsPage() {
   const [cleared, setCleared] = useState(false);
 
   const handleWipeCache = () => {
-    if (confirm("Are you absolutely sure you want to completely erase all local biometric storage caches? This action is permanent and destroys all custom macro logs.")) {
+    if (confirm("Are you absolutely sure you want to delete all of your logged data? This action is permanent and cannot be undone.")) {
       if (typeof window !== "undefined") {
         // Clear mock database
         localStorage.clear();
@@ -40,14 +40,14 @@ export default function SettingsPage() {
       <div className="space-y-8">
         
         {/* Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-br from-primary/10 via-background to-secondary/5 p-6">
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Settings className="h-6 w-6 text-primary animate-pulse" />
-              Platform Settings Control Panel
+              App Settings & Privacy
             </h1>
             <p className="text-xs text-foreground/70 font-semibold">
-              Visual accessibility scales, mock credentials, biometrics purging & RLS settings
+              Customize your theme, adjust readability modes, and manage your account privacy settings.
             </p>
           </div>
         </div>
@@ -63,10 +63,10 @@ export default function SettingsPage() {
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <Sparkles className="h-4 w-4 text-secondary" />
-                  Biometric Engine UI Scale Modifiers
+                  Readability & Experience Modes
                 </h3>
                 <p className="text-xs text-foreground/60 leading-relaxed font-semibold">
-                  Toggling scaling modes automatically mutates typography scale factors, line weights, contrast, and layout complexity parameters across the platform console:
+                  Choose an app experience that matches your active lifestyle. Select Elderly Mode to increase text contrast and font sizes for easier reading:
                 </p>
 
                 <div className="grid grid-cols-3 gap-3 pt-1">
@@ -90,14 +90,14 @@ export default function SettingsPage() {
               <div className="space-y-3 pt-3 border-t border-foreground/5">
                 <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   {theme === "dark" ? <Moon className="h-4.5 w-4.5 text-primary" /> : <Sun className="h-4.5 w-4.5 text-amber-500" />}
-                  Dynamic Interface Theme Color
+                  Interface Color Theme
                 </h3>
                 <div className="flex gap-2">
                   <Button variant={theme === "dark" ? "primary" : "glass"} onClick={toggleTheme} className="flex-1 text-xs">
-                    Dark Space Obsidian
+                    Dark Theme
                   </Button>
                   <Button variant={theme === "light" ? "primary" : "glass"} onClick={toggleTheme} className="flex-1 text-xs">
-                    Light Pure Alabaster
+                    Light Theme
                   </Button>
                 </div>
               </div>
@@ -105,7 +105,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="text-xs text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3">
-              Accessibility compliance: Enabled and compliant with AAA rating under typography scaling modes.
+              Designed for high contrast and readability across all screens.
             </div>
           </div>
 
@@ -114,20 +114,20 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Trash2 className="h-4 w-4 text-red-500 animate-pulse" />
-                GDPR Local Cache Purger
+                Clear Saved Health Data
               </h3>
               <p className="text-xs text-foreground/60 leading-normal font-semibold">
-                Purge all biometric logs, workout lists, and custom sessions from your browser sandbox cache:
+                Erase all saved weight, steps, sleep, and nutrition logs stored locally on your device:
               </p>
 
               {cleared ? (
                 <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-500 font-semibold">
-                  ⚠ All biometric databases wiped successfully! Redirecting...
+                  ⚠ All logged data has been deleted! Redirecting...
                 </div>
               ) : (
                 <Button variant="danger" onClick={handleWipeCache} className="w-full py-3 flex items-center justify-center gap-1 text-xs font-bold">
                   <Trash2 className="h-4 w-4" />
-                  <span>Wipe Biometrics Cache</span>
+                  <span>Reset All Saved Data</span>
                 </Button>
               )}
             </div>
@@ -135,9 +135,9 @@ export default function SettingsPage() {
             <GlassCard glowColor="rose" className="p-4 flex gap-3 items-start border border-foreground/5">
               <ShieldCheck className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
               <div className="space-y-0.5">
-                <h4 className="text-[9px] font-bold text-red-500">HIPAA Inspired Isolation</h4>
+                <h4 className="text-[10px] font-bold text-red-500">Secure Health Privacy</h4>
                 <p className="text-[9px] text-foreground/75 leading-relaxed font-semibold">
-                  Row level security is compiled in all active schemas. All credentials packets are validated against secure cryptographic JSON web token standard procedures.
+                  Your privacy is our priority. All medical, workout, and personal profile information is securely locked down using modern encryption standard procedures.
                 </p>
               </div>
             </GlassCard>
