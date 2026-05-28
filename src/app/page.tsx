@@ -134,11 +134,15 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
+    <div className="flex-1 flex flex-col bg-background relative overflow-hidden">
+      {/* Soft Ambient Cinematic Background Asset */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-45 dark:opacity-20 z-0"
+        style={{ backgroundImage: "url('/images/saas_background.png')" }}
+      />
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.08),transparent_50%)]" />
+      <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden z-10">
         
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6">
           <motion.div
@@ -146,14 +150,14 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/15 px-3 py-1 text-xs font-semibold text-primary"
           >
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="h-3.5 w-3.5 animate-pulse" />
             <span>Next-Generation Preventive Healthcare Platform</span>
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold tracking-tight sm:text-4xl max-w-4xl mx-auto"
+            className="text-3xl font-semibold tracking-tight sm:text-4xl max-w-4xl mx-auto"
           >
             Predict. Prevent.{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary">
@@ -165,7 +169,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-sm text-foreground/70 max-w-2xl mx-auto leading-relaxed"
+            className="text-xs sm:text-sm text-foreground/75 max-w-2xl mx-auto leading-relaxed font-normal"
           >
             AI-powered wellness intelligence that maps your biometrics, forecasts fatigue decay, detects invisible health decline, and adapts with your lifestyle environment.
           </motion.p>
@@ -192,7 +196,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="pt-10 flex flex-wrap justify-center gap-4 text-xs font-bold text-foreground/80 max-w-3xl mx-auto"
+            className="pt-10 flex flex-wrap justify-center gap-4 text-xs font-semibold text-foreground/80 max-w-3xl mx-auto"
           >
             <div className="px-4 py-2.5 rounded-xl glass-panel border-foreground/5 flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />
@@ -205,6 +209,60 @@ export default function LandingPage() {
             <div className="px-4 py-2.5 rounded-xl glass-panel border-foreground/5 flex items-center gap-2">
               <Brain className="h-4 w-4 text-accent" />
               <span>Burnout Simulation Enabled</span>
+            </div>
+          </motion.div>
+
+          {/* Centered Premium App Mockup illustration */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
+            className="pt-12 max-w-3xl mx-auto"
+          >
+            <div className="rounded-[32px] overflow-hidden border border-foreground/5 bg-[var(--card-bg)] shadow-[0_20px_50px_rgba(0,0,0,0.02)] p-2.5 relative group">
+              {/* Decorative premium gradients */}
+              <div className="absolute -inset-1 bg-gradient-to-tr from-primary/10 via-secondary/10 to-accent/5 rounded-[34px] blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
+              
+              <div className="relative rounded-[24px] overflow-hidden bg-background border border-foreground/5 aspect-[16/10] sm:aspect-[16/9] flex items-center justify-center p-6 sm:p-12 bg-cover bg-center" style={{ backgroundImage: "url('/images/saas_background.png')" }}>
+                
+                {/* Embedded Illustrative Mockup Content */}
+                <div className="w-full max-w-lg bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)] rounded-[24px] p-5 sm:p-6 text-left space-y-4 shadow-xl select-none">
+                  {/* Mockup Header */}
+                  <div className="flex justify-between items-center pb-3 border-b border-foreground/5">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                      <span className="text-[9px] font-bold text-[var(--foreground)] uppercase tracking-widest">Wellness Twin Stance</span>
+                    </div>
+                    <span className="text-[9px] text-[var(--muted)] font-semibold">Today's forecast</span>
+                  </div>
+                  
+                  {/* Mockup Body Content */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] text-[var(--muted)] block font-semibold">Biological Recovery Status</span>
+                      <h3 className="text-base font-semibold text-[var(--foreground)] tracking-tight leading-tight">Your recovery is excellent.</h3>
+                      <p className="text-[10px] text-[var(--muted)] leading-relaxed font-normal">
+                        Cardiac indices and sleep debt are fully balanced. Today is optimized for active training.
+                      </p>
+                    </div>
+                    
+                    {/* Visual graph / mini progress layout */}
+                    <div className="bg-[var(--muted-bg)]/40 p-4 rounded-2xl border border-foreground/5 flex flex-col justify-between min-h-[100px]">
+                      <div className="flex justify-between items-center text-[10px] font-semibold text-[var(--muted)]">
+                        <span>Energy Reserves</span>
+                        <span className="text-primary font-bold">88%</span>
+                      </div>
+                      <div className="w-full bg-[var(--border)] h-1 rounded-full overflow-hidden mt-1.5">
+                        <div className="bg-primary h-full rounded-full" style={{ width: "88%" }} />
+                      </div>
+                      <span className="text-[9px] text-[var(--muted)] block leading-normal mt-2 font-medium">
+                        +12% capacity boost compared to yesterday.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </motion.div>
 
