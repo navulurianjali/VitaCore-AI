@@ -64,10 +64,10 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  font-size: 0.9375rem; /* modern base text size (15px) */
+  font-family: 'Times New Roman', Times, Georgia, serif;
+  font-size: 1.03rem; /* warm, highly readable human scale */
   line-height: 1.6;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -76,34 +76,35 @@ body {
 /* ==================== TYPOGRAPHY — Premium responsive system ==================== */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-inter), 'Inter', -apple-system, sans-serif;
+  font-family: 'Times New Roman', Times, Georgia, serif;
   color: var(--foreground);
-  font-weight: 600; /* soft, less aggressively bold headings */
+  font-weight: 550; /* soft, warm human headings */
   line-height: 1.3;
-  letter-spacing: -0.025em;
-}
-
-h1 {
-  font-size: 2rem; /* slightly smaller and less intimidating */
-}
-
-h2 {
-  font-size: 1.5rem;
-  letter-spacing: -0.02em;
-}
-
-h3 {
-  font-size: 1.15rem;
-  font-weight: 550;
   letter-spacing: -0.015em;
 }
 
+h1 {
+  font-size: 2.25rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-size: 1.3rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+}
+
 h4 {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 550;
 }
 
 p {
+  font-size: 0.98rem;
   line-height: 1.6;
   font-weight: 400;
   color: var(--muted);
