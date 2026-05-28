@@ -13,7 +13,12 @@ import {
   AlertCircle,
   CheckCircle,
   Wind,
-  Footprints
+  Footprints,
+  ShieldAlert,
+  Sparkles,
+  Milestone,
+  Calendar,
+  Award
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
@@ -22,6 +27,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme, ActiveMode } from "@/context/ThemeContext";
 import { getBaseMetrics, DailyMetrics } from "@/utils/mockData";
 import { supabase } from "@/utils/supabase";
+import { calculateFutureHealthPredictions } from "@/utils/predictiveEngine";
 
 export default function DashboardPage() {
   const { profile } = useAuth();
@@ -165,6 +171,22 @@ export default function DashboardPage() {
   const caloriePct = Math.min(100, (totalCalories / calorieTarget) * 100);
   const sleepPct = Math.min(100, (sleepHrs / metrics.sleepTarget) * 100);
   const stepsPct = Math.min(100, (metrics.steps / metrics.stepsTarget) * 100);
+
+  const predictions = calculateFutureHealthPredictions({
+    sleepHours: sleepHrs || metrics.sleepHours,
+    sleepQuality: sleepHrs > 0 ? 80 : metrics.sleepQuality,
+    hydrationMl: waterLogged || metrics.hydrationMl,
+    hydrationTarget: metrics.hydrationTarget,
+    stressLevel: metrics.stressLevel,
+    fatigueScore: metrics.fatigueScore,
+    physicalFatigue: metrics.physicalFatigue,
+    mentalFatigue: metrics.mentalFatigue,
+    sorenessLevel: profile?.soreness_level || 0,
+    recoveryPercentage: metrics.recoveryPercentage,
+    stabilityScore: metrics.stabilityScore,
+    screenTimeHours: profile?.screen_time_hours || 6,
+    caffeineIntake: profile?.caffeine_intake || 'moderate'
+  });
 
   return (
     <DashboardLayout>
@@ -452,6 +474,113 @@ export default function DashboardPage() {
             </div>
 
           </div>
+        )}
+
+        {/* ======= AI PREDICTIVE WELLNESS TRAJECTORY PANEL ======= */}
+        {predictions && (
+          <GlassCard glowColor="violet" className="p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Predictive Health Twin</span>
+                </div>
+                <h3 className="text-base font-extrabold text-[var(--foreground)] tracking-tight">AI Future Health Forecasts</h3>
+                <p className="text-xs text-[var(--muted)]">Calculated from your sleep consistency, hydration consistency, and nervous stress indicators.</p>
+              </div>
+              <Link href="/timeline">
+                <Button variant="glass" size="sm" className="gap-1 text-xs font-bold shrink-0">
+                  <Milestone className="h-3.5 w-3.5" />
+                  <span>Launch Engine</span>
+                </Button>
+              </Link>
+            </div>
+
+            {/* Risk Gauges Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              
+              {/* Burnout Risk Indicator */}
+              <div className="bg-[var(--muted-bg)] p-4 rounded-xl border border-[var(--border)] space-y-2">
+                <div className="flex justify-between items-center text-xs font-bold text-[var(--muted)]">
+                  <span>Burnout Risk</span>
+                  <span className={predictions.burnoutRisk > 60 ? "text-rose-400" : predictions.burnoutRisk > 35 ? "text-amber-500" : "text-emerald-500"}>
+                    {predictions.burnoutRisk}%
+                  </span>
+                </div>
+                <div className="w-full bg-[var(--border)] h-2 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      predictions.burnoutRisk > 60 ? "bg-rose-500" : predictions.burnoutRisk > 35 ? "bg-amber-500" : "bg-emerald-500"
+                    }`}
+                    style={{ width: `${predictions.burnoutRisk}%` }} 
+                  />
+                </div>
+                <span className="text-[10px] text-[var(--muted)] block">
+                  {predictions.burnoutRisk > 60 ? "⚠️ High stress overload risk." : predictions.burnoutRisk > 35 ? "Moderate fatigue buffers." : "Optimal recovery buffer."}
+                </span>
+              </div>
+
+              {/* Central Nervous Strain (CNS) fatigue */}
+              <div className="bg-[var(--muted-bg)] p-4 rounded-xl border border-[var(--border)] space-y-2">
+                <div className="flex justify-between items-center text-xs font-bold text-[var(--muted)]">
+                  <span>Fatigue Accumulation</span>
+                  <span className={predictions.fatigueBuildup > 65 ? "text-rose-400" : predictions.fatigueBuildup > 40 ? "text-amber-500" : "text-emerald-500"}>
+                    {predictions.fatigueBuildup}%
+                  </span>
+                </div>
+                <div className="w-full bg-[var(--border)] h-2 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      predictions.fatigueBuildup > 65 ? "bg-rose-500" : predictions.fatigueBuildup > 40 ? "bg-amber-500" : "bg-emerald-500"
+                    }`}
+                    style={{ width: `${predictions.fatigueBuildup}%` }} 
+                  />
+                </div>
+                <span className="text-[10px] text-[var(--muted)] block">
+                  {predictions.fatigueBuildup > 65 ? "⚠️ Overtraining risk. Action needed." : "Steady physical battery status."}
+                </span>
+              </div>
+
+              {/* Biological Health Age Shift */}
+              <div className="bg-[var(--muted-bg)] p-4 rounded-xl border border-[var(--border)] space-y-2 flex flex-col justify-between">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="text-xs font-bold text-[var(--muted)] block">Twin Age Shift</span>
+                    <span className="text-base font-extrabold text-[var(--foreground)] mt-1 block">
+                      {metrics.biologicalAge + predictions.biologicalAgeShift} years
+                    </span>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    predictions.biologicalAgeShift < 0 ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-400"
+                  }`}>
+                    {predictions.biologicalAgeShift < 0 ? `${predictions.biologicalAgeShift} yrs` : `+${predictions.biologicalAgeShift} yrs`}
+                  </span>
+                </div>
+                <span className="text-[10px] text-[var(--muted)] block">
+                  {predictions.biologicalAgeShift < 0 ? "✨ Aging at deceleration velocity." : "Slight cellular recovery debt."}
+                </span>
+              </div>
+
+            </div>
+
+            {/* Smart Proactive Notifications */}
+            {predictions.preventiveReminders.length > 0 && (
+              <div className="space-y-2 pt-2 border-t border-[var(--border)]">
+                <span className="text-[10px] font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
+                  <ShieldAlert className="h-3.5 w-3.5" />
+                  Preventive Recommendations
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-bold text-[var(--foreground)]">
+                  {predictions.preventiveReminders.slice(0, 4).map((reminder, idx) => (
+                    <div key={idx} className="flex items-center gap-2 p-3 bg-secondary/5 rounded-xl border border-secondary/10">
+                      <Sparkles className="h-3.5 w-3.5 text-secondary shrink-0" />
+                      <span className="leading-snug">{reminder}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </GlassCard>
         )}
 
         {/* ======= QUICK ACTIONS (all modes except elderly) ======= */}

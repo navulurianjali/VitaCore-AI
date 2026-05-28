@@ -5,7 +5,7 @@ import {
   Dumbbell, Play, Pause, RotateCcw, Check, Sparkles, ShieldAlert, 
   Award, Clock, Flame, Droplet, Calendar, TrendingUp, Compass, 
   Heart, CheckSquare, Plus, Save, BookOpen, AlertTriangle, ArrowRight, ArrowLeft,
-  ChevronRight, RefreshCw, Layers
+  ChevronRight, RefreshCw, Layers, Activity
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
@@ -752,47 +752,39 @@ export default function FitnessPage() {
               {coachState === "preview" && generatedWorkout.length > 0 && (
                 <div className="max-w-3xl mx-auto space-y-6">
                   
-                  {/* Readiness & Reasoning cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-                    
-                    {/* Readiness score meter */}
-                    <GlassCard glowColor="violet" className="md:col-span-4 p-5 flex flex-col justify-between text-center min-h-[140px]">
+                  {/* Integrated Readiness & Generation Summary */}
+                  <GlassCard glowColor="violet" className="p-6 space-y-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-foreground/5">
                       <div className="space-y-1">
-                        <span className="text-[10px] text-foreground/50 uppercase font-bold tracking-wider">
-                          Workout Readiness
-                        </span>
-                        <div className="text-4xl font-extrabold text-primary pt-2">
+                        <div className="flex items-center gap-1.5">
+                          <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                          <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Circadian Generation Summary</span>
+                        </div>
+                        <h2 className="text-lg font-bold text-foreground">Your Custom Adaptive Workout</h2>
+                      </div>
+                      
+                      {/* Integrated Readiness Badge */}
+                      <div className="flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-2xl px-4 py-2 shrink-0">
+                        <div className="text-right">
+                          <span className="text-[8px] font-bold text-foreground/50 uppercase block">Workout Readiness</span>
+                          <span className="text-xs font-bold text-foreground">{readinessScore > 75 ? "Excellent Capacity" : "Recovery-Aware Active"}</span>
+                        </div>
+                        <div className="h-10 w-10 rounded-full border-2 border-primary flex items-center justify-center font-extrabold text-sm text-primary shadow-lg shadow-primary/15 bg-background shrink-0">
                           {readinessScore}%
                         </div>
-                        <p className="text-[10px] text-foreground/60 font-semibold pt-1">
-                          {readinessScore > 75 ? "Excellent Capacity" : "Recovery Aware Active"}
-                        </p>
                       </div>
-                      <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden mt-3">
-                        <div 
-                          className="bg-primary h-full rounded-full" 
-                          style={{ width: `${readinessScore}%` }} 
-                        />
-                      </div>
-                    </GlassCard>
+                    </div>
 
-                    {/* AI Reasoning box */}
-                    <GlassCard glowColor="emerald" className="md:col-span-8 p-5 flex flex-col justify-between border border-emerald-500/10 bg-emerald-500/5">
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-bold text-foreground flex items-center gap-1">
-                          <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                          AI Workout Compiler Reasoning
-                        </h4>
-                        <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
-                          {recoveryWarning || "Your bodily systems are fully recharged! We compiled a high-productivity strength and cardio session to lock in your metabolic gains."}
-                        </p>
-                      </div>
-                      <div className="text-[10px] text-foreground/50 font-bold uppercase tracking-wider pt-3">
-                        Biometric Telemetry: Fully Synced
-                      </div>
-                    </GlassCard>
+                    {/* AI Reasoning Text */}
+                    <div className="text-xs text-foreground/85 leading-relaxed font-semibold bg-foreground/5 p-4 rounded-xl border border-foreground/5">
+                      {recoveryWarning || "Your bodily systems are fully recharged! We compiled a high-productivity strength and cardio session to lock in your metabolic gains and optimize cardiorespiratory longevity."}
+                    </div>
 
-                  </div>
+                    <div className="flex justify-between items-center text-[10px] text-foreground/50 font-bold uppercase tracking-wider pt-2">
+                      <span>Biometric Telemetry: Fully Synced</span>
+                      <span>Target Duration: {duration} Mins</span>
+                    </div>
+                  </GlassCard>
 
                   {/* Exercises list preview */}
                   <div className="space-y-3">
@@ -856,132 +848,219 @@ export default function FitnessPage() {
                 </div>
               )}
 
-              {/* STATE D: ACTIVE GUIDED SESSION TIMERS */}
+              {/* STATE D: ACTIVE GUIDED IMMERSIVE COACHING TERMINAL */}
               {coachState === "active" && generatedWorkout.length > 0 && (
-                <div className="max-w-2xl mx-auto space-y-6">
+                <div className="max-w-4xl mx-auto space-y-6">
                   
-                  {recoveryWarning && (
-                    <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/10 text-xs text-amber-500 font-semibold leading-relaxed">
-                      {recoveryWarning}
+                  {/* Header Progress Header */}
+                  <GlassCard glowColor="violet" className="p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-foreground">
+                        {activeWorkoutName}
+                      </span>
                     </div>
-                  )}
 
-                  {/* Header progress bar */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-bold text-foreground">
-                      <span>{activeWorkoutName}</span>
+                    {/* Progress details */}
+                    <div className="flex items-center gap-4 text-xs font-bold text-foreground/70 shrink-0">
                       <span>Exercise {currentExerciseIdx + 1} of {generatedWorkout.length}</span>
+                      <span className="bg-primary/10 text-primary px-2.5 py-0.5 rounded-full text-[10px]">
+                        {Math.round(((currentExerciseIdx) / generatedWorkout.length) * 100)}% Done
+                      </span>
+                      <span className="text-rose-400">
+                        🔥 {Math.round((currentExerciseIdx / generatedWorkout.length) * caloriesBurned || (currentExerciseIdx * 35))} kcal
+                      </span>
                     </div>
-                    <div className="w-full bg-foreground/15 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-primary h-full rounded-full transition-all duration-300"
-                        style={{ width: `${((currentExerciseIdx + (isResting ? 0.5 : 0)) / generatedWorkout.length) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Active Exercise Card */}
-                  <GlassCard glowColor={isResting ? "emerald" : "violet"} className="p-6 space-y-6 text-center">
-                    
-                    {isResting ? (
-                      <div className="space-y-4">
-                        <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full uppercase tracking-wider">
-                          Rest & Prepare
-                        </span>
-                        <h2 className="text-3xl font-bold mt-2">Rest Break</h2>
-                        <p className="text-xs text-foreground/65 leading-relaxed max-w-sm mx-auto font-medium">
-                          Next exercise up: **{generatedWorkout[Math.min(generatedWorkout.length - 1, currentExerciseIdx + 1)].name}**. Breathe deeply and hydrate!
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-wider">
-                          Active Set
-                        </span>
-                        <h2 className="text-3xl font-bold mt-2">{generatedWorkout[currentExerciseIdx].name}</h2>
-                        <p className="text-xs text-foreground/75 leading-relaxed max-w-md mx-auto font-semibold">
-                          {generatedWorkout[currentExerciseIdx].description}
-                        </p>
-                        
-                        <div className="flex justify-center gap-8 text-xs font-bold pt-2">
-                          <div className="flex flex-col items-center">
-                            <span className="text-foreground/45 uppercase text-[9px]">Target</span>
-                            <span className="text-sm font-extrabold text-foreground mt-0.5">{generatedWorkout[currentExerciseIdx].reps}</span>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            <span className="text-foreground/45 uppercase text-[9px]">Sets</span>
-                            <span className="text-sm font-extrabold text-foreground mt-0.5">{generatedWorkout[currentExerciseIdx].sets} Sets</span>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            <span className="text-foreground/45 uppercase text-[9px]">Equipment</span>
-                            <span className="text-sm font-extrabold text-secondary mt-0.5">{generatedWorkout[currentExerciseIdx].equipment}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Live Timer Countdown Circle */}
-                    <div className="flex flex-col items-center pt-4">
-                      <div className="h-36 w-36 rounded-full border-4 border-foreground/5 flex flex-col items-center justify-center bg-foreground/5 relative shadow-inner">
-                        <span className="text-4xl font-extrabold tracking-tight text-foreground">{timeLeft}s</span>
-                        <span className="text-[10px] uppercase font-bold text-foreground/40 mt-0.5">{isResting ? "resting" : "active"}</span>
-                      </div>
-                    </div>
-
-                    {/* Interactive controls */}
-                    <div className="flex justify-center items-center gap-4 pt-4">
-                      
-                      <Button variant="glass" size="sm" onClick={handleSkipExercise} className="flex items-center gap-1 text-xs font-bold">
-                        <ArrowRight className="h-4 w-4" />
-                        <span>Skip</span>
-                      </Button>
-
-                      <button 
-                        onClick={() => setTimerRunning(!timerRunning)}
-                        className={`h-14 w-14 rounded-full flex items-center justify-center text-white shadow-lg transition-transform hover:scale-105 active:scale-95 ${
-                          timerRunning 
-                            ? "bg-amber-500 shadow-amber-500/20" 
-                            : "bg-primary shadow-primary/20"
-                        }`}
-                      >
-                        {timerRunning ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
-                      </button>
-
-                      <Button variant="primary" size="sm" onClick={handleMarkComplete} className="flex items-center gap-1 text-xs font-bold">
-                        <Check className="h-4 w-4" />
-                        <span>Complete</span>
-                      </Button>
-
-                    </div>
-
                   </GlassCard>
 
-                  {/* Supporting Muscle Groups */}
-                  {!isResting && (
-                    <GlassCard glowColor="rose" className="p-4 flex justify-between text-xs font-semibold">
-                      <div>
-                        <span className="text-foreground/45 block text-[9px] uppercase">Primary Target Muscle</span>
-                        <span className="text-rose-400 font-bold text-sm">{generatedWorkout[currentExerciseIdx].primaryMuscle}</span>
+                  {/* Immersive Screen Splitter */}
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+                    
+                    {/* Left Column: Visual AI Posture Guidance & Demo Area */}
+                    <GlassCard glowColor="rose" className="md:col-span-7 p-5 flex flex-col justify-between space-y-4 min-h-[380px]">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[9px] font-bold text-rose-500 uppercase tracking-widest flex items-center gap-1">
+                            <Activity className="h-3 w-3 animate-pulse" />
+                            AI Posture Tracking Stream
+                          </span>
+                          <span className="bg-rose-500/10 text-rose-400 text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">
+                            Webcam Sync Ready
+                          </span>
+                        </div>
+                        
+                        {/* Animated Joint Grid Placeholder */}
+                        <div className="relative rounded-2xl overflow-hidden aspect-video bg-black/60 border border-foreground/10 flex flex-col items-center justify-center p-6 text-center group">
+                          {/* Animated vector scanner lines */}
+                          <div className="absolute top-0 bottom-0 left-0 right-0 border-2 border-primary/20 rounded-xl m-4 pointer-events-none" />
+                          <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-bounce pointer-events-none" />
+                          
+                          {/* Floating metrics over camera */}
+                          <div className="absolute top-3 left-3 bg-black/50 backdrop-blur-sm border border-foreground/5 rounded-lg p-2 text-[9px] font-bold text-left text-foreground/80 space-y-0.5">
+                            <div>• Range of Motion: 104°</div>
+                            <div>• Hip-Spine Angle: Stable</div>
+                            <div>• Velocity: Optimal</div>
+                          </div>
+
+                          <div className="absolute bottom-3 right-3 bg-emerald-500/90 text-white text-[8px] font-bold px-2 py-0.5 rounded">
+                            Posture Match: 96%
+                          </div>
+
+                          <Dumbbell className="h-10 w-10 text-primary animate-bounce mb-3" />
+                          <span className="text-xs font-bold text-foreground">Virtual Posture Grid Overlay</span>
+                          <p className="text-[10px] text-foreground/50 max-w-xs leading-relaxed mt-1 font-semibold">
+                            Simulated camera skeleton mapping your joint angles in real-time. Stand in full view of your device.
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <span className="text-foreground/45 block text-[9px] uppercase">Supporting Muscles</span>
-                        <span className="text-foreground font-bold text-sm">{generatedWorkout[currentExerciseIdx].secondaryMuscle}</span>
+
+                      {/* Step-by-Step interactive instructions */}
+                      <div className="space-y-2 pt-2 border-t border-foreground/5">
+                        <span className="text-[10px] font-bold text-foreground/50 uppercase block">Coaching Execution Cues</span>
+                        <div className="space-y-1.5 text-xs text-foreground/80 font-semibold leading-relaxed">
+                          {generatedWorkout[currentExerciseIdx].name === "Cat-Cow Stretch" ? (
+                            <>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">1.</span><span>Start on hands and knees with a neutral spine.</span></div>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">2.</span><span>Inhale, drop your belly, and arch your back (Cow Pose).</span></div>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">3.</span><span>Exhale, round your spine toward the ceiling (Cat Pose).</span></div>
+                            </>
+                          ) : generatedWorkout[currentExerciseIdx].name === "Bodyweight Squats" ? (
+                            <>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">1.</span><span>Place feet shoulder-width apart, chest upright.</span></div>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">2.</span><span>Lower hips down and back as if sitting in a chair.</span></div>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">3.</span><span>Keep knees behind toes, push through heels to stand.</span></div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">1.</span><span>Position yourself on a flat, joint-supportive surface.</span></div>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">2.</span><span>Maintain deep, steady diaphragmatic respiration beats.</span></div>
+                              <div className="flex gap-2 items-start"><span className="text-primary font-bold">3.</span><span>Execute with complete control, prioritizing orthopedic safety.</span></div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </GlassCard>
-                  )}
 
-                  {/* Quit button */}
-                  <div className="text-center pt-2">
-                    <button 
-                      onClick={() => {
-                        if (confirm("Are you sure you want to stop this workout? Progress is not saved.")) {
-                          setCoachState("form");
-                        }
-                      }}
-                      className="text-xs font-bold text-foreground/45 hover:text-red-500 transition-colors"
-                    >
-                      Quit Current Session
-                    </button>
+                    {/* Right Column: Timer, Details, and Active AI Guidance */}
+                    <div className="md:col-span-5 flex flex-col gap-6 justify-between">
+                      
+                      {/* Active Exercise Detail Card */}
+                      <GlassCard glowColor={isResting ? "emerald" : "violet"} className="p-6 text-center space-y-4 flex-1 flex flex-col justify-between">
+                        
+                        {isResting ? (
+                          <div className="space-y-2">
+                            <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full uppercase tracking-wider">
+                              Rest & Transition
+                            </span>
+                            <h2 className="text-xl font-bold mt-2">Catch Your Breath</h2>
+                            <p className="text-[11px] text-foreground/60 leading-relaxed font-semibold">
+                              Prepare for the next exercise:
+                            </p>
+                            <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl inline-block mt-2">
+                              <span className="text-xs font-bold text-foreground">
+                                {generatedWorkout[Math.min(generatedWorkout.length - 1, currentExerciseIdx + 1)].name}
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-wider">
+                              Active Routine
+                            </span>
+                            <h2 className="text-2xl font-black mt-2 leading-tight">{generatedWorkout[currentExerciseIdx].name}</h2>
+                            <p className="text-xs text-foreground/70 font-semibold leading-relaxed">
+                              {generatedWorkout[currentExerciseIdx].description}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Interactive Countdown Timer */}
+                        <div className="flex flex-col items-center py-4">
+                          <div className="h-32 w-32 rounded-full border-4 border-foreground/5 flex flex-col items-center justify-center bg-foreground/5 relative shadow-inner">
+                            <span className="text-3xl font-black tracking-tight text-foreground">{timeLeft}s</span>
+                            <span className="text-[9px] uppercase font-bold text-foreground/45 mt-0.5">
+                              {isResting ? "rest break" : "seconds left"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Active AI Guidance Display */}
+                        <div className="p-3 bg-primary/5 border border-primary/10 rounded-2xl text-[11px] font-bold text-primary leading-normal text-center min-h-[50px] flex items-center justify-center">
+                          {isResting ? (
+                            <span>🧘 Deep box-breathing: Inhale 4s, exhale slowly to lower active cortisol.</span>
+                          ) : timeLeft > 30 ? (
+                            <span>💡 AI Cue: "Slow down your breathing and focus on isometric core control."</span>
+                          ) : timeLeft > 15 ? (
+                            <span>💡 AI Cue: "Maintain posture shoulder alignment. Keep joints soft."</span>
+                          ) : (
+                            <span>💡 AI Cue: "Last push! Keep your spine straight and push through heels."</span>
+                          )}
+                        </div>
+
+                        {/* Target values */}
+                        {!isResting && (
+                          <div className="grid grid-cols-3 gap-2 text-center text-xs font-bold border-t border-foreground/5 pt-4">
+                            <div>
+                              <span className="text-foreground/45 uppercase text-[9px] block">Target</span>
+                              <span className="text-foreground font-black">{generatedWorkout[currentExerciseIdx].reps}</span>
+                            </div>
+                            <div>
+                              <span className="text-foreground/45 uppercase text-[9px] block">Sets</span>
+                              <span className="text-foreground font-black">{generatedWorkout[currentExerciseIdx].sets} Sets</span>
+                            </div>
+                            <div>
+                              <span className="text-foreground/45 uppercase text-[9px] block">Equipment</span>
+                              <span className="text-secondary font-black truncate">{generatedWorkout[currentExerciseIdx].equipment}</span>
+                            </div>
+                          </div>
+                        )}
+
+                      </GlassCard>
+
+                      {/* Interactive Guided Controls */}
+                      <GlassCard glowColor="none" className="p-4 space-y-4">
+                        <div className="flex justify-center items-center gap-4">
+                          
+                          <Button variant="glass" size="sm" onClick={handleSkipExercise} className="flex items-center gap-1 text-xs font-bold">
+                            <ArrowRight className="h-4 w-4" />
+                            <span>Skip</span>
+                          </Button>
+
+                          <button 
+                            onClick={() => setTimerRunning(!timerRunning)}
+                            className={`h-14 w-14 rounded-full flex items-center justify-center text-white shadow-lg transition-transform hover:scale-105 active:scale-95 ${
+                              timerRunning 
+                                ? "bg-amber-500 shadow-amber-500/20" 
+                                : "bg-primary shadow-primary/20"
+                            }`}
+                          >
+                            {timerRunning ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
+                          </button>
+
+                          <Button variant="primary" size="sm" onClick={handleMarkComplete} className="flex items-center gap-1 text-xs font-bold">
+                            <Check className="h-4 w-4" />
+                            <span>Complete</span>
+                          </Button>
+
+                        </div>
+
+                        {/* Quit Trigger */}
+                        <div className="text-center">
+                          <button 
+                            onClick={() => {
+                              if (confirm("Are you sure you want to stop this workout? Your active progress will be lost.")) {
+                                setCoachState("form");
+                              }
+                            }}
+                            className="text-[10px] font-bold text-foreground/40 hover:text-red-400 transition-colors uppercase tracking-widest cursor-pointer"
+                          >
+                            Quit Active Session
+                          </button>
+                        </div>
+                      </GlassCard>
+
+                    </div>
+
                   </div>
 
                 </div>

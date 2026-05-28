@@ -15,7 +15,11 @@ import {
   Scan, 
   CornerDownRight, 
   CheckCircle, 
-  AlertCircle 
+  AlertCircle,
+  Moon,
+  Activity,
+  Calendar,
+  ShieldAlert
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
@@ -25,6 +29,32 @@ import { useTheme } from "@/context/ThemeContext";
 import { parseSimulatedFoodScan, DailyMetrics, ScanResult } from "@/utils/mockData";
 import confetti from "canvas-confetti";
 import { supabase } from "@/utils/supabase";
+
+export interface DietPlan {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  targetMacros: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+}
+
+export const DIET_PLANS: DietPlan[] = [
+  { id: "weight_loss", name: "Weight Loss Decompression", emoji: "📉", description: "High thermic impact meals, calorie-deficit calibration, and rich fiber blocks.", targetMacros: { calories: 1600, protein: 120, carbs: 140, fat: 50 } },
+  { id: "weight_gain", name: "High Calorie Mass Gainer", emoji: "📈", description: "Nutrient-dense whole food blocks to fuel healthy lean hypertrophy.", targetMacros: { calories: 2800, protein: 160, carbs: 320, fat: 80 } },
+  { id: "fat_loss", name: "Somatic Fat Loss Circuit", emoji: "🔥", description: "Macro-balanced high thermogenic foods to optimize metabolic fat oxidation.", targetMacros: { calories: 1800, protein: 140, carbs: 160, fat: 50 } },
+  { id: "muscle_gain", name: "Hypertrophy Muscle Builder", emoji: "💪", description: "Precision amino acid pools and glycogen replenishment carbs.", targetMacros: { calories: 2500, protein: 170, carbs: 260, fat: 70 } },
+  { id: "diabetic_friendly", name: "Low-Glycemic Insulin Guard", emoji: "🩸", description: "Extremely low glycemic indexes to protect steady pancreatic stability.", targetMacros: { calories: 1900, protein: 110, carbs: 150, fat: 60 } },
+  { id: "heart_healthy", name: "Cardiovascular Longevity", emoji: "❤️", description: "Omega-3 rich lipids and low sodium boundaries to safeguard vascular pressure.", targetMacros: { calories: 2000, protein: 115, carbs: 210, fat: 55 } },
+  { id: "stress_recovery", name: "Cortisol Decompression", emoji: "🧠", description: "High magnesium, tryptophan-rich foods to suppress sympathetic nervous stress.", targetMacros: { calories: 2100, protein: 120, carbs: 220, fat: 65 } },
+  { id: "sleep_support", name: "Circadian Melatonin Trigger", emoji: "🌙", description: "Pre-sleep amino complexes that promote deep restorative melatonin cycles.", targetMacros: { calories: 1950, protein: 110, carbs: 200, fat: 60 } },
+  { id: "high_protein", name: "High-Protein Keto-Lean", emoji: "🥩", description: "Elite-level protein thresholds to fuel muscle recovery and peak performance.", targetMacros: { calories: 2200, protein: 190, carbs: 120, fat: 75 } },
+  { id: "vegetarian", name: "Phyto-Longevity Alkaline", emoji: "🌱", description: "100% plant-based organic proteins and high prebiotic fibers.", targetMacros: { calories: 2000, protein: 110, carbs: 230, fat: 60 } }
+];
 
 interface FoodLog {
   id: string;
@@ -46,6 +76,8 @@ export default function NutritionPage() {
   const { profile } = useAuth();
   const { activeMode } = useTheme();
   
+  const [activePlan, setActivePlan] = useState<string>("muscle_gain");
+  const [adjustingPlan, setAdjustingPlan] = useState<boolean>(false);
   const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
   const [foodLogs, setFoodLogs] = useState<FoodLog[]>([]);
   const [waterLogged, setWaterLogged] = useState(0);
@@ -133,10 +165,10 @@ export default function NutritionPage() {
 
   useEffect(() => {
     // Generate static base targets (metabolic calorie limits etc)
-    // Calories consumed and logged items are fully loaded from Supabase below
+    const activePlanObj = DIET_PLANS.find(p => p.id === activePlan) || DIET_PLANS[3];
     const base = {
       caloriesBurned: activeMode === "performance" ? 2800 : 2100,
-      caloriesTarget: 2200,
+      caloriesTarget: activePlanObj.targetMacros.calories,
       caloriesConsumed: 0,
       hydrationMl: 0,
       hydrationTarget: activeMode === "performance" ? 3000 : 2000,
@@ -167,7 +199,7 @@ export default function NutritionPage() {
     } else {
       setLoadingLogs(false);
     }
-  }, [activeMode, profile]);
+  }, [activeMode, profile, activePlan]);
 
   const handleAddFood = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -392,8 +424,8 @@ export default function NutritionPage() {
         {/* Page header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Nutrition & Hydration</h1>
-            <p className="text-sm text-[var(--muted)] mt-0.5">Track meals, macros, and daily water intake</p>
+            <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Personalized Diet Plans</h1>
+            <p className="text-sm text-[var(--muted)] mt-0.5">Adaptive long-term nutrition, dynamic calorie calibrations, and circadian fluid sync</p>
           </div>
         </div>
 
@@ -477,223 +509,110 @@ export default function NutritionPage() {
             {/* 2. DUAL INTERFACES: Scanner vs Manual Logger */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
               
-              {/* LEFT COLUMN: FOOD SCANNER SECTION */}
+              {/* LEFT COLUMN: PERSONALIZED DIET PLANS BUILDER */}
               <div className="lg:col-span-7 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
                 
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
-                    <Scan className="h-4 w-4 text-primary" />
-                    AI Food Scanner
-                  </h3>
+                  <div className="flex justify-between items-start sm:items-center flex-col sm:flex-row gap-3">
+                    <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5 uppercase tracking-widest">
+                      <Utensils className="h-4 w-4 text-primary animate-pulse" />
+                      Select Adaptive Diet Plan
+                    </h3>
+                    <span className="bg-primary/10 border border-primary/20 text-primary text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase shrink-0 animate-pulse">
+                      AI ADAPTIVE ACTIVE
+                    </span>
+                  </div>
                   <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
-                    Upload images, snap camera captures, or search barcodes to run automated chemical audits, portion sizes, glycemic spikes, and recovery swaps.
+                    Choose an AI-calibrated nutrition plan. The plan adjusts your daily calorie limits, macro ratios, and recommended foods dynamically based on your goals, sleep debt, stress levels, hydration consistency, and active workout intensities.
                   </p>
 
-                  {/* Drag & Drop Area */}
-                  <div 
-                    onClick={() => handleScanSimulation("Atlantic Salmon Avocado Salad")}
-                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                    onDragLeave={() => setIsDragging(false)}
-                    onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleScanSimulation("Atlantic Salmon Avocado Salad"); }}
-                    className={`h-44 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2.5 cursor-pointer transition-all duration-300 group ${
-                      isDragging 
-                        ? "border-primary bg-primary/10 scale-[1.01]" 
-                        : "border-foreground/15 bg-foreground/5 hover:border-primary/50 hover:bg-primary/5"
-                    }`}
-                  >
-                    <div className="h-12 w-12 rounded-xl bg-background border border-foreground/5 flex items-center justify-center text-foreground/70 group-hover:scale-110 transition-transform">
-                      <Upload className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="text-center space-y-0.5">
-                      <span className="text-xs font-bold text-foreground block">Drag & Drop Food Image here</span>
-                      <span className="text-xs text-foreground/50">or click to upload a snapshot</span>
-                    </div>
-                  </div>
-
-                  {/* Camera & Barcode controls */}
-                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-1">
-                    <button 
-                      onClick={() => handleScanSimulation("Double Cheese Pepperoni Pizza Slice")}
-                      className="sm:col-span-4 flex items-center justify-center gap-2 text-xs font-bold border border-foreground/10 hover:border-primary/45 rounded-xl bg-foreground/5 hover:bg-primary/5 transition-all py-3 px-4 text-foreground/90 cursor-pointer"
-                    >
-                      <Camera className="h-4 w-4 text-secondary" />
-                      <span>Camera Capture</span>
-                    </button>
-
-                    <div className="sm:col-span-8 flex gap-2">
-                      <input
-                        type="text"
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        placeholder="Enter package barcode or food name"
-                        className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none placeholder-foreground/45"
-                      />
-                      <Button 
-                        variant="primary" 
-                        onClick={() => handleScanSimulation(inputText)}
-                        className="px-5 py-2.5 text-xs font-bold shrink-0"
+                  {/* Plans grid selector */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    {DIET_PLANS.map((plan) => (
+                      <button
+                        key={plan.id}
+                        type="button"
+                        onClick={() => {
+                          setActivePlan(plan.id);
+                          setAdjustingPlan(true);
+                          setTimeout(() => setAdjustingPlan(false), 500);
+                          confetti({
+                            particleCount: 20,
+                            spread: 30,
+                            colors: ["#8b5cf6"]
+                          });
+                        }}
+                        className={`p-3 rounded-xl border text-left flex items-start gap-3 transition-all hover:bg-foreground/5 cursor-pointer ${
+                          activePlan === plan.id
+                            ? "border-primary bg-primary/5 shadow-md shadow-primary/5 scale-[1.01]"
+                            : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                        }`}
                       >
-                        Scan
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Pre-sets */}
-                  <div className="space-y-2 pt-2 border-t border-foreground/5">
-                    <span className="text-[9px] font-bold text-foreground/50 block">Instant Food Simulators</span>
-                    <div className="flex flex-wrap gap-2">
-                      {sampleFoods.map((s, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleScanSimulation(s.query)}
-                          className="px-2.5 py-1.5 text-xs font-bold rounded-xl bg-foreground/5 border border-foreground/5 hover:border-primary/40 transition-all cursor-pointer text-foreground/80 hover:text-foreground"
-                        >
-                          {s.label}
-                        </button>
-                      ))}
-                    </div>
+                        <span className="text-xl shrink-0 mt-0.5">{plan.emoji}</span>
+                        <div className="space-y-0.5 min-w-0">
+                          <span className="text-xs font-bold text-foreground block truncate">{plan.name}</span>
+                          <span className="text-[10px] text-foreground/50 block leading-normal">{plan.description}</span>
+                        </div>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                {/* Results display panel */}
-                <div className="border-t border-foreground/5 pt-5 min-h-[140px] flex flex-col justify-center">
-                  {scanning && (
-                    <div className="flex flex-col items-center gap-3 text-center py-6">
-                      <div className="h-8 w-8 animate-spin rounded-full border-3 border-primary/20 border-t-primary" />
-                      <span className="text-xs font-bold tracking-widest text-primary animate-pulse">Running Neural Food Scanner...</span>
-                      <p className="text-xs text-foreground/60 max-w-xs leading-normal">Extracting chemical additives, sodium matrices, portion weights, and macro ratios.</p>
+                {/* Diet Plan Intelligence details */}
+                <div className="border-t border-foreground/5 pt-5 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
+                      <ShieldAlert className="h-3.5 w-3.5 text-secondary animate-pulse" />
+                      Dynamic Plan Adjustments
+                    </span>
+                    {adjustingPlan && (
+                      <span className="text-[8px] text-primary animate-pulse font-bold tracking-widest uppercase">
+                        Recalibrating...
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]">
+                    {/* Adjustment 1: Workout Intensity */}
+                    <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
+                      <span className="text-[9px] text-primary block uppercase tracking-wider">🏋️ Workout Intensity Sync</span>
+                      <p className="leading-snug text-foreground/80 font-semibold">
+                        {activeMode === "performance" 
+                          ? "High performance active: Protein targets shifted (+15g) to accelerate peak muscular synthesis."
+                          : "Moderate active state: Protein targets aligned for standard recovery thresholds."}
+                      </p>
                     </div>
-                  )}
 
-                  {!scanning && !scanResult && (
-                    <div className="flex flex-col items-center gap-1.5 text-center py-6 text-foreground/40 select-none">
-                      <Scan className="h-8 w-8 text-foreground/25 animate-pulse" />
-                      <span className="text-xs font-bold">Scanner Console Empty</span>
-                      <p className="text-xs max-w-xs leading-normal">Upload a snapshot or scan a packaging barcode to perform automated audits.</p>
+                    {/* Adjustment 2: Sleep & Circadian Debt */}
+                    <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
+                      <span className="text-[9px] text-secondary block uppercase tracking-wider">🌙 Sleep & Circadian Debt</span>
+                      <p className="leading-snug text-foreground/80 font-semibold">
+                        {metrics?.sleepHours && metrics.sleepHours < 7.0 
+                          ? "Sleep debt detected (<7h): Increased restorative glycogen carbs (+10g) to combat cortisol spikes."
+                          : "Sleep parameters synchronized: Stable glycemic load targets active to promote sleep latency."}
+                      </p>
                     </div>
-                  )}
 
-                  {!scanning && scanResult && (
-                    <div className="space-y-5 animate-slide-in">
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="space-y-0.5">
-                          <div className="flex flex-wrap gap-1.5 items-center">
-                            <span className="rounded-full bg-primary/10 border border-primary/15 px-2.5 py-0.5 text-[9px] font-bold text-primary">
-                              Portion: {scanResult.portionSize}
-                            </span>
-                            <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold border ${
-                              scanResult.healthScore >= 75
-                                ? "bg-emerald-500/10 border-emerald-500/15 text-emerald-400"
-                                : "bg-rose-500/10 border-rose-500/15 text-rose-400"
-                            }`}>
-                              {scanResult.healthScore >= 75 ? "✓ Clean Whole Food" : "⚠ Processed glycemic hazard"}
-                            </span>
-                          </div>
-                          <h3 className="text-sm font-bold text-foreground mt-1">{scanResult.foodName}</h3>
-                        </div>
-
-                        <div className="flex items-center gap-3 shrink-0">
-                          <div className="text-right">
-                            <span className="text-[8px] font-bold text-foreground/40 block">Density Score</span>
-                            <span className="text-xs font-bold text-secondary block">{scanResult.nutrientDensity}/10</span>
-                          </div>
-                          
-                          <div className={`h-12 w-12 rounded-full border-2 flex flex-col items-center justify-center shrink-0 shadow-lg ${
-                            scanResult.healthScore >= 75
-                              ? "border-secondary text-secondary shadow-secondary/10"
-                              : "border-rose-500 text-rose-500 shadow-rose-500/10"
-                          }`}>
-                            <span className="text-[7px] font-bold">Health</span>
-                            <span className="text-sm font-bold">{scanResult.healthScore}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Macros */}
-                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-xs font-bold">
-                        <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
-                          <span className="text-primary block font-bold">Protein</span>
-                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.protein}g</span>
-                        </div>
-                        <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
-                          <span className="text-secondary block font-bold">Carbs</span>
-                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.carbs}g</span>
-                        </div>
-                        <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
-                          <span className="text-accent block font-bold">Fats</span>
-                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.fat}g</span>
-                        </div>
-                        <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
-                          <span className="text-rose-400 block font-bold">Sugars</span>
-                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.sugar}g</span>
-                        </div>
-                        <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
-                          <span className="text-amber-500 block font-bold">Sodium</span>
-                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.sodium}mg</span>
-                        </div>
-                        <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
-                          <span className="text-teal-400 block font-bold">Fiber</span>
-                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.fiber}g</span>
-                        </div>
-                      </div>
-
-                      {/* Warnings & Swaps */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-foreground/5 pt-4">
-                        <div className="space-y-2">
-                          <span className="text-[9px] font-bold text-rose-500 block">Auditing Alerts:</span>
-                          <div className="space-y-1.5 text-[9px] font-bold text-foreground/85">
-                            {scanResult.sugarAlert && (
-                              <div className="flex gap-1.5 items-center text-rose-400 bg-rose-400/5 rounded-lg px-2 py-1">
-                                <AlertCircle className="h-3.5 w-3.5" />
-                                <span>Glycemic spike: Sugar count exceeded</span>
-                              </div>
-                            )}
-                            {scanResult.sodium > 800 && (
-                              <div className="flex gap-1.5 items-center text-rose-400 bg-rose-400/5 rounded-lg px-2 py-1">
-                                <AlertCircle className="h-3.5 w-3.5" />
-                                <span>High sodium logged: Recovery blocker</span>
-                              </div>
-                            )}
-                            {scanResult.unhealthyAdditives.length > 0 ? (
-                              <div className="flex flex-wrap gap-1">
-                                {scanResult.unhealthyAdditives.map((ad, idx) => (
-                                  <span key={idx} className="bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded text-[8px] font-bold text-red-500">
-                                    ⚠ {ad}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="flex gap-1.5 items-center text-emerald-400 bg-emerald-400/5 rounded-lg px-2 py-1">
-                                <CheckCircle className="h-3.5 w-3.5" />
-                                <span>Additive Audit: 100% Chemical Safe</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <span className="text-[9px] font-bold text-secondary block">Longevity Swaps:</span>
-                          <div className="space-y-1.5">
-                            {scanResult.alternatives.map((alt, idx) => (
-                              <div key={idx} className="flex items-center gap-1.5 p-1.5 bg-secondary/5 rounded-lg border border-secondary/10 text-[9px] font-bold text-foreground/80">
-                                <CornerDownRight className="h-3 w-3 text-secondary shrink-0" />
-                                <span>{alt}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <Button 
-                        variant="primary" 
-                        onClick={handleLogScannedMeal}
-                        className="w-full py-3 flex items-center justify-center gap-2"
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                        <span>Approve & Log Scanned Meal</span>
-                      </Button>
+                    {/* Adjustment 3: Hydration Metrics */}
+                    <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
+                      <span className="text-[9px] text-emerald-500 block uppercase tracking-wider">💧 Fluid Intake Compliance</span>
+                      <p className="leading-snug text-foreground/80 font-semibold">
+                        {waterLogged < 1500 
+                          ? "Dehydration alert: Fluid volume is low. Added 500ml hydration buffer to safeguard liver kinetics."
+                          : "Excellent rehydration: Balanced metabolic cleansing rates are currently active."}
+                      </p>
                     </div>
-                  )}
+
+                    {/* Adjustment 4: Stress and Workload */}
+                    <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
+                      <span className="text-[9px] text-amber-500 block uppercase tracking-wider">🧠 Cortisol / Screen Strain</span>
+                      <p className="leading-snug text-foreground/80 font-semibold">
+                        {metrics?.stressLevel && metrics.stressLevel > 50
+                          ? "Elevated stress detected: Added high-magnesium tryptophan whole food seeds to lower CNS strain."
+                          : "Stress indicators optimal: Plan calibrated to baseline autonomic nervous system balance."}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
               </div>

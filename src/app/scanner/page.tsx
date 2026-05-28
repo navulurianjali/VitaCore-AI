@@ -28,6 +28,7 @@ export default function FoodScannerPage() {
   const { profile } = useAuth();
   
   // UI states
+  const [scannerTab, setScannerTab] = useState<"plate" | "barcode">("plate");
   const [inputText, setInputText] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
@@ -42,6 +43,7 @@ export default function FoodScannerPage() {
   const [showCamera, setShowCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Cycle scanning messages for visual premium feedback
   useEffect(() => {
@@ -246,15 +248,41 @@ export default function FoodScannerPage() {
           </div>
         </div>
 
+        {/* Scanner Tab Selection Navigation */}
+        <div className="flex border-b border-foreground/5 pb-1 gap-2 overflow-x-auto scrollbar-none">
+          <button
+            onClick={() => { setScannerTab("plate"); setResult(null); setImagePreview(null); setErrorMsg(""); }}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 ${
+              scannerTab === "plate"
+                ? "bg-primary text-white shadow-md shadow-primary/15"
+                : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
+            }`}
+          >
+            <Camera className="h-4 w-4" />
+            <span>Plate Image Scanning</span>
+          </button>
+          <button
+            onClick={() => { setScannerTab("barcode"); setResult(null); setImagePreview(null); setErrorMsg(""); }}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 ${
+              scannerTab === "barcode"
+                ? "bg-primary text-white shadow-md shadow-primary/15"
+                : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
+            }`}
+          >
+            <Scan className="h-4 w-4" />
+            <span>Barcode Auditing Console</span>
+          </button>
+        </div>
+
         {/* 1. DUAL CONTAINER: Trigger console vs Results view */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
           {/* Left panel: Camera capture & Upload triggers */}
           <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
             <div className="space-y-6">
-              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                <Sparkles className="h-4.5 w-4.5 text-primary" />
-                Capture or Upload Plate
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-widest">
+                <Sparkles className="h-4.5 w-4.5 text-primary animate-pulse" />
+                {scannerTab === "plate" ? "Capture or Upload Plate" : "Package Barcode Scan"}
               </h3>
 
               {/* Error warning box */}
@@ -265,103 +293,171 @@ export default function FoodScannerPage() {
                 </div>
               )}
 
-              {/* HTML5 Live Webcam / Camera Stream window */}
-              {showCamera ? (
-                <div className="relative rounded-2xl overflow-hidden border border-foreground/10 bg-black aspect-video flex items-center justify-center">
-                  <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    playsInline 
-                    className="w-full h-full object-cover transform scale-x-[-1]"
-                  />
-                  
-                  {/* Capture Trigger controls */}
-                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
-                    <button 
-                      onClick={handleCapturePhoto}
-                      className="bg-primary text-white h-11 px-5 rounded-full text-xs font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-transform flex items-center gap-1"
+              {scannerTab === "plate" ? (
+                <>
+                  {/* HTML5 Live Webcam / Camera Stream window */}
+                  {showCamera ? (
+                    <div className="relative rounded-2xl overflow-hidden border border-foreground/10 bg-black aspect-video flex items-center justify-center">
+                      <video 
+                        ref={videoRef} 
+                        autoPlay 
+                        playsInline 
+                        className="w-full h-full object-cover transform scale-x-[-1]"
+                      />
+                      
+                      {/* Capture Trigger controls */}
+                      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
+                        <button 
+                          onClick={handleCapturePhoto}
+                          className="bg-primary text-white h-11 px-5 rounded-full text-xs font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-transform flex items-center gap-1"
+                        >
+                          <Camera className="h-4 w-4" />
+                          <span>Take Photo</span>
+                        </button>
+                        
+                        <button 
+                          onClick={handleStopCamera}
+                          className="bg-foreground/20 hover:bg-foreground/35 text-white h-11 w-11 rounded-full flex items-center justify-center backdrop-blur-md transition-colors"
+                        >
+                          <X className="h-4.5 w-4.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Drag & Drop Photo Upload Zone */
+                    <div 
+                      onDragEnter={handleDrag}
+                      onDragOver={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`relative h-44 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2.5 cursor-pointer transition-all duration-300 group ${
+                        dragActive 
+                          ? "border-primary bg-primary/5" 
+                          : "border-foreground/15 hover:border-primary/50 bg-foreground/5 hover:bg-primary/5"
+                      }`}
                     >
-                      <Camera className="h-4 w-4" />
-                      <span>Take Photo</span>
-                    </button>
-                    
-                    <button 
-                      onClick={handleStopCamera}
-                      className="bg-foreground/20 hover:bg-foreground/35 text-white h-11 w-11 rounded-full flex items-center justify-center backdrop-blur-md transition-colors"
-                    >
-                      <X className="h-4.5 w-4.5" />
-                    </button>
-                  </div>
-                </div>
+                      <input 
+                        ref={fileInputRef}
+                        type="file" 
+                        onChange={handleFileInput}
+                        accept="image/jpeg,image/png,image/webp" 
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer hidden"
+                      />
+
+                      <div className="h-11 w-11 rounded-xl bg-background border border-foreground/5 flex items-center justify-center text-foreground/70 group-hover:scale-115 transition-transform">
+                        <Upload className="h-5 w-5 text-primary" />
+                      </div>
+                      <span className="text-xs font-bold text-foreground">
+                        Drag Plate Image here or click to browse
+                      </span>
+                      <span className="text-[10px] text-foreground/50 font-semibold uppercase tracking-wider">
+                        Supports JPEG, PNG, WEBP (under 5MB)
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Dual Action buttons (Camera + Upload picker button) */}
+                  {!showCamera && (
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                      <Button 
+                        variant="primary" 
+                        onClick={handleOpenCamera}
+                        className="py-3 flex items-center justify-center gap-1.5 text-xs font-bold shadow-lg shadow-primary/10"
+                      >
+                        <Camera className="h-4 w-4" />
+                        <span>Use Camera</span>
+                      </Button>
+                      <Button 
+                        variant="glass" 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="py-3 flex items-center justify-center gap-1.5 text-xs font-bold border border-foreground/10 hover:border-primary/30"
+                      >
+                        <Upload className="h-4 w-4" />
+                        <span>Upload Photo</span>
+                      </Button>
+                    </div>
+                  )}
+                </>
               ) : (
-                /* Drag & Drop Photo Upload Zone */
-                <div 
-                  onDragEnter={handleDrag}
-                  onDragOver={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDrop={handleDrop}
-                  className={`relative h-44 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2.5 cursor-pointer transition-all duration-300 group ${
-                    dragActive 
-                      ? "border-primary bg-primary/5" 
-                      : "border-foreground/15 hover:border-primary/50 bg-foreground/5 hover:bg-primary/5"
-                  }`}
-                >
-                  <input 
-                    type="file" 
-                    onChange={handleFileInput}
-                    accept="image/jpeg,image/png,image/webp" 
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-
-                  <div className="h-11 w-11 rounded-xl bg-background border border-foreground/5 flex items-center justify-center text-foreground/70 group-hover:scale-115 transition-transform">
-                    <Upload className="h-5 w-5 text-primary" />
+                /* Barcode input simulated reader */
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl border border-foreground/5 bg-foreground/5 space-y-2 text-center">
+                    <Scan className="h-8 w-8 text-secondary mx-auto animate-pulse" />
+                    <span className="text-xs font-bold text-foreground block">Simulated Barcode Scan Console</span>
+                    <p className="text-[10px] text-foreground/60 leading-relaxed font-semibold">
+                      Enter product package codes (e.g. 73204901842) or try preset bars below to run chemical, sugar, and additive audits instantly.
+                    </p>
                   </div>
-                  <span className="text-xs font-bold text-foreground">
-                    Drag Plate Image here or click to browse
-                  </span>
-                  <span className="text-[10px] text-foreground/50 font-semibold uppercase tracking-wider">
-                    Supports JPEG, PNG, WEBP (under 5MB)
-                  </span>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      placeholder="Enter UPC/EAN Barcode (e.g. 73204901842)"
+                      className="w-full text-xs px-3.5 py-3 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none focus:border-secondary/50 placeholder-foreground/35"
+                    />
+                    <Button 
+                      variant="primary" 
+                      onClick={() => {
+                        if (!inputText.trim()) return;
+                        setImagePreview(null);
+                        handleScanSimulation(inputText);
+                      }} 
+                      className="px-5 py-3 text-xs font-bold shrink-0 shadow-lg shadow-primary/10"
+                    >
+                      Audit
+                    </Button>
+                  </div>
+
+                  {/* Preset UPCs */}
+                  <div className="space-y-2 pt-2">
+                    <span className="text-[9px] font-bold text-foreground/50 block">Preset Simulated Package Bars</span>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => { setInputText("73204901842"); handleScanSimulation("73204901842"); }}
+                        className="px-2.5 py-1.5 text-[10px] font-bold rounded-lg bg-foreground/5 border border-foreground/5 hover:border-secondary/40 transition-colors text-foreground/80 cursor-pointer"
+                      >
+                        ⚡ Energy Protein Bar
+                      </button>
+                      <button
+                        onClick={() => { setInputText("salad"); handleScanSimulation("Atlantic Salmon Salad"); }}
+                        className="px-2.5 py-1.5 text-[10px] font-bold rounded-lg bg-foreground/5 border border-foreground/5 hover:border-secondary/40 transition-colors text-foreground/80 cursor-pointer"
+                      >
+                        🥗 Clean Whole Food salad
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Action triggers */}
-              {!showCamera && (
-                <Button 
-                  variant="primary" 
-                  onClick={handleOpenCamera}
-                  className="w-full py-3 flex items-center justify-center gap-1 text-xs font-bold shadow-lg shadow-primary/10"
-                >
-                  <Camera className="h-4 w-4" />
-                  <span>Open Device Camera</span>
-                </Button>
-              )}
-
-              {/* Text fallback query for convenience */}
-              <div className="space-y-1.5 pt-2 border-t border-foreground/5">
-                <label className="text-[11px] font-bold text-foreground/60">Manual Meal Query Fallback</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Enter meal name (e.g. Avocado Toast)"
-                    className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground placeholder-foreground/35 focus:outline-none"
-                  />
-                  <Button 
-                    variant="glass" 
-                    onClick={() => {
-                      if (!inputText.trim()) return;
-                      // Convert query input to basic simulated snapshot context
-                      setImagePreview(null);
-                      handleScanSimulation(inputText);
-                    }} 
-                    className="px-4 py-2.5 text-xs font-bold shrink-0"
-                  >
-                    Search
-                  </Button>
+              {/* Text fallback query for convenience (Only in plate scanning) */}
+              {scannerTab === "plate" && (
+                <div className="space-y-1.5 pt-2 border-t border-foreground/5">
+                  <label className="text-[11px] font-bold text-foreground/60">Manual Meal Query Fallback</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      placeholder="Enter meal name (e.g. Avocado Toast)"
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground placeholder-foreground/35 focus:outline-none"
+                    />
+                    <Button 
+                      variant="glass" 
+                      onClick={() => {
+                        if (!inputText.trim()) return;
+                        setImagePreview(null);
+                        handleScanSimulation(inputText);
+                      }} 
+                      className="px-4 py-2.5 text-xs font-bold shrink-0"
+                    >
+                      Search
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
 
             </div>
 
