@@ -160,6 +160,10 @@ textarea {
   outline: none;
 }
 
+.input-with-icon {
+  padding-left: 2.75rem !important;
+}
+
 textarea {
   height: auto !important;
   min-height: 80px !important;

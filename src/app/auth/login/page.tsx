@@ -76,7 +76,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-foreground placeholder-foreground/35 focus:outline-none pl-12"
+                  className="w-full text-foreground placeholder-foreground/35 focus:outline-none input-with-icon"
                   placeholder="name@company.com"
                 />
               </div>
@@ -96,7 +96,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full text-foreground placeholder-foreground/35 focus:outline-none pl-12"
+                  className="w-full text-foreground placeholder-foreground/35 focus:outline-none input-with-icon"
                   placeholder="••••••••"
                 />
               </div>

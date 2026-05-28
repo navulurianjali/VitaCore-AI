@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full text-foreground placeholder-foreground/35 focus:outline-none"
+                    className="w-full text-foreground placeholder-foreground/35 focus:outline-none input-with-icon"
                     placeholder="name@company.com"
                   />
                 </div>
