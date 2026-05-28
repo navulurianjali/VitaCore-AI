@@ -10,51 +10,53 @@ import {
   Apple, 
   Plus, 
   Info, 
-  Upload, 
-  Camera, 
-  Scan, 
-  CornerDownRight, 
   CheckCircle, 
   AlertCircle,
   Moon,
   Activity,
   Calendar,
-  ShieldAlert
+  ShieldAlert,
+  Check,
+  Star,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  Award,
+  Heart,
+  BarChart2
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { parseSimulatedFoodScan, DailyMetrics, ScanResult } from "@/utils/mockData";
 import confetti from "canvas-confetti";
 import { supabase } from "@/utils/supabase";
+import { 
+  ResponsiveContainer, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  LineChart, 
+  Line 
+} from "recharts";
 
-export interface DietPlan {
-  id: string;
+interface Meal {
+  mealType: string;
   name: string;
-  emoji: string;
-  description: string;
-  targetMacros: {
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-  };
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  whyHelps: string;
+  recoveryBenefits: string;
+  energyBenefits: string;
+  hydrationSupport: string;
 }
-
-export const DIET_PLANS: DietPlan[] = [
-  { id: "weight_loss", name: "Weight Loss Decompression", emoji: "📉", description: "High thermic impact meals, calorie-deficit calibration, and rich fiber blocks.", targetMacros: { calories: 1600, protein: 120, carbs: 140, fat: 50 } },
-  { id: "weight_gain", name: "High Calorie Mass Gainer", emoji: "📈", description: "Nutrient-dense whole food blocks to fuel healthy lean hypertrophy.", targetMacros: { calories: 2800, protein: 160, carbs: 320, fat: 80 } },
-  { id: "fat_loss", name: "Somatic Fat Loss Circuit", emoji: "🔥", description: "Macro-balanced high thermogenic foods to optimize metabolic fat oxidation.", targetMacros: { calories: 1800, protein: 140, carbs: 160, fat: 50 } },
-  { id: "muscle_gain", name: "Hypertrophy Muscle Builder", emoji: "💪", description: "Precision amino acid pools and glycogen replenishment carbs.", targetMacros: { calories: 2500, protein: 170, carbs: 260, fat: 70 } },
-  { id: "diabetic_friendly", name: "Low-Glycemic Insulin Guard", emoji: "🩸", description: "Extremely low glycemic indexes to protect steady pancreatic stability.", targetMacros: { calories: 1900, protein: 110, carbs: 150, fat: 60 } },
-  { id: "heart_healthy", name: "Cardiovascular Longevity", emoji: "❤️", description: "Omega-3 rich lipids and low sodium boundaries to safeguard vascular pressure.", targetMacros: { calories: 2000, protein: 115, carbs: 210, fat: 55 } },
-  { id: "stress_recovery", name: "Cortisol Decompression", emoji: "🧠", description: "High magnesium, tryptophan-rich foods to suppress sympathetic nervous stress.", targetMacros: { calories: 2100, protein: 120, carbs: 220, fat: 65 } },
-  { id: "sleep_support", name: "Circadian Melatonin Trigger", emoji: "🌙", description: "Pre-sleep amino complexes that promote deep restorative melatonin cycles.", targetMacros: { calories: 1950, protein: 110, carbs: 200, fat: 60 } },
-  { id: "high_protein", name: "High-Protein Keto-Lean", emoji: "🥩", description: "Elite-level protein thresholds to fuel muscle recovery and peak performance.", targetMacros: { calories: 2200, protein: 190, carbs: 120, fat: 75 } },
-  { id: "vegetarian", name: "Phyto-Longevity Alkaline", emoji: "🌱", description: "100% plant-based organic proteins and high prebiotic fibers.", targetMacros: { calories: 2000, protein: 110, carbs: 230, fat: 60 } }
-];
 
 interface FoodLog {
   id: string;
@@ -64,67 +66,120 @@ interface FoodLog {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
-  sugar_g: number;
-  sodium_mg: number;
-  fiber_g: number;
-  stress_eating: boolean;
-  emotional_eating_trigger?: string;
   created_at: string;
 }
 
-export default function NutritionPage() {
+// Preset Alternatives library for meal swaps
+const ALTERNATIVES_DATABASE: Record<string, Omit<Meal, "mealType">[]> = {
+  breakfast: [
+    { name: "Scrambled Tofu with Spinach & Avocado", calories: 310, protein: 20, carbs: 12, fat: 18, whyHelps: "Light, clean plant protein that sustains focus without early morning insulin spikes.", recoveryBenefits: "Rich in magnesium to relax muscle fibers and support thyroid kinetics.", energyBenefits: "Low glycemic starches provide 4 hours of steady cognitive fuel.", hydrationSupport: "High water content veggies contribute to cellular rehydration." },
+    { name: "Greek Yogurt Parfait with Mixed Berries & Walnuts", calories: 340, protein: 26, carbs: 24, fat: 12, whyHelps: "High-protein recovery base with prebiotic fibers and healthy fats.", recoveryBenefits: "Slow-release casein proteins feed muscles and reduce muscle breakdown.", energyBenefits: "Steady energy profile backed by healthy brain-boosting omega-3 lipids.", hydrationSupport: "High electrolyte calcium content promotes neural fluid transfer." },
+    { name: "Spiced Vegetable Poha with Peanuts", calories: 290, protein: 12, carbs: 42, fat: 9, whyHelps: "Traditional low-glycemic flattened rice providing excellent carb-loading stamina.", recoveryBenefits: "B-vitamins help synthesize glucose into muscular ATP recovery stores.", energyBenefits: "Light, easily digestible complex carbs ideal for active mornings.", hydrationSupport: "Pair with fresh lemon juice to bolster mineral electrolyte assimilation." }
+  ],
+  lunch: [
+    { name: "Spiced Paneer Tikka Salad with Mint Chutney", calories: 480, protein: 24, carbs: 16, fat: 28, whyHelps: "Satisfying vegetarian fuel rich in calcium, fats and clean proteins.", recoveryBenefits: "Calcium pools facilitate muscular contraction and joint cartilage support.", energyBenefits: "Ketogenic fats provide slow, smooth ketone energy for stable afternoons.", hydrationSupport: "Hydrating cucumber and mint base supports kidney filtration." },
+    { name: "Lentil Chickpea Quinoa Salad Bowl", calories: 450, protein: 22, carbs: 62, fat: 10, whyHelps: "Fiber-rich plant powerhouse containing complete vegetarian amino acids.", recoveryBenefits: "Plant iron helps oxygenate working muscle tissues to reduce fatigue.", energyBenefits: "High prebiotic fiber slows digestion to eliminate mid-day energy crashes.", hydrationSupport: "Rich in potassium to safeguard fluid boundaries inside cells." },
+    { name: "Tender Grilled Chicken Avocado Sourdough Wrap", calories: 510, protein: 36, carbs: 38, fat: 16, whyHelps: "Optimal lean muscle fuel with high essential aminos and rich fat carriers.", recoveryBenefits: "Lean poultry aminos speed up post-workout muscle protein synthesis.", energyBenefits: "Complex grains paired with healthy avocado fats keep stamina peaked.", hydrationSupport: "Low sodium composition protects optimal blood pressure levels." }
+  ],
+  dinner: [
+    { name: "Baked Cod Fillet with Roasted Asparagus", calories: 380, protein: 32, carbs: 14, fat: 10, whyHelps: "Highly digestible marine protein that prevents heavy overnight digestion strain.", recoveryBenefits: "Lean aminos facilitate tissue repair during deep sleep phases.", energyBenefits: "Keeps morning insulin levels low for optimal waking energy.", hydrationSupport: "Asparagus acts as a natural prebiotic fluid flush agent." },
+    { name: "Hearty Black Bean & Lentil Chili with Cornbread", calories: 460, protein: 20, carbs: 68, fat: 8, whyHelps: "Fiber-rich evening bowl to sustain overnight metabolic activity.", recoveryBenefits: "High dietary magnesium supports parasympathetic muscle relaxation.", energyBenefits: "Slow starches stabilize baseline overnight growth hormone cycles.", hydrationSupport: "Lentil broths restore baseline systemic hydration balances." },
+    { name: "Grilled Paneer & Stir-Fry Broccoli in Soy Sesame", calories: 430, protein: 22, carbs: 18, fat: 22, whyHelps: "High-protein, low-sugar evening plate to safeguard hormone pathways.", recoveryBenefits: "High amino density protects skeletal muscles from nocturnal catabolism.", energyBenefits: "Maintains optimal fat oxidation levels throughout overnight rest.", hydrationSupport: "Pair with warm herbal tea to maximize overnight hydration levels." }
+  ],
+  snack: [
+    { name: "Roasted Makhana (Foxnuts) with Turmeric", calories: 140, protein: 4, carbs: 24, fat: 3, whyHelps: "Low-calorie, highly crunchy superfood to curb nervous eating cues.", recoveryBenefits: "Antioxidants suppress minor workout-induced muscle soreness.", energyBenefits: "Keeps blood sugars flat to prevent afternoon sluggishness.", hydrationSupport: "Turmeric curcumin aids systemic fluid cellular detox." },
+    { name: "Whey / Plant Protein Shake with half a Banana", calories: 210, protein: 25, carbs: 20, fat: 2, whyHelps: "Rapid amino acid delivery to quickly replenish empty glycogen stores.", recoveryBenefits: "Direct muscular protein absorption accelerates hyper-recovery.", energyBenefits: "Quick potassium spike restores athletic focus and neural stamina.", hydrationSupport: "Mixes with 350ml fluid to directly target post-activity hydration." },
+    { name: "Celery Sticks with Almond Butter", calories: 170, protein: 6, carbs: 10, fat: 13, whyHelps: "Highly crisp fat-burner snack rich in minerals and good fats.", recoveryBenefits: "Vitamins support immune function and counter cellular work strain.", energyBenefits: "Steady monounsaturated lipids keep nerve functions optimally calm.", hydrationSupport: "Celery is 95% water, restoring vital active fluid volumes." }
+  ]
+};
+
+// Mock visual history chart data
+const WEEKLY_TRENDS_DATA = [
+  { name: "Mon", Target: 2200, Consumed: 1950, Protein: 125, Hydration: 2400 },
+  { name: "Tue", Target: 2200, Consumed: 2100, Protein: 145, Hydration: 2800 },
+  { name: "Wed", Target: 2200, Consumed: 1800, Protein: 110, Hydration: 2000 },
+  { name: "Thu", Target: 2200, Consumed: 2450, Protein: 165, Hydration: 3200 },
+  { name: "Fri", Target: 2200, Consumed: 2050, Protein: 135, Hydration: 2500 },
+  { name: "Sat", Target: 2200, Consumed: 2300, Protein: 150, Hydration: 2700 },
+  { name: "Sun", Target: 2200, Consumed: 1980, Protein: 120, Hydration: 2200 }
+];
+
+const SLEEP_NUTRITION_DATA = [
+  { name: "Mon", Sleep: 6.2, NutritionScore: 68 },
+  { name: "Tue", Sleep: 7.5, NutritionScore: 88 },
+  { name: "Wed", Sleep: 5.8, NutritionScore: 60 },
+  { name: "Thu", Sleep: 8.0, NutritionScore: 92 },
+  { name: "Fri", Sleep: 7.0, NutritionScore: 85 },
+  { name: "Sat", Sleep: 7.8, NutritionScore: 90 },
+  { name: "Sun", Sleep: 7.2, NutritionScore: 82 }
+];
+
+export default function SmartNutritionPlansPage() {
   const { profile } = useAuth();
   const { activeMode } = useTheme();
-  
-  const [activePlan, setActivePlan] = useState<string>("muscle_gain");
-  const [adjustingPlan, setAdjustingPlan] = useState<boolean>(false);
-  const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
-  const [foodLogs, setFoodLogs] = useState<FoodLog[]>([]);
-  const [waterLogged, setWaterLogged] = useState(0);
-  const [loadingLogs, setLoadingLogs] = useState(true);
-  const [dbError, setDbError] = useState("");
 
-  // Form States
-  const [foodName, setFoodName] = useState("");
-  const [mealType, setMealType] = useState("breakfast");
-  const [calories, setCalories] = useState(350);
-  const [protein, setProtein] = useState(25);
-  const [carbs, setCarbs] = useState(40);
-  const [fat, setFat] = useState(10);
-  const [sugar, setSugar] = useState(5);
-  const [sodium, setSodium] = useState(180);
-  const [fiber, setFiber] = useState(3);
-  const [isStressSnacking, setIsStressSnacking] = useState(false);
-  const [stressTrigger, setStressTrigger] = useState("late night coding / deadline inertia");
-
-  // Scanner States
-  const [inputText, setInputText] = useState("");
-  const [scanning, setScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<ScanResult & {
-    sodium: number;
-    fiber: number;
-    hydrationImpact: "supportive" | "dehydrating" | "neutral";
-    nutrientDensity: number;
-    mealQuality: string;
+  // Generator flow states
+  const [plannerStep, setPlannerStep] = useState<"onboarding" | "generating" | "ready">("onboarding");
+  const [selectedGoal, setSelectedGoal] = useState("Muscle Gain");
+  const [selectedPreference, setSelectedPreference] = useState("Balanced");
+  const [activePlan, setActivePlan] = useState<{
+    plan: Meal[];
+    insights: string[];
+    habits: string[];
+    warnings: string[];
   } | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
 
-  const fetchNutritionAndHydration = async () => {
+  const [loadingTextIndex, setLoadingTextIndex] = useState(0);
+  const [waterLogged, setWaterLogged] = useState(0);
+  const [foodLogs, setFoodLogs] = useState<FoodLog[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [expandedMeal, setExpandedMeal] = useState<string | null>(null);
+  const [swappingMealType, setSwappingMealType] = useState<string | null>(null);
+
+  // Stepper choices constants
+  const GOAL_OPTIONS = [
+    { id: "Weight Loss", label: "Weight Loss", icon: "📉", desc: "Burn fat steadily" },
+    { id: "Weight Gain", label: "Weight Gain", icon: "📈", desc: "Increase lean mass" },
+    { id: "Muscle Gain", label: "Muscle Gain", icon: "💪", desc: "Build strength & tone" },
+    { id: "Better Energy", label: "Better Energy", icon: "⚡", desc: "Eradicate fatigue cycles" },
+    { id: "Better Sleep", label: "Better Sleep", icon: "🌙", desc: "Calm evening hormone spikes" },
+    { id: "Stress Recovery", label: "Stress Recovery", icon: "🧠", desc: "Lower nervous cortisol" },
+    { id: "General Wellness", label: "General Wellness", icon: "🌱", desc: "Sustain cell longevity" }
+  ];
+
+  const PREFERENCE_OPTIONS = [
+    { id: "Balanced", label: "Balanced", icon: "🍱", desc: "All macronutrient sources" },
+    { id: "Vegetarian", label: "Vegetarian", icon: "🥗", desc: "Plant-based + dairy" },
+    { id: "Vegan", label: "Vegan", icon: "🌿", desc: "100% strict plants only" },
+    { id: "High Protein", label: "High Protein", icon: "🥩", desc: "Enhanced amino load" },
+    { id: "South Indian", label: "South Indian", icon: "🥥", desc: "Rice, coconut, lentils" },
+    { id: "North Indian", label: "North Indian", icon: "🫓", desc: "Wheat, paneer, spices" },
+    { id: "Mediterranean", label: "Mediterranean", icon: "🫒", desc: "Olive oil, clean seafood" },
+    { id: "Keto", label: "Keto", icon: "🥑", desc: "High-fat, low-carbs" },
+    { id: "Low Sugar", label: "Low Sugar", icon: "🍋", desc: "Glucose spike protection" }
+  ];
+
+  const loadingPhrases = [
+    "Ingesting biological telemetry...",
+    "Analyzing workout recovery demands...",
+    "Querying Gemini AI Metabolic Engine...",
+    "Calibrating circadian macro thresholds...",
+    "Synthesizing customized whole food schedules..."
+  ];
+
+  // Fetch logged meals & water
+  const fetchLogs = async () => {
     if (!supabase || !profile) return;
     try {
-      setLoadingLogs(true);
-      setDbError("");
-      
-      // Fetch nutrition logs for current user
-      const { data: foodData, error: foodError } = await supabase
+      setLoadingHistory(true);
+      const { data: foodData } = await supabase
         .from("nutrition_logs")
         .select("*")
         .eq("user_id", profile.id)
         .order("created_at", { ascending: false });
-      
-      if (foodError) {
-        setDbError(foodError.message);
-      } else if (foodData) {
+
+      if (foodData) {
         setFoodLogs(foodData.map((d: any) => ({
           id: d.id,
           meal_type: d.meal_type,
@@ -133,110 +188,112 @@ export default function NutritionPage() {
           protein_g: Number(d.protein_g || 0),
           carbs_g: Number(d.carbs_g || 0),
           fat_g: Number(d.fat_g || 0),
-          sugar_g: Number(d.sugar_g || 0),
-          sodium_mg: Number(d.sodium_mg || 0),
-          fiber_g: Number(d.fiber_g || 0),
-          stress_eating: d.stress_eating || false,
-          emotional_eating_trigger: d.emotional_eating_trigger || "",
           created_at: d.created_at
         })));
       }
 
-      // Fetch today's hydration logs
       const todayStr = new Date().toISOString().split("T")[0];
-      const { data: waterData, error: waterError } = await supabase
+      const { data: waterData } = await supabase
         .from("hydration_logs")
         .select("*")
         .eq("user_id", profile.id)
         .gte("created_at", `${todayStr}T00:00:00Z`);
 
-      if (waterError) {
-        console.error(waterError.message);
-      } else if (waterData) {
+      if (waterData) {
         const total = waterData.reduce((sum: number, log: any) => sum + log.amount_ml, 0);
         setWaterLogged(total);
       }
-    } catch (e: any) {
-      setDbError(e.message || "Unable to sync nutrition registers.");
+    } catch (e) {
+      console.error("Supabase load error:", e);
     } finally {
-      setLoadingLogs(false);
+      setLoadingHistory(false);
     }
   };
 
   useEffect(() => {
-    // Generate static base targets (metabolic calorie limits etc)
-    const activePlanObj = DIET_PLANS.find(p => p.id === activePlan) || DIET_PLANS[3];
-    const base = {
-      caloriesBurned: activeMode === "performance" ? 2800 : 2100,
-      caloriesTarget: activePlanObj.targetMacros.calories,
-      caloriesConsumed: 0,
-      hydrationMl: 0,
-      hydrationTarget: activeMode === "performance" ? 3000 : 2000,
-      steps: 0,
-      stepsTarget: 10000,
-      sleepHours: 0,
-      sleepTarget: 8.0,
-      sleepQuality: 0,
-      stressLevel: 45,
-      mood: "Optimal",
-      recoveryPercentage: 85,
-      fatigueScore: 20,
-      physicalFatigue: 15,
-      mentalFatigue: 25,
-      energyLevel: 90,
-      biologicalAge: 29.5,
-      stabilityScore: 98,
-      metabolicEfficiency: 82,
-      lifestyleSustainability: 88,
-      glycemicIndexLoad: "low" as const,
-      sedentaryPostureRisk: "low" as const,
-      micronutrientDeficiencies: []
-    };
-    setMetrics(base);
-    
     if (profile?.id) {
-      fetchNutritionAndHydration();
+      fetchLogs();
     } else {
-      setLoadingLogs(false);
+      setLoadingHistory(false);
     }
-  }, [activeMode, profile, activePlan]);
+  }, [profile]);
 
-  const handleAddFood = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!foodName || !profile) return;
+  // Loading text animator
+  useEffect(() => {
+    if (plannerStep === "generating") {
+      const interval = setInterval(() => {
+        setLoadingTextIndex(prev => (prev + 1) % loadingPhrases.length);
+      }, 1200);
+      return () => clearInterval(interval);
+    }
+  }, [plannerStep]);
+
+  // Generate Plan via API
+  const handleGeneratePlan = async () => {
+    setPlannerStep("generating");
+    setLoadingTextIndex(0);
 
     try {
-      setLoadingLogs(true);
+      const response = await fetch("/api/nutrition-planner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          goal: selectedGoal,
+          preference: selectedPreference,
+          profile,
+          metrics: {
+            stressLevel: activeMode === "performance" ? 65 : 40,
+            sleepHours: 7.2
+          }
+        })
+      });
+
+      if (response.ok) {
+        const planData = await response.json();
+        setActivePlan(planData);
+        setPlannerStep("ready");
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          colors: ["#8b5cf6", "#10b981", "#3b82f6"]
+        });
+      } else {
+        throw new Error("API failed");
+      }
+    } catch (err) {
+      console.error(err);
+      // Fallback
+      setPlannerStep("ready");
+    }
+  };
+
+  // Add meal to Supabase Eaten Logs
+  const handleMarkEaten = async (meal: Meal) => {
+    if (!profile) return;
+    try {
       const { error } = await supabase
         .from("nutrition_logs")
         .insert({
           user_id: profile.id,
-          meal_type: mealType,
-          food_name: foodName,
-          calories: Number(calories),
-          protein_g: Number(protein),
-          carbs_g: Number(carbs),
-          fat_g: Number(fat),
-          stress_eating: isStressSnacking,
-          emotional_eating_trigger: isStressSnacking ? stressTrigger : undefined
+          meal_type: meal.mealType,
+          food_name: meal.name,
+          calories: Number(meal.calories),
+          protein_g: Number(meal.protein),
+          carbs_g: Number(meal.carbs),
+          fat_g: Number(meal.fat),
+          stress_eating: false
         });
 
-      if (error) {
-        alert("Failed to log food: " + error.message);
-      } else {
-        await fetchNutritionAndHydration();
-        setFoodName("");
-        setIsStressSnacking(false);
+      if (!error) {
+        await fetchLogs();
         confetti({
-          particleCount: 50,
-          spread: 40,
+          particleCount: 40,
+          spread: 30,
           colors: ["#10b981", "#8b5cf6"]
         });
       }
-    } catch (err: any) {
-      alert("An error occurred: " + err.message);
-    } finally {
-      setLoadingLogs(false);
+    } catch (err) {
+      console.error("Mark eaten log fail:", err);
     }
   };
 
@@ -250,618 +307,603 @@ export default function NutritionPage() {
           amount_ml: amount
         });
       
-      if (error) {
-        alert("Failed to log water: " + error.message);
-      } else {
-        await fetchNutritionAndHydration();
+      if (!error) {
+        await fetchLogs();
         confetti({
-          particleCount: 30,
-          spread: 30,
+          particleCount: 25,
+          spread: 25,
           colors: ["#3b82f6"]
         });
       }
-    } catch (err: any) {
-      console.error(err);
+    } catch (err) {
+      console.error("Water log fail:", err);
     }
   };
 
-  // Trigger Scanner Simulation
-  const handleScanSimulation = (query: string) => {
-    if (!query.trim()) return;
-
-    setScanning(true);
-    setScanResult(null);
-
-    // Simulate real AI scanning animation
-    setTimeout(() => {
-      const baseResult = parseSimulatedFoodScan(query);
-      
-      // Augment simulation with detailed parameters
-      let sodiumVal = 120;
-      let fiberVal = 4;
-      let hydration: "supportive" | "dehydrating" | "neutral" = "supportive";
-      let density = 8.5;
-      let qualityStr = "A";
-
-      const lowercase = baseResult.foodName.toLowerCase();
-      if (lowercase.includes("salad") || lowercase.includes("salmon")) {
-        sodiumVal = 380;
-        fiberVal = 8;
-        hydration = "supportive";
-        density = 9.4;
-        qualityStr = "A+ Premium";
-      } else if (lowercase.includes("pizza") || lowercase.includes("burger")) {
-        sodiumVal = 1420;
-        fiberVal = 2;
-        hydration = "dehydrating";
-        density = 3.2;
-        qualityStr = "D- Glycemic Trap";
-      } else if (lowercase.includes("apple") || lowercase.includes("fruit")) {
-        sodiumVal = 2;
-        fiberVal = 4.5;
-        hydration = "supportive";
-        density = 9.0;
-        qualityStr = "A Fuji Organic";
-      } else {
-        sodiumVal = 290;
-        fiberVal = 3.0;
-        hydration = "neutral";
-        density = 5.8;
-        qualityStr = "B- Engineered";
-      }
-
-      setScanResult({
-        ...baseResult,
-        sodium: sodiumVal,
-        fiber: fiberVal,
-        hydrationImpact: hydration,
-        nutrientDensity: density,
-        mealQuality: qualityStr
-      });
-      setScanning(false);
-      setInputText("");
-
-      if (baseResult.healthScore >= 75) {
-        confetti({
-          particleCount: 60,
-          spread: 45,
-          colors: ["#10b981", "#3b82f6"]
-        });
-      }
-    }, 1500);
+  // Star Favorites Toggle
+  const handleToggleFavorite = (mealName: string) => {
+    setFavorites(prev => 
+      prev.includes(mealName) 
+        ? prev.filter(f => f !== mealName) 
+        : [...prev, mealName]
+    );
   };
 
-  const handleLogScannedMeal = async () => {
-    if (!scanResult || !profile) return;
-    
-    try {
-      setLoadingLogs(true);
-      const { error } = await supabase
-        .from("nutrition_logs")
-        .insert({
-          user_id: profile.id,
-          meal_type: "snack",
-          food_name: scanResult.foodName,
-          calories: Number(scanResult.calories),
-          protein_g: Number(scanResult.protein),
-          carbs_g: Number(scanResult.carbs),
-          fat_g: Number(scanResult.fat),
-          stress_eating: false
-        });
-
-      if (error) {
-        alert("Failed to log scanned meal: " + error.message);
-      } else {
-        await fetchNutritionAndHydration();
-        setScanResult(null);
-        confetti({
-          particleCount: 80,
-          spread: 60,
-          colors: ["#10b981", "#8b5cf6"]
-        });
+  // Swap active meal with alternative
+  const handleSwapMeal = (mealType: string, alt: Omit<Meal, "mealType">) => {
+    if (!activePlan) return;
+    const updatedMeals = activePlan.plan.map(m => {
+      if (m.mealType === mealType) {
+        return { ...alt, mealType };
       }
-    } catch (err: any) {
-      alert("An error occurred: " + err.message);
-    } finally {
-      setLoadingLogs(false);
-    }
+      return m;
+    });
+    setActivePlan({ ...activePlan, plan: updatedMeals });
+    setSwappingMealType(null);
+    confetti({
+      particleCount: 30,
+      spread: 30,
+      colors: ["#3b82f6", "#10b981"]
+    });
   };
 
-  const sampleFoods = [
-    { label: "Salmon Avocado Salad", query: "Atlantic Salmon Avocado Salad" },
-    { label: "Pepperoni Pizza", query: "Double Cheese Pepperoni Pizza Slice" },
-    { label: "Fuji Apple", query: "Organic Fuji Apple" },
-    { label: "Energy Bar (Barcode)", query: "73204901842" }
-  ];
-
-  if (!metrics) return null;
-
-  // Calculate totals
+  // Math totals from logged meals today
   const totalCalories = foodLogs.reduce((acc, curr) => acc + curr.calories, 0);
   const totalProtein = foodLogs.reduce((acc, curr) => acc + curr.protein_g, 0);
   const totalCarbs = foodLogs.reduce((acc, curr) => acc + curr.carbs_g, 0);
   const totalFat = foodLogs.reduce((acc, curr) => acc + curr.fat_g, 0);
-  const totalSugar = foodLogs.reduce((acc, curr) => acc + (curr.sugar_g || 0), 0);
-  const totalSodium = foodLogs.reduce((acc, curr) => acc + (curr.sodium_mg || 0), 0);
-  const totalFiber = foodLogs.reduce((acc, curr) => acc + (curr.fiber_g || 0), 0);
-
-  const stressLogs = foodLogs.filter(log => log.stress_eating);
-
-  // Generate dynamic AI Insights list based on current daily logged foods
-  const generateAIInsights = () => {
-    const insights = [];
-    if (totalSugar > 25) {
-      insights.push({ type: "warning", text: "High sugar detected. Soluble fructose intake has exceeded optimal insulin stability thresholds." });
-    }
-    if (totalProtein < 50 && totalCalories > 1000) {
-      insights.push({ type: "alert", text: "Low protein ratio logged. Insufficient amino acid pools detected to fuel optimal lean muscle repair." });
-    }
-    if (totalSodium > 1500) {
-      insights.push({ type: "warning", text: "High sodium intake detected. Excess sodium may impair overnight microvascular recovery velocity." });
-    }
-    if (totalFiber < 15 && totalCalories > 800) {
-      insights.push({ type: "alert", text: "Fiber intake is insufficient. Dietary prebiotics are below baseline levels required for metabolic longevity." });
-    }
-    if (waterLogged >= metrics.hydrationTarget) {
-      insights.push({ type: "success", text: "Outstanding hydration stability! Water volume has successfully cleared cell dehydration risk protocols." });
-    } else if (waterLogged > 0) {
-      insights.push({ type: "info", text: "Good hydration-supportive actions. Continue steady fluid intake to support cell waste clearing." });
-    }
-    
-    // Default fallback insights
-    if (insights.length === 0) {
-      insights.push({ type: "info", text: "Telemetry waiting: Log meals or utilize the AI Food Scanner to synthesize preventative metabolic insights." });
-    }
-    return insights;
-  };
-
-  const activeInsights = generateAIInsights();
 
   return (
     <DashboardLayout>
-      <div className="space-y-5 pb-10 max-w-5xl">
+      <div className="space-y-6 pb-10 max-w-6xl">
         
-        {/* Page header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Personalized Diet Plans</h1>
-            <p className="text-sm text-[var(--muted)] mt-0.5">Adaptive long-term nutrition, dynamic calorie calibrations, and circadian fluid sync</p>
+        {/* Banner header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5 p-6">
+          <div className="space-y-1">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+              <Utensils className="h-6 w-6 text-primary animate-pulse" />
+              Smart Nutrition Plans
+            </h1>
+            <p className="text-xs text-foreground/70 font-semibold">
+              An intelligent nutrition coach that understands your habits, adapts daily meal recommendations, and protects your cellular energy.
+            </p>
           </div>
+          {plannerStep === "ready" && (
+            <Button 
+              variant="glass" 
+              size="sm" 
+              onClick={() => setPlannerStep("onboarding")} 
+              className="text-xs font-bold shrink-0 flex items-center gap-1 border-primary/20 text-primary bg-primary/5"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Change Goal / Preference
+            </Button>
+          )}
         </div>
 
-        {dbError && (
-          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-[13px] text-rose-400 font-medium">
-            ⚠️ <strong>Supabase connection issue:</strong> {dbError}
+        {/* STEP 1 & 2: ONBOARDING QUESTIONS STEPPER */}
+        {plannerStep === "onboarding" && (
+          <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+            <GlassCard glowColor="violet" className="p-6 space-y-6">
+              
+              {/* Question 1 */}
+              <div className="space-y-4">
+                <span className="text-xs font-bold text-primary flex items-center gap-1.5 uppercase tracking-widest">
+                  <span className="h-4.5 w-4.5 rounded-full bg-primary/10 text-primary text-[10px] flex items-center justify-center font-bold">1</span>
+                  What is your current wellness goal?
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                  {GOAL_OPTIONS.map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setSelectedGoal(opt.id)}
+                      className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-foreground/5 cursor-pointer ${
+                        selectedGoal === opt.id
+                          ? "border-primary bg-primary/5 shadow-md shadow-primary/5 scale-[1.03]"
+                          : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                      }`}
+                    >
+                      <span className="text-2xl shrink-0">{opt.icon}</span>
+                      <div className="space-y-0.5">
+                        <span className="text-[11px] font-bold block">{opt.label}</span>
+                        <span className="text-[8px] text-foreground/45 block font-semibold leading-tight">{opt.desc}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Question 2 */}
+              <div className="space-y-4 border-t border-foreground/5 pt-6">
+                <span className="text-xs font-bold text-secondary flex items-center gap-1.5 uppercase tracking-widest">
+                  <span className="h-4.5 w-4.5 rounded-full bg-secondary/10 text-secondary text-[10px] flex items-center justify-center font-bold">2</span>
+                  What kind of foods do you prefer?
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-3">
+                  {PREFERENCE_OPTIONS.map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setSelectedPreference(opt.id)}
+                      className={`p-3 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-foreground/5 cursor-pointer ${
+                        selectedPreference === opt.id
+                          ? "border-secondary bg-secondary/5 shadow-md shadow-secondary/5 scale-[1.03]"
+                          : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                      }`}
+                    >
+                      <span className="text-2xl shrink-0">{opt.icon}</span>
+                      <div className="space-y-0.5">
+                        <span className="text-[11px] font-bold block">{opt.label}</span>
+                        <span className="text-[8px] text-foreground/45 block font-semibold leading-tight">{opt.desc}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Trigger Plan Generator */}
+              <div className="border-t border-foreground/5 pt-5 flex justify-end">
+                <Button 
+                  variant="primary" 
+                  onClick={handleGeneratePlan} 
+                  className="px-6 py-3 text-xs font-bold flex items-center gap-1.5 bg-gradient-to-r from-primary to-secondary hover:from-primary/95 hover:to-secondary/95 shadow-lg shadow-primary/10"
+                >
+                  <Sparkles className="h-4.5 w-4.5 animate-pulse" />
+                  Synthesize My AI Nutrition Plan
+                </Button>
+              </div>
+
+            </GlassCard>
           </div>
         )}
 
-        {loadingLogs ? (
-          <div className="flex items-center justify-center py-16 gap-2 text-sm text-[var(--muted)]">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-            Loading nutrition data...
+        {/* LOADING SCREEN */}
+        {plannerStep === "generating" && (
+          <div className="flex flex-col items-center justify-center py-24 space-y-4 animate-[fadeIn_0.3s_ease-out]">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary shrink-0" />
+            <div className="text-center space-y-1">
+              <span className="text-sm font-bold text-foreground block">Synthesizing Smart Plan</span>
+              <p className="text-xs text-foreground/60 font-semibold animate-pulse">{loadingPhrases[loadingTextIndex]}</p>
+            </div>
           </div>
-        ) : (
-          <>
-            {/* 1. Daily Nutrition Overview & Macro Tracking Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        )}
+
+        {/* READY PLAN STATE */}
+        {plannerStep === "ready" && activePlan && (
+          <div className="space-y-8 animate-[fadeIn_0.3s_ease-out]">
+
+            {/* 1. DAILY MACRO PROGRESS TRACKER */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               
-              {/* Calorie card */}
-              <GlassCard glowColor="rose" className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium text-[var(--muted)]">Calories Consumed</span>
-                  <Flame className="h-4 w-4 text-rose-500" />
+              {/* Calories card */}
+              <GlassCard glowColor="rose" className="p-4 flex flex-col justify-between min-h-[110px]">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-foreground/60 uppercase">Calories Logged</span>
+                  <Flame className="h-4.5 w-4.5 text-rose-500" />
                 </div>
-                <div className="analytics-number text-[var(--foreground)]">{totalCalories}</div>
-                <div className="text-xs text-[var(--muted)] mt-0.5">/ {metrics.caloriesTarget * 3} kcal</div>
-                <div className="progress-bar mt-3">
-                  <div className="progress-bar-fill bg-rose-500" style={{ width: `${Math.min(100, (totalCalories / (metrics.caloriesTarget * 3)) * 100)}%` }} />
+                <div>
+                  <h3 className="text-3xl font-black text-rose-500">{totalCalories} kcal</h3>
+                  <div className="progress-bar mt-2 bg-foreground/5 h-1.5 rounded-full overflow-hidden">
+                    <div className="progress-bar-fill bg-rose-500 h-full rounded-full" style={{ width: `${Math.min(100, (totalCalories / 2200) * 100)}%` }} />
+                  </div>
+                  <span className="text-[9px] font-bold text-foreground/45 block mt-1.5">Target Daily Ceiling: 2200 kcal</span>
                 </div>
               </GlassCard>
 
-              {/* Macro Matrix */}
-              <GlassCard glowColor="violet" className="p-4">
-                <span className="text-xs font-medium text-[var(--muted)] block mb-3">Macro Breakdown</span>
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
-                    <span className="text-xs font-semibold text-primary block">Protein</span>
-                    <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalProtein}g</span>
-                    <span className="text-xs text-[var(--muted)]">/ 140g</span>
+              {/* Protein card */}
+              <GlassCard glowColor="violet" className="p-4 flex flex-col justify-between min-h-[110px]">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-foreground/60 uppercase">Protein Rebuild</span>
+                  <Award className="h-4.5 w-4.5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-black text-primary">{totalProtein}g</h3>
+                  <div className="progress-bar mt-2 bg-foreground/5 h-1.5 rounded-full overflow-hidden">
+                    <div className="progress-bar-fill bg-primary h-full rounded-full" style={{ width: `${Math.min(100, (totalProtein / 140) * 100)}%` }} />
                   </div>
-                  <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
-                    <span className="text-xs font-semibold text-secondary block">Carbs</span>
-                    <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalCarbs}g</span>
-                    <span className="text-xs text-[var(--muted)]">/ 220g</span>
-                  </div>
-                  <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
-                    <span className="text-xs font-semibold text-amber-500 block">Fats</span>
-                    <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalFat}g</span>
-                    <span className="text-xs text-[var(--muted)]">/ 60g</span>
-                  </div>
+                  <span className="text-[9px] font-bold text-foreground/45 block mt-1.5">Metabolic Target: 140g</span>
                 </div>
               </GlassCard>
 
-              {/* Hydration Tracker */}
-              <GlassCard glowColor="emerald" className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium text-[var(--muted)]">Water Intake</span>
-                  <Droplet className="h-4 w-4 text-emerald-500" />
+              {/* Carbohydrates card */}
+              <GlassCard glowColor="emerald" className="p-4 flex flex-col justify-between min-h-[110px]">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-foreground/60 uppercase">Glycogen Carbs</span>
+                  <Activity className="h-4.5 w-4.5 text-emerald-500" />
                 </div>
-                <div className="analytics-number text-[var(--foreground)]">{waterLogged}</div>
-                <div className="text-xs text-[var(--muted)] mt-0.5">/ {metrics.hydrationTarget} ml</div>
-                <div className="flex gap-2 mt-3">
-                  <button 
-                    onClick={() => handleLogWater(250)} 
-                    className="text-xs bg-[var(--muted-bg)] hover:bg-secondary/10 border border-[var(--border)] hover:border-secondary/20 px-3 py-2 rounded-lg font-medium text-secondary flex-1 transition-all"
-                  >
-                    +250ml
-                  </button>
-                  <button 
-                    onClick={() => handleLogWater(500)} 
-                    className="text-xs bg-[var(--muted-bg)] hover:bg-secondary/10 border border-[var(--border)] hover:border-secondary/20 px-3 py-2 rounded-lg font-medium text-secondary flex-1 transition-all"
-                  >
-                    +500ml
-                  </button>
+                <div>
+                  <h3 className="text-3xl font-black text-emerald-500">{totalCarbs}g</h3>
+                  <div className="progress-bar mt-2 bg-foreground/5 h-1.5 rounded-full overflow-hidden">
+                    <div className="progress-bar-fill bg-emerald-500 h-full rounded-full" style={{ width: `${Math.min(100, (totalCarbs / 220) * 100)}%` }} />
+                  </div>
+                  <span className="text-[9px] font-bold text-foreground/45 block mt-1.5">Stable Cap: 220g</span>
+                </div>
+              </GlassCard>
+
+              {/* Fats card */}
+              <GlassCard glowColor="amber" className="p-4 flex flex-col justify-between min-h-[110px]">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-foreground/60 uppercase">Healthy Lipids</span>
+                  <Heart className="h-4.5 w-4.5 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-black text-amber-500">{totalFat}g</h3>
+                  <div className="progress-bar mt-2 bg-foreground/5 h-1.5 rounded-full overflow-hidden">
+                    <div className="progress-bar-fill bg-amber-500 h-full rounded-full" style={{ width: `${Math.min(100, (totalFat / 70) * 100)}%` }} />
+                  </div>
+                  <span className="text-[9px] font-bold text-foreground/45 block mt-1.5">Optimal Lipids: 70g</span>
                 </div>
               </GlassCard>
 
             </div>
 
-            {/* 2. DUAL INTERFACES: Scanner vs Manual Logger */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            {/* 2. DUAL INTUITIVE PANELS: PLANNER CARDS & AI HABITS */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               
-              {/* LEFT COLUMN: PERSONALIZED DIET PLANS BUILDER */}
-              <div className="lg:col-span-7 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
-                
-                <div className="space-y-4">
-                  <div className="flex justify-between items-start sm:items-center flex-col sm:flex-row gap-3">
-                    <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5 uppercase tracking-widest">
-                      <Utensils className="h-4 w-4 text-primary animate-pulse" />
-                      Select Adaptive Diet Plan
-                    </h3>
-                    <span className="bg-primary/10 border border-primary/20 text-primary text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase shrink-0 animate-pulse">
-                      AI ADAPTIVE ACTIVE
-                    </span>
-                  </div>
-                  <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
-                    Choose an AI-calibrated nutrition plan. The plan adjusts your daily calorie limits, macro ratios, and recommended foods dynamically based on your goals, sleep debt, stress levels, hydration consistency, and active workout intensities.
-                  </p>
+              {/* LEFT: GENERATED PLAN CARD VIEW */}
+              <div className="lg:col-span-7 space-y-4">
+                <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center justify-between">
+                  <span>Your Dynamic Schedule ({selectedPreference})</span>
+                  <span className="text-xs text-foreground/45 font-semibold">Today's Focus: {selectedGoal}</span>
+                </h3>
 
-                  {/* Plans grid selector */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                    {DIET_PLANS.map((plan) => (
-                      <button
-                        key={plan.id}
-                        type="button"
-                        onClick={() => {
-                          setActivePlan(plan.id);
-                          setAdjustingPlan(true);
-                          setTimeout(() => setAdjustingPlan(false), 500);
-                          confetti({
-                            particleCount: 20,
-                            spread: 30,
-                            colors: ["#8b5cf6"]
-                          });
-                        }}
-                        className={`p-3 rounded-xl border text-left flex items-start gap-3 transition-all hover:bg-foreground/5 cursor-pointer ${
-                          activePlan === plan.id
-                            ? "border-primary bg-primary/5 shadow-md shadow-primary/5 scale-[1.01]"
-                            : "border-foreground/5 bg-foreground/5 text-foreground/80"
-                        }`}
+                <div className="space-y-3">
+                  {activePlan.plan.map((meal, index) => {
+                    const isExpanded = expandedMeal === meal.mealType;
+                    const isStarred = favorites.includes(meal.name);
+                    const isEatenToday = foodLogs.some(
+                      log => log.meal_type === meal.mealType && log.food_name === meal.name
+                    );
+
+                    return (
+                      <GlassCard 
+                        key={meal.mealType} 
+                        glowColor={meal.mealType === "breakfast" ? "violet" : meal.mealType === "lunch" ? "emerald" : meal.mealType === "dinner" ? "rose" : "amber"} 
+                        className="p-4 space-y-3"
                       >
-                        <span className="text-xl shrink-0 mt-0.5">{plan.emoji}</span>
-                        <div className="space-y-0.5 min-w-0">
-                          <span className="text-xs font-bold text-foreground block truncate">{plan.name}</span>
-                          <span className="text-[10px] text-foreground/50 block leading-normal">{plan.description}</span>
+                        {/* Header Block */}
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="flex gap-3 items-start min-w-0">
+                            <span className="h-8 w-8 rounded-xl bg-foreground/5 border border-foreground/5 flex items-center justify-center shrink-0 text-base font-bold">
+                              {meal.mealType === "breakfast" ? "☕" : meal.mealType === "lunch" ? "🍱" : meal.mealType === "dinner" ? "🍲" : "🍎"}
+                            </span>
+                            <div className="space-y-0.5 min-w-0">
+                              <span className="text-[10px] font-bold text-foreground/40 block uppercase tracking-wider">{meal.mealType}</span>
+                              <span className="text-xs font-black text-foreground block truncate leading-snug">{meal.name}</span>
+                              <span className="text-[10px] text-foreground/60 block font-semibold leading-relaxed">
+                                {meal.whyHelps}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-xs font-black text-foreground shrink-0 pl-2">
+                            {meal.calories} kcal
+                          </span>
                         </div>
-                      </button>
+
+                        {/* Expand details toggler */}
+                        <div className="flex justify-between items-center border-t border-foreground/5 pt-2 text-[10px] font-semibold text-foreground/50">
+                          <span className="font-bold text-primary flex gap-1">
+                            <span>P: {meal.protein}g</span>
+                            <span>C: {meal.carbs}g</span>
+                            <span>F: {meal.fat}g</span>
+                          </span>
+                          <button 
+                            onClick={() => setExpandedMeal(isExpanded ? null : meal.mealType)}
+                            className="flex items-center gap-0.5 text-foreground/60 hover:text-foreground cursor-pointer"
+                          >
+                            <span>{isExpanded ? "Collapse Details" : "View Recovery Sync"}</span>
+                            {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                          </button>
+                        </div>
+
+                        {/* Collapsible details content */}
+                        {isExpanded && (
+                          <div className="border-t border-foreground/5 pt-3 space-y-2 animate-[slideDown_0.2s_ease-out]">
+                            <div className="grid grid-cols-3 gap-2">
+                              <div className="p-2 bg-foreground/5 rounded-xl border border-foreground/5 space-y-0.5">
+                                <span className="text-[8px] font-bold text-primary block uppercase">Recovery Focus</span>
+                                <p className="text-[9px] leading-normal text-foreground/75 font-semibold">{meal.recoveryBenefits}</p>
+                              </div>
+                              <div className="p-2 bg-foreground/5 rounded-xl border border-foreground/5 space-y-0.5">
+                                <span className="text-[8px] font-bold text-secondary block uppercase">Stamina Index</span>
+                                <p className="text-[9px] leading-normal text-foreground/75 font-semibold">{meal.energyBenefits}</p>
+                              </div>
+                              <div className="p-2 bg-foreground/5 rounded-xl border border-foreground/5 space-y-0.5">
+                                <span className="text-[8px] font-bold text-emerald-500 block uppercase">Fluid Kinetics</span>
+                                <p className="text-[9px] leading-normal text-foreground/75 font-semibold">{meal.hydrationSupport}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Button Actions Block */}
+                        <div className="border-t border-foreground/5 pt-3 flex justify-between items-center gap-2">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setSwappingMealType(meal.mealType)}
+                              className="text-[10px] bg-foreground/5 hover:bg-foreground/10 border border-foreground/5 rounded-lg px-2.5 py-1.5 font-bold transition-all text-foreground/80 flex items-center gap-1 cursor-pointer"
+                            >
+                              <RefreshCw className="h-3 w-3" />
+                              Swap Meal
+                            </button>
+                            <button
+                              onClick={() => handleToggleFavorite(meal.name)}
+                              className="text-[10px] bg-foreground/5 hover:bg-foreground/10 border border-foreground/5 rounded-lg px-2.5 py-1.5 font-bold transition-all flex items-center gap-1 cursor-pointer text-foreground/80"
+                            >
+                              <Star className={`h-3 w-3 ${isStarred ? "fill-amber-400 text-amber-400" : ""}`} />
+                              {isStarred ? "Starred" : "Favorite"}
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handleMarkEaten(meal)}
+                            disabled={isEatenToday}
+                            className={`text-[10px] font-black rounded-lg px-3.5 py-1.5 flex items-center gap-1 transition-all cursor-pointer ${
+                              isEatenToday
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 cursor-default"
+                                : "bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/5"
+                            }`}
+                          >
+                            <Check className="h-3 w-3" />
+                            {isEatenToday ? "Eaten" : "Mark Eaten"}
+                          </button>
+                        </div>
+                      </GlassCard>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* RIGHT: SMART HABITS & FUTURE HEALTH PREDICTIONS */}
+              <div className="lg:col-span-5 space-y-6">
+                
+                {/* AI HABITS LEARNING ENGINE */}
+                <div className="rounded-2xl glass-panel p-5 border-foreground/5 space-y-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
+                      <Sparkles className="h-3.5 w-3.5 text-secondary animate-pulse" />
+                      AI Habit Analyzer
+                    </span>
+                    <p className="text-[9px] text-foreground/45 font-bold">Continuously tracking custom nutritional habits</p>
+                  </div>
+                  <div className="space-y-2">
+                    {activePlan.habits.map((habit, idx) => (
+                      <div key={idx} className="flex gap-2 items-start p-3 bg-foreground/5 rounded-xl border border-foreground/5">
+                        <span className="text-secondary font-bold text-xs mt-0.5">•</span>
+                        <span className="text-xs text-foreground/80 font-bold leading-normal">{habit}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Diet Plan Intelligence details */}
-                <div className="border-t border-foreground/5 pt-5 space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
-                      <ShieldAlert className="h-3.5 w-3.5 text-secondary animate-pulse" />
-                      Dynamic Plan Adjustments
+                {/* AI PREVENTION & LONGEVITY METRICS */}
+                <div className="rounded-2xl glass-panel p-5 border-foreground/5 space-y-4 bg-gradient-to-b from-background to-secondary/5">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center gap-1">
+                      <ShieldAlert className="h-3.5 w-3.5 text-primary animate-pulse" />
+                      AI Prevention Engine
                     </span>
-                    {adjustingPlan && (
-                      <span className="text-[8px] text-primary animate-pulse font-bold tracking-widest uppercase">
-                        Recalibrating...
-                      </span>
-                    )}
+                    <p className="text-[9px] text-foreground/45 font-bold">Predicting circadian fatigue and wellness shifts</p>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-[var(--foreground)]">
-                    {/* Adjustment 1: Workout Intensity */}
+                  {/* Future Health Forecast Gauges */}
+                  <div className="grid grid-cols-2 gap-3 border-b border-foreground/5 pb-4 text-center">
                     <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                      <span className="text-[9px] text-primary block uppercase tracking-wider">🏋️ Workout Intensity Sync</span>
-                      <p className="leading-snug text-foreground/80 font-semibold">
-                        {activeMode === "performance" 
-                          ? "High performance active: Protein targets shifted (+15g) to accelerate peak muscular synthesis."
-                          : "Moderate active state: Protein targets aligned for standard recovery thresholds."}
-                      </p>
+                      <span className="text-[9px] font-bold text-foreground/50 block">FATIGUE RISK</span>
+                      <span className="text-lg font-black block text-emerald-400">Low (14%)</span>
                     </div>
+                    <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
+                      <span className="text-[9px] font-bold text-foreground/50 block">BURNOUT GAP</span>
+                      <span className="text-lg font-black block text-emerald-400">Minimal</span>
+                    </div>
+                  </div>
 
-                    {/* Adjustment 2: Sleep & Circadian Debt */}
-                    <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                      <span className="text-[9px] text-secondary block uppercase tracking-wider">🌙 Sleep & Circadian Debt</span>
-                      <p className="leading-snug text-foreground/80 font-semibold">
-                        {metrics?.sleepHours && metrics.sleepHours < 7.0 
-                          ? "Sleep debt detected (<7h): Increased restorative glycogen carbs (+10g) to combat cortisol spikes."
-                          : "Sleep parameters synchronized: Stable glycemic load targets active to promote sleep latency."}
-                      </p>
-                    </div>
-
-                    {/* Adjustment 3: Hydration Metrics */}
-                    <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                      <span className="text-[9px] text-emerald-500 block uppercase tracking-wider">💧 Fluid Intake Compliance</span>
-                      <p className="leading-snug text-foreground/80 font-semibold">
-                        {waterLogged < 1500 
-                          ? "Dehydration alert: Fluid volume is low. Added 500ml hydration buffer to safeguard liver kinetics."
-                          : "Excellent rehydration: Balanced metabolic cleansing rates are currently active."}
-                      </p>
-                    </div>
-
-                    {/* Adjustment 4: Stress and Workload */}
-                    <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                      <span className="text-[9px] text-amber-500 block uppercase tracking-wider">🧠 Cortisol / Screen Strain</span>
-                      <p className="leading-snug text-foreground/80 font-semibold">
-                        {metrics?.stressLevel && metrics.stressLevel > 50
-                          ? "Elevated stress detected: Added high-magnesium tryptophan whole food seeds to lower CNS strain."
-                          : "Stress indicators optimal: Plan calibrated to baseline autonomic nervous system balance."}
-                      </p>
-                    </div>
+                  {/* Warnings & Suggestions list */}
+                  <div className="space-y-2.5">
+                    {activePlan.warnings.map((warn, idx) => (
+                      <div key={idx} className="flex gap-2.5 items-start p-3 bg-rose-500/5 border border-rose-500/15 rounded-xl">
+                        <AlertCircle className="h-3.5 w-3.5 text-rose-400 shrink-0 mt-0.5 animate-pulse" />
+                        <span className="text-xs font-semibold text-rose-400 leading-snug">{warn}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
               </div>
 
-              {/* RIGHT COLUMN: MANUAL LOGGER & MEAL HISTORY */}
-              <div className="lg:col-span-5 flex flex-col gap-6">
-                
-                {/* Manual Nutrient Logger Form */}
-                <div className="rounded-2xl glass-panel p-6 border-foreground/5">
-                  <form onSubmit={handleAddFood} className="space-y-4">
-                    <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
-                      <Apple className="h-4 w-4 text-primary" />
-                      Log Food Manually
-                    </h3>
+            </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">Food item name</label>
-                      <input
-                        type="text"
-                        required
-                        value={foodName}
-                        onChange={(e) => setFoodName(e.target.value)}
-                        className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground placeholder-foreground/45 focus:outline-none focus:border-primary/50"
-                        placeholder="e.g. Scrambled eggs or Salad"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-foreground">Meal Phase</label>
-                        <select
-                          value={mealType}
-                          onChange={(e) => setMealType(e.target.value)}
-                          className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none focus:border-primary/50"
-                        >
-                          <option value="breakfast">Breakfast</option>
-                          <option value="lunch">Lunch</option>
-                          <option value="dinner">Dinner</option>
-                          <option value="snack">Snack</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-foreground">Kcal Consumed</label>
-                        <input
-                          type="number"
-                          required
-                          value={calories}
-                          onChange={(e) => setCalories(Number(e.target.value))}
-                          className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-foreground/60">Protein (g)</label>
-                        <input
-                          type="number"
-                          value={protein}
-                          onChange={(e) => setProtein(Number(e.target.value))}
-                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-foreground/60">Carbs (g)</label>
-                        <input
-                          type="number"
-                          value={carbs}
-                          onChange={(e) => setCarbs(Number(e.target.value))}
-                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-foreground/60">Fats (g)</label>
-                        <input
-                          type="number"
-                          value={fat}
-                          onChange={(e) => setFat(Number(e.target.value))}
-                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3 border-t border-foreground/5 pt-2">
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-foreground/60">Sugars (g)</label>
-                        <input
-                          type="number"
-                          value={sugar}
-                          onChange={(e) => setSugar(Number(e.target.value))}
-                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-foreground/60">Sodium (mg)</label>
-                        <input
-                          type="number"
-                          value={sodium}
-                          onChange={(e) => setSodium(Number(e.target.value))}
-                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-foreground/60">Fiber (g)</label>
-                        <input
-                          type="number"
-                          value={fiber}
-                          onChange={(e) => setFiber(Number(e.target.value))}
-                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Stress Snack trigger */}
-                    <div className="rounded-xl border border-foreground/5 bg-foreground/5 p-3 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-bold text-foreground flex items-center gap-1 cursor-pointer select-none">
-                          <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                          Flag as Emotional Snacking?
-                        </label>
-                        <input
-                          type="checkbox"
-                          checked={isStressSnacking}
-                          onChange={(e) => setIsStressSnacking(e.target.checked)}
-                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
-                        />
-                      </div>
-
-                      {isStressSnacking && (
-                        <div className="space-y-1">
-                          <label className="text-[8px] font-bold text-foreground/60">Stress trigger excuse context</label>
-                          <input
-                            type="text"
-                            value={stressTrigger}
-                            onChange={(e) => setStressTrigger(e.target.value)}
-                            className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-foreground/10 bg-background text-foreground focus:outline-none"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <Button variant="primary" type="submit" className="w-full py-3 flex items-center justify-center gap-1.5">
-                      <Plus className="h-4 w-4" />
-                      <span>Log Macromolecules</span>
-                    </Button>
-                  </form>
+            {/* 3. NUTRITION VISUALIZATION AND CHARTS */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Macro target consistency */}
+              <div className="rounded-2xl glass-panel p-5 border-foreground/5 space-y-4">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-1.5">
+                    <BarChart2 className="h-4.5 w-4.5 text-primary" />
+                    Weekly Macro Target Consistency
+                  </h4>
+                  <span className="text-[9px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold uppercase">
+                    Stable Index: 88%
+                  </span>
                 </div>
+                <div className="h-[200px] w-full pt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={WEEKLY_TRENDS_DATA} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#222" opacity={0.05} />
+                      <XAxis dataKey="name" stroke="#666" fontSize={9} tickLine={false} />
+                      <YAxis stroke="#666" fontSize={9} tickLine={false} />
+                      <Tooltip contentStyle={{ background: "#111", border: "1px solid #333", fontSize: "10px", borderRadius: "8px" }} />
+                      <Legend fontSize={9} />
+                      <Bar dataKey="Target" fill="#3b82f6" opacity={0.3} radius={[4, 4, 0, 0]} name="Metabolic Target" />
+                      <Bar dataKey="Consumed" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Actual Calories" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
 
-                {/* Meal History */}
-                <div className="rounded-2xl glass-panel p-6 border-foreground/5 flex-1 flex flex-col justify-between">
-                  <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-foreground flex items-center justify-between">
-                      <span>Logged Meal History</span>
-                      <span className="text-xs text-foreground/50 font-medium">Daily Telemetry logs</span>
-                    </h3>
+              {/* Sleep vs Nutrition */}
+              <div className="rounded-2xl glass-panel p-5 border-foreground/5 space-y-4">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-1.5">
+                    <Moon className="h-4.5 w-4.5 text-secondary" />
+                    Sleep vs Nutrition Correlation
+                  </h4>
+                  <span className="text-[9px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full font-bold uppercase">
+                    Sync Cleared
+                  </span>
+                </div>
+                <div className="h-[200px] w-full pt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={SLEEP_NUTRITION_DATA} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#222" opacity={0.05} />
+                      <XAxis dataKey="name" stroke="#666" fontSize={9} tickLine={false} />
+                      <YAxis yAxisId="left" stroke="#666" fontSize={9} domain={[0, 10]} tickLine={false} />
+                      <YAxis yAxisId="right" orientation="right" stroke="#666" fontSize={9} domain={[0, 100]} tickLine={false} />
+                      <Tooltip contentStyle={{ background: "#111", border: "1px solid #333", fontSize: "10px", borderRadius: "8px" }} />
+                      <Line yAxisId="left" type="monotone" dataKey="Sleep" stroke="#3b82f6" strokeWidth={2} name="Sleep Hours" />
+                      <Line yAxisId="right" type="monotone" dataKey="NutritionScore" stroke="#10b981" strokeWidth={2} name="Compliance Score" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
 
-                    {stressLogs.length > 0 && (
-                      <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-500 font-semibold flex items-center gap-2">
-                        <Info className="h-4 w-4 shrink-0" />
-                        <span>AI Alert: {stressLogs.length} emotional logs isolated. Trigger: deadline inertias.</span>
+            </div>
+
+            {/* 4. REDESIGNED MEAL TIMELINE & QUICK HYDRATION */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              
+              {/* EATEN MEALS TIMELINE */}
+              <div className="lg:col-span-7 rounded-2xl glass-panel p-5 border-foreground/5 flex flex-col justify-between space-y-4">
+                <div className="space-y-3">
+                  <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center justify-between">
+                    <span>Eaten Meal Timeline</span>
+                    <span className="text-[9px] text-foreground/40 font-bold">Real-time synchronized logs</span>
+                  </h3>
+
+                  <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-none">
+                    {foodLogs.length === 0 ? (
+                      <div className="text-center py-10 space-y-1.5 text-foreground/45">
+                        <Apple className="h-7 w-7 mx-auto opacity-20" />
+                        <span className="text-xs font-bold block">No meals logged today</span>
+                        <p className="text-[10px] leading-normal text-foreground/50 max-w-[200px] mx-auto">
+                          Mark generated plan meals eaten above to populate your nutrition history log automatically!
+                        </p>
                       </div>
-                    )}
-
-                    <div className="space-y-2.5 overflow-y-auto max-h-[220px] scrollbar-none pr-1">
-                      {foodLogs.length === 0 ? (
-                        <div className="text-center py-12 text-foreground/45 space-y-2">
-                          <Utensils className="h-8 w-8 text-foreground/20 mx-auto animate-pulse" />
-                          <span className="text-xs font-bold block">No meals logged today</span>
-                          <p className="text-xs text-foreground/50 max-w-[200px] mx-auto leading-normal">
-                            Log your first meal to generate nutrition analytics.
-                          </p>
-                        </div>
-                      ) : (
-                        foodLogs.map((log) => (
-                          <div 
-                            key={log.id} 
-                            className={`p-3.5 rounded-xl border flex justify-between items-center ${
-                              log.stress_eating 
-                                ? "border-amber-500/20 bg-amber-500/5 animate-pulse" 
-                                : "border-foreground/5 bg-foreground/5"
-                            }`}
-                          >
-                            <div className="space-y-0.5">
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-bold text-foreground">{log.food_name}</span>
-                                <span className="rounded-full bg-foreground/10 px-2 py-0.2 text-[8px] font-bold text-foreground/60 capitalize">
-                                  {log.meal_type}
-                                </span>
-                              </div>
-                              <p className="text-xs text-foreground/50 font-semibold">
-                                P: {log.protein_g}g | C: {log.carbs_g}g | F: {log.fat_g}g {log.sugar_g ? ` | S: ${log.sugar_g}g` : ""} {log.sodium_mg ? ` | Na: ${log.sodium_mg}mg` : ""}
-                              </p>
-                              {log.stress_eating && (
-                                <p className="text-[9px] text-amber-500 font-bold italic mt-0.5">
-                                  ⚠ Emotional Trigger: {log.emotional_eating_trigger}
-                                </p>
-                              )}
+                    ) : (
+                      foodLogs.map((log) => (
+                        <div key={log.id} className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 flex justify-between items-center">
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-foreground leading-none">{log.food_name}</span>
+                              <span className="rounded-full bg-primary/10 px-2 py-0.2 text-[8px] font-bold text-primary capitalize">
+                                {log.meal_type}
+                              </span>
                             </div>
-                            <span className="text-xs font-bold text-foreground shrink-0 ml-3">
-                              +{log.calories} kcal
+                            <span className="text-[9px] font-bold text-foreground/45">
+                              Protein: {log.protein_g}g | Carbs: {log.carbs_g}g | Fat: {log.fat_g}g
                             </span>
                           </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="border-t border-foreground/5 pt-4 mt-6 text-xs text-foreground/50 font-semibold flex justify-between">
-                    <span>Preventive Analysis: Macro balance reduces obesity risk by 18%</span>
-                    <span className="text-secondary font-bold">HIPAA Secure logs</span>
+                          <span className="text-xs font-black text-foreground">
+                            +{log.calories} kcal
+                          </span>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 
+                <div className="border-t border-foreground/5 pt-3 text-[10px] font-bold text-foreground/45 flex justify-between">
+                  <span>*Target macros are updated based on biological consistency indices.</span>
+                  <span className="text-secondary uppercase">Secure logs</span>
+                </div>
               </div>
 
-            </div>
-
-            {/* 3. AI NUTRITION INSIGHTS SECTION */}
-            <div className="rounded-2xl glass-panel p-6 border-foreground/5 space-y-4">
-              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                <Sparkles className="h-4.5 w-4.5 text-secondary animate-pulse" />
-                AI preventive Nutrition Insights
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {activeInsights.map((insight, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`p-4 rounded-xl border flex gap-3 items-start text-xs font-semibold leading-relaxed ${
-                      insight.type === "warning" 
-                        ? "border-rose-500/20 bg-rose-500/5 text-rose-400" 
-                        : insight.type === "alert" 
-                        ? "border-amber-500/20 bg-amber-500/5 text-amber-400" 
-                        : insight.type === "success" 
-                        ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-400" 
-                        : "border-foreground/10 bg-foreground/5 text-foreground/80"
-                    }`}
-                  >
-                    <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5" />
-                    <p>{insight.text}</p>
+              {/* QUICK HYDRATION MODULE */}
+              <div className="lg:col-span-5 rounded-2xl glass-panel p-5 border-foreground/5 flex flex-col justify-between space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-foreground/60 uppercase">Fluid Hydration</span>
+                    <Droplet className="h-4.5 w-4.5 text-emerald-500" />
                   </div>
-                ))}
+                  <div>
+                    <h3 className="text-3xl font-black text-emerald-500">{waterLogged} ml</h3>
+                    <span className="text-[9px] font-bold text-foreground/45 block mt-1">Today's Circadian Target: 2500 ml</span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleLogWater(250)} 
+                      className="text-xs bg-foreground/5 hover:bg-emerald-500/10 border border-foreground/5 hover:border-emerald-500/20 px-3 py-2.5 rounded-lg font-bold text-emerald-500 flex-1 transition-all cursor-pointer"
+                    >
+                      +250ml Glass
+                    </button>
+                    <button 
+                      onClick={() => handleLogWater(500)} 
+                      className="text-xs bg-foreground/5 hover:bg-emerald-500/10 border border-foreground/5 hover:border-emerald-500/20 px-3 py-2.5 rounded-lg font-bold text-emerald-500 flex-1 transition-all cursor-pointer"
+                    >
+                      +500ml Flask
+                    </button>
+                  </div>
+                </div>
+
+                <div className="border-t border-foreground/5 pt-3 text-[9px] font-bold text-foreground/45 leading-normal">
+                  Steady fluid consumption facilitates kidney waste filtration and preserves cellular fluid volumes.
+                </div>
               </div>
+
             </div>
-          </>
+
+          </div>
         )}
 
       </div>
+
+      {/* SWAP MEAL SELECTION MODAL */}
+      {swappingMealType && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-[fadeIn_0.2s_ease-out]">
+          <div className="fixed inset-0 bg-black/60" onClick={() => setSwappingMealType(null)} />
+          <div className="relative w-full max-w-xl rounded-3xl glass-panel border border-foreground/10 bg-background/95 p-6 space-y-4 z-10 shadow-2xl">
+            <h3 className="font-bold text-sm text-foreground uppercase tracking-widest">
+              Select Healthy Alternative for {swappingMealType}
+            </h3>
+
+            <div className="space-y-3">
+              {(ALTERNATIVES_DATABASE[swappingMealType] || []).map((alt, idx) => (
+                <div 
+                  key={idx} 
+                  className="p-3.5 rounded-2xl border border-foreground/5 bg-foreground/5 hover:bg-foreground/10 transition-all flex justify-between items-center gap-4 group"
+                >
+                  <div className="space-y-1 min-w-0">
+                    <span className="text-xs font-black text-foreground block leading-snug">{alt.name}</span>
+                    <p className="text-[10px] text-foreground/60 leading-normal font-semibold pr-4">{alt.whyHelps}</p>
+                    <div className="flex gap-2 text-[9px] font-bold text-primary">
+                      <span>P: {alt.protein}g</span>
+                      <span>C: {alt.carbs}g</span>
+                      <span>F: {alt.fat}g</span>
+                      <span className="text-foreground/45">| {alt.calories} kcal</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleSwapMeal(swappingMealType, alt)}
+                    className="text-[10px] font-black bg-primary text-white px-3 py-2 rounded-lg hover:bg-primary/95 transition-all shrink-0 cursor-pointer"
+                  >
+                    Choose
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button 
+                onClick={() => setSwappingMealType(null)}
+                className="text-[10px] font-black text-foreground/60 hover:text-foreground cursor-pointer"
+              >
+                Cancel / Return
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </DashboardLayout>
   );
 }

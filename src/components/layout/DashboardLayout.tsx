@@ -72,7 +72,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
     {
       label: "Health",
       links: [
-        { name: "Diet Plans", href: "/nutrition", icon: Utensils },
+        { name: "Smart Nutrition Plans", href: "/nutrition", icon: Utensils },
         { name: "Sleep", href: "/sleep", icon: Moon },
         { name: "Recovery", href: "/recovery", icon: HeartPulse },
         { name: "Health Evolution", href: "/timeline", icon: Milestone },
