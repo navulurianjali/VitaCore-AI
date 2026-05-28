@@ -170,7 +170,7 @@ export default function LandingPage() {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-extrabold tracking-tight sm:text-6xl max-w-4xl mx-auto"
+            className="text-3xl font-bold tracking-tight sm:text-4xl max-w-4xl mx-auto"
           >
             Predict. Prevent.{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary">
@@ -182,7 +182,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-lg text-foreground/70 max-w-2xl mx-auto font-medium leading-relaxed"
+            className="text-sm text-foreground/70 max-w-2xl mx-auto leading-relaxed"
           >
             AI-powered wellness intelligence that maps your biometrics, forecasts fatigue decay, detects invisible health decline, and adapts with your lifestyle environment.
           </motion.p>
@@ -308,44 +308,44 @@ export default function LandingPage() {
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-6">
               
               {/* Recovery card */}
-              <GlassCard glowColor={simRecovery > 65 ? "emerald" : "rose"} className="flex flex-col justify-between min-h-[160px]">
+              <GlassCard glowColor={simRecovery > 65 ? "emerald" : "rose"} className="flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold tracking-wider text-foreground/65 uppercase">Biorecovery Score</span>
-                  <HeartPulse className="h-4.5 w-4.5 text-secondary" />
+                  <span className="text-xs font-medium text-[var(--muted)]">Biorecovery Score</span>
+                  <HeartPulse className="h-4 w-4 text-secondary" />
                 </div>
-                <div className="my-4">
-                  <span className="text-4xl font-extrabold text-foreground">{simRecovery}%</span>
+                <div className="my-3">
+                  <span className="analytics-number text-[var(--foreground)]">{simRecovery}%</span>
                 </div>
-                <div className="text-[10px] text-foreground/60 leading-normal font-semibold">
-                  {simRecovery > 65 ? "✓ Cardiovascular HRV capacity is fully primed." : "⚠ Sleep debt is active; prioritize light stretching today."}
+                <div className="text-xs text-[var(--muted)] leading-normal">
+                  {simRecovery > 65 ? "Cardiovascular HRV capacity primed." : "Sleep debt active; prioritize light stretching."}
                 </div>
               </GlassCard>
 
               {/* Burnout risk card */}
-              <GlassCard glowColor={simBurnoutRisk > 60 ? "rose" : "violet"} className="flex flex-col justify-between min-h-[160px]">
+              <GlassCard glowColor={simBurnoutRisk > 60 ? "rose" : "violet"} className="flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold tracking-wider text-foreground/65 uppercase">Burnout Probability</span>
-                  <AlertTriangle className="h-4.5 w-4.5 text-accent" />
+                  <span className="text-xs font-medium text-[var(--muted)]">Burnout Probability</span>
+                  <AlertTriangle className="h-4 w-4 text-accent" />
                 </div>
-                <div className="my-4">
-                  <span className="text-4xl font-extrabold text-foreground">{simBurnoutRisk}%</span>
+                <div className="my-3">
+                  <span className="analytics-number text-[var(--foreground)]">{simBurnoutRisk}%</span>
                 </div>
-                <div className="text-[10px] text-foreground/60 leading-normal font-semibold">
-                  {simBurnoutRisk > 60 ? "⚠ High Danger of fatigue collapse. Limit work focus." : "✓ Wellness stability parameters are stable."}
+                <div className="text-xs text-[var(--muted)] leading-normal">
+                  {simBurnoutRisk > 60 ? "High fatigue risk. Limit focus work today." : "Wellness parameters stable."}
                 </div>
               </GlassCard>
 
               {/* Wellness stability score */}
-              <GlassCard glowColor={simStability > 70 ? "violet" : "amber"} className="flex flex-col justify-between min-h-[160px]">
+              <GlassCard glowColor={simStability > 70 ? "violet" : "amber"} className="flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold tracking-wider text-foreground/65 uppercase">Lifestyle Stability</span>
-                  <Activity className="h-4.5 w-4.5 text-primary" />
+                  <span className="text-xs font-medium text-[var(--muted)]">Lifestyle Stability</span>
+                  <Activity className="h-4 w-4 text-primary" />
                 </div>
-                <div className="my-4">
-                  <span className="text-4xl font-extrabold text-foreground">{simStability}%</span>
+                <div className="my-3">
+                  <span className="analytics-number text-[var(--foreground)]">{simStability}%</span>
                 </div>
-                <div className="text-[10px] text-foreground/60 leading-normal font-semibold">
-                  {simStability > 70 ? "✓ Healthy balance maintained. Keep consistency." : "⚠ System instability detected. Hydrate and sleep early."}
+                <div className="text-xs text-[var(--muted)] leading-normal">
+                  {simStability > 70 ? "Healthy balance maintained." : "System instability. Hydrate and sleep early."}
                 </div>
               </GlassCard>
 
@@ -489,10 +489,10 @@ export default function LandingPage() {
                 
                 <div className="space-y-4">
                   <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">{plan.name}</h3>
-                  <div className="flex items-baseline">
-                    <span className="text-4xl font-extrabold">$</span>
-                    <span className="text-5xl font-extrabold tracking-tight">{plan.price}</span>
-                    <span className="text-xs text-foreground/60 font-semibold ml-1">/ month</span>
+                  <div className="flex items-baseline gap-0.5 my-1">
+                    <span className="text-xl font-bold">$</span>
+                    <span className="text-3xl font-bold tracking-tight">{plan.price}</span>
+                    <span className="text-xs text-[var(--muted)] ml-1">/ month</span>
                   </div>
                   <p className="text-xs text-foreground/70 font-medium leading-relaxed">{plan.description}</p>
                   
