@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Dumbbell, Play, Pause, RotateCcw, Check, Sparkles, ShieldAlert, 
   Award, Clock, Flame, Droplet, Calendar, TrendingUp, Compass, 
-  Heart, CheckSquare, Plus, Save, BookOpen, AlertTriangle, ArrowRight, ArrowLeft 
+  Heart, CheckSquare, Plus, Save, BookOpen, AlertTriangle, ArrowRight, ArrowLeft,
+  ChevronRight, RefreshCw, Layers
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
@@ -15,7 +16,7 @@ import { getBaseMetrics, DailyMetrics } from "@/utils/mockData";
 import { supabase } from "@/utils/supabase";
 import confetti from "canvas-confetti";
 
-// Curated exercise library with beginner-friendly coaching labels
+// Curated exercise library
 interface Exercise {
   name: string;
   description: string;
@@ -72,9 +73,12 @@ export default function FitnessPage() {
   
   const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
   const [activeTab, setActiveTab] = useState<"coach" | "history" | "progress" | "routines" | "recovery">("coach");
-  const [coachState, setCoachState] = useState<"form" | "active" | "summary">("form");
+  const [coachState, setCoachState] = useState<"form" | "generating" | "preview" | "active" | "summary">("form");
 
-  // Daily fitness questionnaire state
+  // Onboarding questionnaire steps (1 to 6)
+  const [questionStep, setQuestionStep] = useState(1);
+
+  // Questionnaire form states
   const [feeling, setFeeling] = useState("normal");
   const [location, setLocation] = useState("home");
   const [focus, setFocus] = useState("full_body");
@@ -82,10 +86,16 @@ export default function FitnessPage() {
   const [equipment, setEquipment] = useState("none");
   const [intensity, setIntensity] = useState("moderate");
 
-  // Generated workout session state
+  // Loading screen ticks state
+  const [loadingTick, setLoadingTick] = useState(0);
+
+  // Generated workout session states
   const [generatedWorkout, setGeneratedWorkout] = useState<Exercise[]>([]);
   const [recoveryWarning, setRecoveryWarning] = useState("");
   const [activeWorkoutName, setActiveWorkoutName] = useState("Custom Adaptive Workout");
+
+  // Readiness / Fatigue Score
+  const [readinessScore, setReadinessScore] = useState(85);
 
   // Live Timer states
   const [currentExerciseIdx, setCurrentExerciseIdx] = useState(0);
@@ -99,10 +109,10 @@ export default function FitnessPage() {
   const [caloriesBurned, setCaloriesBurned] = useState(0);
   const [postWorkoutFeedback, setPostWorkoutFeedback] = useState("");
 
-  // History state
+  // History states
   const [workoutHistory, setWorkoutHistory] = useState<any[]>([]);
 
-  // Saved routines state
+  // Saved routines states
   const [savedRoutines, setSavedRoutines] = useState<any[]>([]);
 
   // Load metrics and local logs on mount
@@ -110,13 +120,11 @@ export default function FitnessPage() {
     const base = getBaseMetrics(activeMode);
     setMetrics(base);
 
-    // Initial default routines
     setSavedRoutines([
       { id: "r1", name: "Everyday Core Decompression", focus: "core", duration: 15, exercisesCount: 3 },
       { id: "r2", name: "Hamstring Recovery Flow", focus: "mobility", duration: 20, exercisesCount: 3 }
     ]);
 
-    // LocalStorage fallback loading for history
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("vitalcore_workout_history");
       if (stored) {
@@ -143,7 +151,6 @@ export default function FitnessPage() {
             .eq("user_id", profile.id)
             .order("created_at", { ascending: false });
           if (data && !error) {
-            // Merge with local logs securely
             const merged = data.map((w: any) => ({
               date: new Date(w.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
               focus: w.type,
@@ -172,7 +179,7 @@ export default function FitnessPage() {
     }
   }, [profile]);
 
-  // Handle countdown interval
+  // Timer intervals
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (timerRunning && timeLeft > 0) {
@@ -186,10 +193,28 @@ export default function FitnessPage() {
     return () => clearInterval(interval);
   }, [timerRunning, timeLeft]);
 
-  // Trigger when countdown reaches 0
+  // Loading Screen ticks animation
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (coachState === "generating") {
+      interval = setInterval(() => {
+        setLoadingTick(prev => {
+          if (prev >= 3) {
+            clearInterval(interval);
+            setTimeout(() => {
+              setCoachState("preview");
+            }, 600);
+            return 3;
+          }
+          return prev + 1;
+        });
+      }, 700);
+    }
+    return () => clearInterval(interval);
+  }, [coachState]);
+
   const handleTimeExpired = () => {
     if (isResting) {
-      // Finished resting, go to next exercise
       setIsResting(false);
       const nextIdx = currentExerciseIdx + 1;
       if (nextIdx < generatedWorkout.length) {
@@ -200,7 +225,6 @@ export default function FitnessPage() {
         finishWorkoutSession();
       }
     } else {
-      // Completed active set, mark as complete and start rest
       const updated = [...completedExercises];
       updated[currentExerciseIdx] = true;
       setCompletedExercises(updated);
@@ -216,42 +240,45 @@ export default function FitnessPage() {
     }
   };
 
-  // Generate dynamic, recovery-aware AI workout
-  const handleGenerateWorkout = () => {
+  // Compile final adaptive workout
+  const compileWorkout = () => {
     setRecoveryWarning("");
-    
-    // 1. Gather filtered list from DB or fallback
+    setLoadingTick(0);
+    setCoachState("generating");
+
     const focusKey = focus === "yoga" || focus === "recovery" ? "mobility" : focus;
     const originalList = EXERCISE_DATABASE[focusKey] || EXERCISE_DATABASE["full_body"];
     
-    // Filter by equipment availability
     let filteredList = originalList.filter(ex => {
       if (equipment === "none") return ex.equipment === "Bodyweight";
       if (equipment === "dumbbells") return ex.equipment === "Bodyweight" || ex.equipment === "Dumbbells";
-      return true; // Gym / bands / all available
+      return true;
     });
 
     if (filteredList.length === 0) {
-      filteredList = originalList; // Safe fallback
+      filteredList = originalList;
     }
 
-    // 2. Perform Recovery-Aware Dynamic Adaptations
     let finalIntensity = intensity;
     let restBuffer = 0;
     
-    // Check bio-sensors (High fatigue, sleep debt, high soreness)
+    // Bio-feedback calculations
     const isFatigued = feeling === "tired" || feeling === "stressed" || feeling === "sore" || (metrics && metrics.sleepQuality < 65);
     const isHighSoreness = profile?.soreness_level && profile.soreness_level > 5;
     
+    let readiness = 88;
+    if (isFatigued) readiness -= 20;
+    if (isHighSoreness) readiness -= 15;
+    setReadinessScore(Math.max(30, readiness));
+
     if (isFatigued || isHighSoreness) {
       finalIntensity = "light";
-      restBuffer = 10; // Add 10s extra rest
+      restBuffer = 10; 
       setRecoveryWarning(
-        "⚠️ Recovery Adaptation Active: We detected higher levels of daily fatigue, sleep debt, or muscular soreness. To support your joints and CNS recovery, we have calibrated your workout intensity to Light and increased your rest break buffers."
+        "💡 We detected higher fatigue, sleep debt, or muscular soreness. To protect your joints, we have calibrated your workout to a supportive Light intensity and added extra rest buffers."
       );
     }
 
-    // Map intensity to duration variables
     const formattedExercises = filteredList.map(ex => {
       let repsLabel = ex.reps;
       let dur = ex.durationSeconds;
@@ -272,7 +299,6 @@ export default function FitnessPage() {
       };
     });
 
-    // Configure naming
     const titleFocus = focus.replace("_", " ").toUpperCase();
     setActiveWorkoutName(`AI ${finalIntensity.toUpperCase()} ${titleFocus} ROUTINE`);
     setGeneratedWorkout(formattedExercises);
@@ -281,12 +307,8 @@ export default function FitnessPage() {
     setTimeLeft(formattedExercises[0].durationSeconds);
     setIsResting(false);
     setTimerRunning(false);
-    
-    // Switch state to active guided screen
-    setCoachState("active");
   };
 
-  // Mark exercise complete / skip
   const handleMarkComplete = () => {
     const updated = [...completedExercises];
     updated[currentExerciseIdx] = true;
@@ -314,7 +336,6 @@ export default function FitnessPage() {
     }
   };
 
-  // End workout flow
   const finishWorkoutSession = async () => {
     setTimerRunning(false);
     confetti({
@@ -323,14 +344,12 @@ export default function FitnessPage() {
       colors: ["#8b5cf6", "#10b981", "#ec4899"]
     });
 
-    // Compute metrics
     const mins = duration;
     setWorkoutDurationSpent(mins);
     
     const calorieBurn = Math.round(mins * (intensity === "intense" ? 10 : intensity === "moderate" ? 7 : 4));
     setCaloriesBurned(calorieBurn);
 
-    // Dynamic AI feedback
     let feedback = "";
     if (feeling === "tired" || feeling === "stressed") {
       feedback = "🧘 Excellent! Your active mobility and gentle intensity choice today kept cardiac strain low. Remember to hydrate with 600ml of mineralized water within 30 minutes to reduce muscle tension.";
@@ -339,7 +358,6 @@ export default function FitnessPage() {
     }
     setPostWorkoutFeedback(feedback);
 
-    // Save Workout log
     const newLog = {
       date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
       focus: focus.replace("_", " ").toUpperCase(),
@@ -349,14 +367,12 @@ export default function FitnessPage() {
       rating: intensity.toUpperCase()
     };
 
-    // Save to LocalStorage
     const stored = localStorage.getItem("vitalcore_workout_history");
     const parsed = stored ? JSON.parse(stored) : [];
     parsed.unshift(newLog);
     setWorkoutHistory(parsed);
     localStorage.setItem("vitalcore_workout_history", JSON.stringify(parsed));
 
-    // Save to Supabase DB if authenticated
     if (supabase && profile?.id) {
       try {
         await supabase.from("workouts").insert({
@@ -378,7 +394,6 @@ export default function FitnessPage() {
     setCoachState("summary");
   };
 
-  // Add routine bookmarking
   const handleSaveRoutine = () => {
     const newRoutine = {
       id: `r-${Date.now()}`,
@@ -389,6 +404,28 @@ export default function FitnessPage() {
     };
     setSavedRoutines(prev => [newRoutine, ...prev]);
     alert("Routine successfully added to your Saved Routines library!");
+  };
+
+  // Advance step in form and automatically submit if final step
+  const handleSelectOption = (key: string, val: any) => {
+    if (key === "feeling") setFeeling(val);
+    if (key === "location") setLocation(val);
+    if (key === "focus") setFocus(val);
+    if (key === "duration") setDuration(Number(val));
+    if (key === "equipment") setEquipment(val);
+    if (key === "intensity") {
+      setIntensity(val);
+      // Last step answered, compile immediately
+      setTimeout(() => {
+        compileWorkout();
+      }, 200);
+      return;
+    }
+    
+    // Smooth transition to next step
+    setTimeout(() => {
+      setQuestionStep(prev => Math.min(6, prev + 1));
+    }, 200);
   };
 
   return (
@@ -408,7 +445,7 @@ export default function FitnessPage() {
           </div>
         </div>
 
-        {/* Cohesive Subsections Tab navigation */}
+        {/* Tab navigation */}
         <div className="flex border-b border-foreground/5 pb-1 gap-2 overflow-x-auto scrollbar-none">
           {[
             { id: "coach", label: "AI Workout Coach", icon: Dumbbell },
@@ -423,7 +460,10 @@ export default function FitnessPage() {
                 key={tab.id}
                 onClick={() => {
                   setActiveTab(tab.id as any);
-                  if (tab.id === "coach") setCoachState("form");
+                  if (tab.id === "coach") {
+                    setCoachState("form");
+                    setQuestionStep(1);
+                  }
                 }}
                 className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shrink-0 ${
                   activeTab === tab.id
@@ -444,173 +484,382 @@ export default function FitnessPage() {
           {/* TAB 1: COACH TAB */}
           {activeTab === "coach" && (
             <>
-              {/* STATE A: QUESTIONNAIRE FORM */}
+              {/* STATE A: MULTI-STEP CONVERSATIONAL QUESTIONNAIRE */}
               {coachState === "form" && (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="max-w-[500px] mx-auto py-10">
+                  <GlassCard glowColor="violet" className="p-6 border border-foreground/5 space-y-6">
+                    
+                    {/* Header Step progress */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-[10px] font-bold text-foreground/50 tracking-wider uppercase">
+                        <span>Step {questionStep} of 6</span>
+                        <span>{Math.round((questionStep / 6) * 100)}% Complete</span>
+                      </div>
+                      <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-primary h-full rounded-full transition-all duration-300"
+                          style={{ width: `${(questionStep / 6) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Step 1: Feeling */}
+                    {questionStep === 1 && (
+                      <div className="space-y-5">
+                        <h2 className="text-base font-bold text-foreground tracking-tight leading-snug">
+                          How are you feeling today?
+                        </h2>
+                        <div className="flex flex-col gap-2">
+                          {[
+                            { value: "energetic", label: "💪 Energetic & Dynamic" },
+                            { value: "normal", label: "😌 Good & Normal" },
+                            { value: "tired", label: "😴 Tired & Low Energy" },
+                            { value: "stressed", label: "🧠 Stressed & Burnt-out" },
+                            { value: "sore", label: "🩹 Sore Muscles" }
+                          ].map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() => handleSelectOption("feeling", opt.value)}
+                              className={`w-full text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 ${
+                                feeling === opt.value
+                                  ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/5"
+                                  : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 2: Location */}
+                    {questionStep === 2 && (
+                      <div className="space-y-5">
+                        <h2 className="text-base font-bold text-foreground tracking-tight leading-snug">
+                          Where are you working out today?
+                        </h2>
+                        <div className="flex flex-col gap-2">
+                          {[
+                            { value: "home", label: "🏡 Home Living Space" },
+                            { value: "gym", label: "🏋️ Commercial Gym" },
+                            { value: "outdoors", label: "🌳 Outdoors & Park" },
+                            { value: "office", label: "🏢 Office Desk Area" },
+                            { value: "traveling", label: "✈️ Hotel / Traveling" }
+                          ].map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() => handleSelectOption("location", opt.value)}
+                              className={`w-full text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 ${
+                                location === opt.value
+                                  ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/5"
+                                  : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 3: Focus */}
+                    {questionStep === 3 && (
+                      <div className="space-y-5">
+                        <h2 className="text-base font-bold text-foreground tracking-tight leading-snug">
+                          What is your target focus today?
+                        </h2>
+                        <div className="flex flex-col gap-2">
+                          {[
+                            { value: "full_body", label: "🌀 Full Body Integration" },
+                            { value: "chest", label: "🏋️ Chest Press & Push" },
+                            { value: "back", label: "👐 Back Pulls & Lats" },
+                            { value: "legs", label: "🦿 Leg strength & Squat" },
+                            { value: "core", label: "🪵 Core Stability & Abs" },
+                            { value: "shoulders", label: "🛡️ Shoulders & Upper Posture" },
+                            { value: "mobility", label: "🧘 Restorative Mobility Flow" }
+                          ].map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() => handleSelectOption("focus", opt.value)}
+                              className={`w-full text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 ${
+                                focus === opt.value
+                                  ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/5"
+                                  : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 4: Duration */}
+                    {questionStep === 4 && (
+                      <div className="space-y-5">
+                        <h2 className="text-base font-bold text-foreground tracking-tight leading-snug">
+                          How much time do you have today?
+                        </h2>
+                        <div className="flex flex-col gap-2">
+                          {[
+                            { value: "15", label: "⏱️ 15 Mins (Express Routine)" },
+                            { value: "30", label: "⏱️ 30 Mins (Standard Balance)" },
+                            { value: "45", label: "⏱️ 45 Mins (Optimized Power)" },
+                            { value: "60", label: "⏱️ 60+ Mins (Peak Performance)" }
+                          ].map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() => handleSelectOption("duration", opt.value)}
+                              className={`w-full text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 ${
+                                duration.toString() === opt.value
+                                  ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/5"
+                                  : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 5: Equipment */}
+                    {questionStep === 5 && (
+                      <div className="space-y-5">
+                        <h2 className="text-base font-bold text-foreground tracking-tight leading-snug">
+                          What equipment is available?
+                        </h2>
+                        <div className="flex flex-col gap-2">
+                          {[
+                            { value: "none", label: "🤸 Bodyweight Only (No Gear)" },
+                            { value: "dumbbells", label: "🏋️ Dumbbells Only" },
+                            { value: "bands", label: "🧬 Resistance Bands / Gym Equipment" }
+                          ].map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() => handleSelectOption("equipment", opt.value)}
+                              className={`w-full text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 ${
+                                equipment === opt.value
+                                  ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/5"
+                                  : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 6: Intensity */}
+                    {questionStep === 6 && (
+                      <div className="space-y-5">
+                        <h2 className="text-base font-bold text-foreground tracking-tight leading-snug">
+                          How intense should today be?
+                        </h2>
+                        <div className="flex flex-col gap-2">
+                          {[
+                            { value: "light", label: "🕊️ Light (Aerobic & Recovery)" },
+                            { value: "moderate", label: "⚡ Moderate (Steady & Active)" },
+                            { value: "intense", label: "🔥 Intense (High Power & Stamina)" }
+                          ].map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() => handleSelectOption("intensity", opt.value)}
+                              className={`w-full text-left px-4 py-3 rounded-xl border text-xs font-bold transition-all hover:bg-foreground/5 ${
+                                intensity === opt.value
+                                  ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/5"
+                                  : "border-foreground/5 bg-foreground/5 text-foreground/80"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Footer Nav Controls */}
+                    <div className="flex justify-between items-center pt-4 border-t border-foreground/5 text-xs font-semibold">
+                      {questionStep > 1 ? (
+                        <button 
+                          onClick={() => setQuestionStep(prev => prev - 1)} 
+                          className="flex items-center gap-1.5 text-foreground/60 hover:text-foreground transition-colors"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                          <span>Back</span>
+                        </button>
+                      ) : (
+                        <div />
+                      )}
+                      
+                      {questionStep < 6 && (
+                        <button 
+                          onClick={() => setQuestionStep(prev => prev + 1)}
+                          className="flex items-center gap-1 text-primary hover:underline transition-colors"
+                        >
+                          <span>Skip</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+
+                  </GlassCard>
+                </div>
+              )}
+
+              {/* STATE B: NEURAL GENERATING LOADING SCREEN */}
+              {coachState === "generating" && (
+                <div className="max-w-[460px] mx-auto py-16 text-center">
+                  <GlassCard glowColor="violet" className="p-8 space-y-6">
+                    <div className="flex justify-center">
+                      <RefreshCw className="h-12 w-12 text-primary animate-spin" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-base font-bold text-foreground">Generating Your Adaptive Workout...</h3>
+                      <p className="text-xs text-foreground/50 font-bold tracking-widest uppercase">
+                        AI Telemetry Processing
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 pt-3 text-left max-w-sm mx-auto">
+                      {[
+                        "Checking circadian sleep quality indicators...",
+                        "Mapping active soreness and telemetry zones...",
+                        "Calculating screen time focus fatigue...",
+                        "Formulating joint-safe physical adjustments..."
+                      ].map((stepMsg, idx) => (
+                        <div key={idx} className="flex gap-2.5 items-center text-xs font-semibold">
+                          <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 text-[10px] ${
+                            loadingTick >= idx 
+                              ? "bg-emerald-500/10 text-emerald-500 font-bold" 
+                              : "bg-foreground/5 text-foreground/20"
+                          }`}>
+                            {loadingTick >= idx ? "✓" : idx + 1}
+                          </div>
+                          <span className={loadingTick >= idx ? "text-foreground" : "text-foreground/30"}>
+                            {stepMsg}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </GlassCard>
+                </div>
+              )}
+
+              {/* STATE C: PRE-WORKOUT PREVIEW DASHBOARD */}
+              {coachState === "preview" && generatedWorkout.length > 0 && (
+                <div className="max-w-3xl mx-auto space-y-6">
                   
-                  {/* Left panel: Questionnaire */}
-                  <div className="lg:col-span-8 space-y-6">
-                    <GlassCard glowColor="violet" className="p-6 border border-foreground/5 space-y-5">
+                  {/* Readiness & Reasoning cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+                    
+                    {/* Readiness score meter */}
+                    <GlassCard glowColor="violet" className="md:col-span-4 p-5 flex flex-col justify-between text-center min-h-[140px]">
                       <div className="space-y-1">
-                        <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-                          <Sparkles className="h-4.5 w-4.5 text-primary" />
-                          Today's Readiness Questionnaire
-                        </h3>
-                        <p className="text-xs text-foreground/60 leading-relaxed font-semibold">
-                          Customize your target coordinates. The AI coach will instantly adapt your active workout block based on your sleep debt, soreness, and stress sensors.
+                        <span className="text-[10px] text-foreground/50 uppercase font-bold tracking-wider">
+                          Workout Readiness
+                        </span>
+                        <div className="text-4xl font-extrabold text-primary pt-2">
+                          {readinessScore}%
+                        </div>
+                        <p className="text-[10px] text-foreground/60 font-semibold pt-1">
+                          {readinessScore > 75 ? "Excellent Capacity" : "Recovery Aware Active"}
                         </p>
                       </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-                        
-                        {/* 1. Feeling */}
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-foreground">How are you feeling today?</label>
-                          <select 
-                            value={feeling} 
-                            onChange={(e) => setFeeling(e.target.value)}
-                            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
-                          >
-                            <option value="energetic">💪 Energetic & Peak Power</option>
-                            <option value="normal">😊 Normal / Steady</option>
-                            <option value="tired">💤 Tired / Low sleep</option>
-                            <option value="stressed">🧠 Stressed / Coding burnout</option>
-                            <option value="sore">🩹 Sore muscles</option>
-                          </select>
-                        </div>
-
-                        {/* 2. Location */}
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-foreground">Where are you training?</label>
-                          <select 
-                            value={location} 
-                            onChange={(e) => setLocation(e.target.value)}
-                            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
-                          >
-                            <option value="home">🏡 Home living space</option>
-                            <option value="gym">🏋️ Commercial Gym</option>
-                            <option value="outdoors">🌳 Outdoor park</option>
-                            <option value="office">🏢 Office desk block</option>
-                            <option value="traveling">✈️ Hotel / Traveling</option>
-                          </select>
-                        </div>
-
-                        {/* 3. Focus */}
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-foreground">What is your workout focus?</label>
-                          <select 
-                            value={focus} 
-                            onChange={(e) => setFocus(e.target.value)}
-                            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
-                          >
-                            <option value="full_body">🌀 Full Body Integration</option>
-                            <option value="chest">🏋️ Chest Press & Push</option>
-                            <option value="back">👐 Back Pulls & Lat care</option>
-                            <option value="legs">🦿 Leg strength & Squat</option>
-                            <option value="core">🪵 Core Stability & Abs</option>
-                            <option value="shoulders">🛡️ Shoulders & Upper Posture</option>
-                            <option value="mobility">🧘 Restorative Mobility Flow</option>
-                          </select>
-                        </div>
-
-                        {/* 4. Time */}
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-foreground">How much time do you have?</label>
-                          <select 
-                            value={duration.toString()} 
-                            onChange={(e) => setDuration(Number(e.target.value))}
-                            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
-                          >
-                            <option value="15">⏱️ 15 min Express Express</option>
-                            <option value="30">⏱️ 30 min Standard Balance</option>
-                            <option value="45">⏱️ 45 min Optimized Power</option>
-                            <option value="60">⏱️ 60+ min High Capacity</option>
-                          </select>
-                        </div>
-
-                        {/* 5. Equipment */}
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-foreground">What equipment is available?</label>
-                          <select 
-                            value={equipment} 
-                            onChange={(e) => setEquipment(e.target.value)}
-                            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
-                          >
-                            <option value="none">Bodyweight only (No gear)</option>
-                            <option value="dumbbells">Dumbbells only</option>
-                            <option value="bands">Full equipment (Gym, bands, gear)</option>
-                          </select>
-                        </div>
-
-                        {/* 6. Intensity */}
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-foreground">Target Session Intensity</label>
-                          <select 
-                            value={intensity} 
-                            onChange={(e) => setIntensity(e.target.value)}
-                            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground focus:outline-none"
-                          >
-                            <option value="light">🕊️ Light (Aerobic Recovery)</option>
-                            <option value="moderate">⚡ Moderate (Steady Balance)</option>
-                            <option value="intense">🔥 Intense (High Peak Stamina)</option>
-                          </select>
-                        </div>
-
+                      <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden mt-3">
+                        <div 
+                          className="bg-primary h-full rounded-full" 
+                          style={{ width: `${readinessScore}%` }} 
+                        />
                       </div>
-
-                      <Button variant="primary" onClick={handleGenerateWorkout} className="w-full mt-4 py-3 flex items-center justify-center gap-1 text-xs font-bold shadow-lg shadow-primary/20">
-                        <Dumbbell className="h-4 w-4" />
-                        <span>Dynamically Construct AI Routine</span>
-                      </Button>
                     </GlassCard>
+
+                    {/* AI Reasoning box */}
+                    <GlassCard glowColor="emerald" className="md:col-span-8 p-5 flex flex-col justify-between border border-emerald-500/10 bg-emerald-500/5">
+                      <div className="space-y-2">
+                        <h4 className="text-xs font-bold text-foreground flex items-center gap-1">
+                          <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                          AI Workout Compiler Reasoning
+                        </h4>
+                        <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
+                          {recoveryWarning || "Your bodily systems are fully recharged! We compiled a high-productivity strength and cardio session to lock in your metabolic gains."}
+                        </p>
+                      </div>
+                      <div className="text-[10px] text-foreground/50 font-bold uppercase tracking-wider pt-3">
+                        Biometric Telemetry: Fully Synced
+                      </div>
+                    </GlassCard>
+
                   </div>
 
-                  {/* Right panel: Live Bio-feedback indicators */}
-                  <div className="lg:col-span-4 space-y-6">
-                    <GlassCard glowColor="emerald" className="p-5 space-y-4">
-                      <h3 className="text-xs font-bold text-foreground flex items-center gap-1">
-                        <Heart className="h-4.5 w-4.5 text-secondary animate-pulse" />
-                        Live Coaching Sensor Sync
-                      </h3>
-                      
-                      <div className="space-y-3.5 text-xs font-semibold leading-relaxed">
-                        
-                        <div className="flex justify-between items-center border-b border-foreground/5 pb-2">
-                          <span className="text-foreground/60">Sleep Quality</span>
-                          <span className="text-primary font-bold">{metrics?.sleepQuality || 74}%</span>
+                  {/* Exercises list preview */}
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-bold text-foreground uppercase tracking-widest pl-1">
+                      Exercise Routine Preview ({generatedWorkout.length} exercises)
+                    </h3>
+                    <div className="space-y-3">
+                      {generatedWorkout.map((ex, idx) => (
+                        <div key={idx} className="p-4 rounded-2xl glass-panel border border-foreground/5 bg-background/30 flex justify-between items-center gap-4">
+                          <div className="space-y-1 min-w-0">
+                            <h4 className="text-xs font-bold text-foreground leading-normal flex items-center gap-1.5">
+                              <span className="text-[10px] font-bold text-primary bg-primary/10 h-5 w-5 rounded-lg flex items-center justify-center shrink-0">
+                                {idx + 1}
+                              </span>
+                              {ex.name}
+                            </h4>
+                            <p className="text-[11px] text-foreground/60 leading-relaxed font-semibold max-w-lg truncate">
+                              {ex.description}
+                            </p>
+                          </div>
+
+                          <div className="flex gap-4 text-xs font-bold shrink-0">
+                            <div className="text-right">
+                              <span className="text-[9px] text-foreground/45 uppercase block">Target</span>
+                              <span>{ex.reps}</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[9px] text-secondary uppercase block">Equipment</span>
+                              <span className="text-secondary">{ex.equipment}</span>
+                            </div>
+                          </div>
                         </div>
+                      ))}
+                    </div>
+                  </div>
 
-                        <div className="flex justify-between items-center border-b border-foreground/5 pb-2">
-                          <span className="text-foreground/60">Muscle Soreness</span>
-                          <span className="text-amber-500 font-bold">Grade {profile?.soreness_level || 0} / 10</span>
-                        </div>
+                  {/* Action triggers */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-3">
+                    <Button 
+                      variant="glass" 
+                      onClick={() => {
+                        setCoachState("form");
+                        setQuestionStep(1);
+                      }} 
+                      className="flex-1 py-3 text-xs font-bold flex items-center justify-center gap-1"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      <span>Re-compile Questionnaire</span>
+                    </Button>
 
-                        <div className="flex justify-between items-center border-b border-foreground/5 pb-2">
-                          <span className="text-foreground/60">Active Stress Index</span>
-                          <span className="text-secondary font-bold">{metrics?.stressLevel || 58}%</span>
-                        </div>
-
-                        <div className="flex justify-between items-center pb-1">
-                          <span className="text-foreground/60">Selected Fitness Mode</span>
-                          <span className="text-secondary font-bold capitalize">Everyday Fitness</span>
-                        </div>
-
-                      </div>
-
-                      <div className="p-3 bg-secondary/5 rounded-xl border border-secondary/10 text-[10px] text-foreground/75 leading-relaxed font-semibold">
-                        💡 **Biometric Sync active**: Generates routines adapted to protect central nervous fatigue.
-                      </div>
-                    </GlassCard>
+                    <Button 
+                      variant="primary" 
+                      onClick={() => setCoachState("active")} 
+                      className="flex-[2] py-3 text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/25"
+                    >
+                      <Play className="h-4 w-4 fill-white" />
+                      <span>Launch Guided Workout Terminal</span>
+                    </Button>
                   </div>
 
                 </div>
               )}
 
-              {/* STATE B: ACTIVE GUIDED SESSION TIMERS */}
+              {/* STATE D: ACTIVE GUIDED SESSION TIMERS */}
               {coachState === "active" && generatedWorkout.length > 0 && (
                 <div className="max-w-2xl mx-auto space-y-6">
                   
-                  {/* Warning overlay if recovery adapt triggers */}
                   {recoveryWarning && (
                     <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/10 text-xs text-amber-500 font-semibold leading-relaxed">
                       {recoveryWarning}
@@ -671,7 +920,7 @@ export default function FitnessPage() {
                       </div>
                     )}
 
-                    {/* LIVE TIMER COUNTDOWN GRAPHIC */}
+                    {/* Live Timer Countdown Circle */}
                     <div className="flex flex-col items-center pt-4">
                       <div className="h-36 w-36 rounded-full border-4 border-foreground/5 flex flex-col items-center justify-center bg-foreground/5 relative shadow-inner">
                         <span className="text-4xl font-extrabold tracking-tight text-foreground">{timeLeft}s</span>
@@ -679,16 +928,14 @@ export default function FitnessPage() {
                       </div>
                     </div>
 
-                    {/* INTERACTIVE CONTROLS */}
+                    {/* Interactive controls */}
                     <div className="flex justify-center items-center gap-4 pt-4">
                       
-                      {/* Skip/Prev */}
                       <Button variant="glass" size="sm" onClick={handleSkipExercise} className="flex items-center gap-1 text-xs font-bold">
                         <ArrowRight className="h-4 w-4" />
                         <span>Skip</span>
                       </Button>
 
-                      {/* Play/Pause toggle */}
                       <button 
                         onClick={() => setTimerRunning(!timerRunning)}
                         className={`h-14 w-14 rounded-full flex items-center justify-center text-white shadow-lg transition-transform hover:scale-105 active:scale-95 ${
@@ -700,7 +947,6 @@ export default function FitnessPage() {
                         {timerRunning ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
                       </button>
 
-                      {/* Mark Complete */}
                       <Button variant="primary" size="sm" onClick={handleMarkComplete} className="flex items-center gap-1 text-xs font-bold">
                         <Check className="h-4 w-4" />
                         <span>Complete</span>
@@ -710,7 +956,7 @@ export default function FitnessPage() {
 
                   </GlassCard>
 
-                  {/* Muscle Balance Details */}
+                  {/* Supporting Muscle Groups */}
                   {!isResting && (
                     <GlassCard glowColor="rose" className="p-4 flex justify-between text-xs font-semibold">
                       <div>
@@ -724,7 +970,7 @@ export default function FitnessPage() {
                     </GlassCard>
                   )}
 
-                  {/* Cancel button */}
+                  {/* Quit button */}
                   <div className="text-center pt-2">
                     <button 
                       onClick={() => {
@@ -741,7 +987,7 @@ export default function FitnessPage() {
                 </div>
               )}
 
-              {/* STATE C: SESSION SUMMARY */}
+              {/* STATE E: SESSION SUMMARY */}
               {coachState === "summary" && (
                 <div className="max-w-xl mx-auto space-y-6">
                   
@@ -813,7 +1059,7 @@ export default function FitnessPage() {
             </>
           )}
 
-          {/* TAB 2: HISTORY TAB */}
+          {/* TAB 2: HISTORY */}
           {activeTab === "history" && (
             <div className="max-w-2xl mx-auto space-y-4">
               <h3 className="text-xs font-bold text-foreground uppercase tracking-widest pl-1">
@@ -861,11 +1107,10 @@ export default function FitnessPage() {
             </div>
           )}
 
-          {/* TAB 3: PROGRESS TAB */}
+          {/* TAB 3: PROGRESS TRACKING */}
           {activeTab === "progress" && (
             <div className="space-y-6">
               
-              {/* Highlight metrics grid */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 
                 <GlassCard glowColor="violet" className="p-4 text-center space-y-1">
@@ -890,10 +1135,9 @@ export default function FitnessPage() {
 
               </div>
 
-              {/* Advanced visual balance charts */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                 
-                {/* Left panel: Muscle Group Balance */}
+                {/* Muscle Group Balance */}
                 <div className="lg:col-span-6 rounded-2xl glass-panel p-6 border-foreground/5 space-y-5">
                   <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                     <TrendingUp className="h-4.5 w-4.5 text-primary" />
@@ -904,7 +1148,6 @@ export default function FitnessPage() {
                   </p>
 
                   <div className="space-y-4 pt-2">
-                    {/* Upper body */}
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs font-bold">
                         <span>Upper Body Strength (Chest/Back/Arms)</span>
@@ -915,7 +1158,6 @@ export default function FitnessPage() {
                       </div>
                     </div>
 
-                    {/* Lower body */}
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs font-bold">
                         <span>Lower Body Strength (Squat/Posterior)</span>
@@ -926,7 +1168,6 @@ export default function FitnessPage() {
                       </div>
                     </div>
 
-                    {/* Core */}
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs font-bold">
                         <span>Core & Abs Stability</span>
@@ -937,7 +1178,6 @@ export default function FitnessPage() {
                       </div>
                     </div>
 
-                    {/* Recovery & yoga */}
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs font-bold">
                         <span>Restorative Mobility & Yoga</span>
@@ -950,7 +1190,7 @@ export default function FitnessPage() {
                   </div>
                 </div>
 
-                {/* Right panel: AI Smart Fitness Insights */}
+                {/* AI Insights */}
                 <div className="lg:col-span-6 rounded-2xl glass-panel p-6 border-foreground/5 space-y-4">
                   <h3 className="text-xs font-bold text-foreground">AI Predictive Fitness Insights</h3>
                   
@@ -1006,7 +1246,21 @@ export default function FitnessPage() {
                         setFocus(routine.focus);
                         setDuration(routine.duration);
                         setActiveTab("coach");
-                        handleGenerateWorkout();
+                        setGeneratedWorkout([]); // Reset previous
+                        setCoachState("preview");
+                        // Compile automatically based on routine
+                        const originalList = EXERCISE_DATABASE[routine.focus] || EXERCISE_DATABASE["full_body"];
+                        const formatted = originalList.slice(0, routine.exercisesCount).map(ex => ({
+                          ...ex,
+                          durationSeconds: ex.durationSeconds,
+                          restSeconds: ex.restSeconds
+                        }));
+                        setActiveWorkoutName(routine.name);
+                        setGeneratedWorkout(formatted);
+                        setCompletedExercises(new Array(formatted.length).fill(false));
+                        setCurrentExerciseIdx(0);
+                        setTimeLeft(formatted[0].durationSeconds);
+                        setIsResting(false);
                       }}
                       className="w-full py-2.5 text-xs font-bold flex items-center justify-center gap-1 mt-3"
                     >
@@ -1034,7 +1288,6 @@ export default function FitnessPage() {
 
               <div className="space-y-4">
                 
-                {/* 1. Box Breathing */}
                 <GlassCard className="p-4 flex gap-4 items-start border border-foreground/5">
                   <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 font-bold text-lg">
                     🧘
@@ -1047,7 +1300,6 @@ export default function FitnessPage() {
                   </div>
                 </GlassCard>
 
-                {/* 2. Foam Rolling leg care */}
                 <GlassCard className="p-4 flex gap-4 items-start border border-foreground/5">
                   <div className="h-10 w-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0 font-bold text-lg">
                     🩹
