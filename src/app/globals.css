@@ -58,8 +58,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.125rem !important; /* Enforces 18px minimum globally */
-  line-height: 1.7 !important;
+  font-size: 15px !important; /* Premium 15px default body size */
+  line-height: 1.6 !important;
   letter-spacing: -0.015em;
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -67,29 +67,42 @@ body {
 
 /* ==================== TYPOGRAPHY SCALE OVERHAUL ==================== */
 h1 {
-  font-size: clamp(2.5rem, 5vw, 3rem) !important; /* 40px - 48px */
+  font-size: clamp(1.75rem, 4vw, 2.0rem) !important; /* Page Titles: 28px - 32px */
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.hero-title {
+  font-size: clamp(2.25rem, 5vw, 2.625rem) !important; /* Hero Titles: 36px - 42px */
   font-weight: 850 !important;
   line-height: 1.2 !important;
   letter-spacing: -0.035em !important;
 }
 
 h2 {
-  font-size: clamp(1.75rem, 4vw, 2.125rem) !important; /* 28px - 34px */
-  font-weight: 800 !important;
+  font-size: clamp(1.375rem, 3vw, 1.625rem) !important; /* Section Headings: 22px - 26px */
+  font-weight: 750 !important;
   line-height: 1.3 !important;
-  letter-spacing: -0.025em !important;
+  letter-spacing: -0.020em !important;
 }
 
 h3, h4 {
-  font-size: clamp(1.375rem, 3vw, 1.625rem) !important; /* 22px - 26px */
-  font-weight: 750 !important;
-  line-height: 1.4 !important;
-  letter-spacing: -0.02em !important;
+  font-size: clamp(1.125rem, 2vw, 1.25rem) !important; /* Card Titles: 18px - 20px */
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.015em !important;
 }
 
 p, span, li, a {
-  font-size: 1.125rem !important; /* minimum 18px */
-  font-weight: 550 !important;
+  font-size: 15px !important; /* 15px default text */
+  font-weight: 500 !important;
+}
+
+.analytics-number {
+  font-size: clamp(1.5rem, 4vw, 2.0rem) !important; /* Analytics: 24px - 32px */
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
 }
 
 /* ==================== FORM INPUT REDESIGN ==================== */
@@ -100,52 +113,59 @@ input[type="email"],
 input[type="password"],
 select,
 textarea {
-  min-height: 60px !important; /* Strict 56px-64px height standard */
-  background-color: rgba(9, 10, 16, 0.95) !important;
-  border: 2px solid rgba(255, 255, 255, 0.12) !important;
+  min-height: 48px !important;
+  height: 48px !important; /* Height restricted to 48px-52px range */
+  background-color: rgba(9, 10, 16, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important; /* Thinner 1px border */
   color: #ffffff !important;
-  border-radius: 16px !important;
-  font-size: 1.125rem !important; /* 18px input text */
-  font-weight: 650 !important;
-  padding: 0.85rem 1.35rem !important;
+  border-radius: 12px !important; /* Softer, compact radius */
+  font-size: 15px !important; /* 15px input text */
+  font-weight: 500 !important;
+  padding: 0 1.25rem !important; /* Balanced padding */
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: none !important;
   width: 100%;
 }
 
 input:focus, select:focus, textarea:focus {
   border-color: hsl(263, 90%, 55%) !important;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25) !important;
-  background-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15) !important;
+  background-color: rgba(6, 6, 12, 0.9) !important;
   outline: none;
 }
 
 label {
-  font-size: 1.125rem !important; /* 18px labels */
-  font-weight: 750 !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  letter-spacing: 0.02em;
-  margin-bottom: 0.55rem !important;
+  font-size: 14px !important; /* Form Labels: 14px - 15px */
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.45rem !important;
   display: block;
+}
+
+.helper-text {
+  font-size: 12px !important; /* Helper Text: 12px - 13px */
+  font-weight: 450 !important;
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 /* ==================== PRECISE DROPDOWN FIXES ==================== */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
-  background-position: right 1.35rem center !important;
-  background-size: 1.25rem !important;
-  padding-right: 3.5rem !important;
+  background-position: right 1.15rem center !important;
+  background-size: 1rem !important;
+  padding-right: 2.75rem !important;
   cursor: pointer;
 }
 
 select option {
   background-color: #090a10 !important; /* Deep dark select option container */
   color: #ffffff !important;
-  font-size: 1.125rem !important;
-  font-weight: 650 !important;
-  padding: 16px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  padding: 12px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -156,19 +176,21 @@ select option:hover, select option:focus {
 
 /* ==================== BUTTON REDESIGN ==================== */
 button, .btn {
-  font-size: 1.125rem !important; /* 18px button text */
-  font-weight: 750 !important;
-  min-height: 56px !important;
-  border-radius: 16px !important;
+  font-size: 15px !important; /* Button Text: 15px - 16px */
+  font-weight: 600 !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
   letter-spacing: -0.01em;
-  padding: 0.85rem 1.75rem !important;
+  padding: 0 1.5rem !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1) !important; /* Reduced shadow glow */
 }
 
 /* ==================== SLIDER OVERHAUL ==================== */
 input[type="range"] {
-  height: 10px !important;
+  height: 8px !important;
   border-radius: 9999px !important;
   background: rgba(255, 255, 255, 0.15) !important;
   appearance: none;
@@ -178,17 +200,17 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  width: 24px !important;
-  height: 24px !important;
+  width: 20px !important;
+  height: 20px !important;
   border-radius: 50% !important;
   background: #ffffff !important;
-  border: 4px solid hsl(263, 90%, 50%) !important;
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5) !important;
+  border: 3.5px solid hsl(263, 90%, 50%) !important;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.4) !important;
   transition: transform 0.15s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
 
 /* ==================== MODALS & OVERLAYS ==================== */
@@ -200,12 +222,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* Glassmorphism custom standard panel */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 2px solid var(--glass-border) !important; /* Cleaner, strong contrast borders */
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.25);
-  border-radius: 24px;
-  padding: 1.75rem !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border) !important; /* Thinner 1px border */
+  box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.15); /* Softer shadows */
+  border-radius: 18px; /* Compact border radius */
+  padding: 1.25rem !important; /* Compact, breathable card padding */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -214,54 +236,54 @@ input[type="range"]::-webkit-slider-thumb:hover {
   --glass-border: rgba(16, 185, 129, 0.15);
 }
 .wellness-mode .glass-panel {
-  box-shadow: 0 12px 40px rgba(16, 185, 129, 0.03);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.02);
 }
 
 .performance-mode .glass-panel {
-  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.05);
-  border-color: rgba(139, 92, 246, 0.25) !important;
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.03);
+  border-color: rgba(139, 92, 246, 0.2) !important;
 }
 
 .elderly-mode {
-  font-size: 1.45rem !important; /* scaled up heavily for grandmother readability */
-  line-height: 1.8 !important;
+  font-size: 1.3rem !important; /* scaled up moderately for readability */
+  line-height: 1.7 !important;
 }
 .elderly-mode h1 {
-  font-size: 3.2rem !important;
+  font-size: 2.6rem !important;
   font-weight: 850 !important;
 }
 .elderly-mode h2 {
-  font-size: 2.5rem !important;
+  font-size: 2.1rem !important;
   font-weight: 800 !important;
 }
 .elderly-mode h3 {
-  font-size: 2rem !important;
+  font-size: 1.7rem !important;
   font-weight: 750 !important;
 }
 .elderly-mode p, .elderly-mode span, .elderly-mode li, .elderly-mode button, .elderly-mode input, .elderly-mode select, .elderly-mode textarea, .elderly-mode label {
-  font-size: 1.45rem !important;
+  font-size: 1.3rem !important;
   font-weight: 700 !important;
 }
 .elderly-mode .glass-panel {
-  border-width: 4px !important;
-  border-color: rgba(139, 92, 246, 0.55) !important;
+  border-width: 3px !important;
+  border-color: rgba(139, 92, 246, 0.45) !important;
   background: rgba(4, 4, 8, 0.98) !important;
 }
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.35);
+  background: rgba(139, 92, 246, 0.3);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.6);
+  background: rgba(139, 92, 246, 0.55);
 }
 
 .scrollbar-none::-webkit-scrollbar {
@@ -272,84 +294,4 @@ input[type="range"]::-webkit-slider-thumb:hover {
   scrollbar-width: none;
 }
 
-/* ==================== AUTH PAGE REBALANCING OVERRIDES ==================== */
-.auth-page {
-  font-size: 16px !important;
-}
-
-.auth-page h1, .auth-page .auth-title {
-  font-size: 34px !important;
-  font-weight: 800 !important;
-  line-height: 1.25 !important;
-  letter-spacing: -0.025em !important;
-}
-
-.auth-page h2, .auth-page .auth-subtitle {
-  font-size: 26px !important;
-  font-weight: 750 !important;
-  line-height: 1.3 !important;
-  letter-spacing: -0.020em !important;
-}
-
-.auth-page label, .auth-page .auth-label {
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  color: rgba(255, 255, 255, 0.8) !important;
-  margin-bottom: 0.45rem !important;
-  display: block;
-}
-
-.auth-page input[type="text"],
-.auth-page input[type="email"],
-.auth-page input[type="password"] {
-  min-height: 52px !important;
-  height: 52px !important;
-  font-size: 16px !important;
-  font-weight: 500 !important;
-  padding: 0 1.25rem 0 3.25rem !important; /* pl-13 equivalent (52px) for icons */
-  border-radius: 12px !important;
-  background-color: rgba(10, 11, 18, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: none !important;
-}
-
-.auth-page input[type="text"]:focus,
-.auth-page input[type="email"]:focus,
-.auth-page input[type="password"]:focus {
-  border-color: hsl(263, 90%, 55%) !important;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15) !important;
-  background-color: rgba(6, 6, 12, 0.9) !important;
-}
-
-.auth-page input::placeholder {
-  font-size: 15px !important;
-  color: rgba(255, 255, 255, 0.35) !important;
-  font-weight: 400 !important;
-}
-
-.auth-page button, .auth-page .btn {
-  min-height: 52px !important;
-  height: 52px !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  border-radius: 12px !important;
-  padding: 0 1.5rem !important;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12) !important;
-}
-
-.auth-page .auth-helper {
-  font-size: 13px !important;
-  font-weight: 450 !important;
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-.auth-page p, .auth-page span, .auth-page li, .auth-page a {
-  font-size: 14px !important;
-  font-weight: 500 !important;
-}
-
-.auth-page a.auth-link {
-  font-size: 13px !important;
-  font-weight: 600 !important;
-}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { supabase, isSupabaseConfigured, mockDb } from "@/utils/supabase";
+import { supabase, isSupabaseConfigured } from "@/utils/supabase";
 
 interface UserProfile {
   id: string;
@@ -64,10 +64,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const isMockMode = !isSupabaseConfigured;
+  const isMockMode = false; // Supabase is now exclusively active
 
   useEffect(() => {
-    if (isSupabaseConfigured && supabase) {
+    if (supabase) {
       // Supabase Active mode listener
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
@@ -93,15 +93,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         subscription.unsubscribe();
       };
     } else {
-      // Mock mode session check
-      if (typeof window !== "undefined") {
-        const storedUser = localStorage.getItem("vitalcore_session_user");
-        const storedProfile = localStorage.getItem("vitalcore_session_profile");
-        if (storedUser && storedProfile) {
-          setUser(JSON.parse(storedUser));
-          setProfile(JSON.parse(storedProfile));
-        }
-      }
       setLoading(false);
     }
   }, []);
@@ -125,50 +116,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
-    if (isSupabaseConfigured && supabase) {
+    if (supabase) {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error };
       setUser(data.user);
       return { error: null };
-    } else {
-      // Mock Sign In logic
-      const users = mockDb.getTableData<any>("users");
-      const found = users.find((u) => u.email === email && u.password === password);
-      
-      if (!found) {
-        return { error: new Error("Invalid email or password.") };
-      }
-
-      const sessionUser = { id: found.id, email: found.email, role: "authenticated" };
-      
-      // Fetch profile
-      const profiles = mockDb.getTableData<UserProfile>("profiles");
-      let userProfile = profiles.find((p) => p.id === found.id);
-
-      if (!userProfile) {
-        userProfile = {
-          id: found.id,
-          email: found.email,
-          full_name: found.full_name || "Wellness Explorer",
-          username: found.username || email.split("@")[0],
-          active_mode: "wellness",
-          onboarding_completed: false,
-          soreness_level: 0,
-          biological_age: 30.0,
-          stability_score: 100.0,
-        };
-        mockDb.insertRow("profiles", userProfile);
-      }
-
-      if (typeof window !== "undefined") {
-        localStorage.setItem("vitalcore_session_user", JSON.stringify(sessionUser));
-        localStorage.setItem("vitalcore_session_profile", JSON.stringify(userProfile));
-      }
-
-      setUser(sessionUser);
-      setProfile(userProfile);
-      return { error: null };
     }
+    return { error: new Error("Supabase client is not initialized.") };
   };
 
   const signUp = async (
@@ -177,7 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fullName: string,
     username: string
   ): Promise<{ error: Error | null }> => {
-    if (isSupabaseConfigured && supabase) {
+    if (supabase) {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -189,63 +143,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
       if (error) return { error };
+      
+      // Explicitly insert into profiles table to guarantee instant profile creation
+      if (data.user) {
+        const { error: profileError } = await supabase.from("profiles").insert({
+          id: data.user.id,
+          email: email,
+          full_name: fullName,
+          username: username,
+          active_mode: "wellness",
+          onboarding_completed: false,
+          soreness_level: 0,
+          biological_age: 28.5,
+          stability_score: 95.0,
+        });
+        if (profileError) {
+          console.error("Error creating user profile:", profileError);
+        }
+      }
+      
       setUser(data.user);
       return { error: null };
-    } else {
-      // Mock Sign Up logic
-      const users = mockDb.getTableData<any>("users");
-      const exists = users.some((u) => u.email === email || u.username === username);
-
-      if (exists) {
-        return { error: new Error("User with this email or username already exists.") };
-      }
-
-      const uid = crypto.randomUUID();
-      const newUser = { id: uid, email, password, full_name: fullName, username };
-      mockDb.insertRow("users", newUser);
-
-      const userProfile: UserProfile = {
-        id: uid,
-        email,
-        full_name: fullName,
-        username,
-        active_mode: "wellness",
-        onboarding_completed: false,
-        soreness_level: 0,
-        biological_age: 28.5,
-        stability_score: 95.0,
-      };
-      mockDb.insertRow("profiles", userProfile);
-
-      const sessionUser = { id: uid, email, role: "authenticated" };
-      if (typeof window !== "undefined") {
-        localStorage.setItem("vitalcore_session_user", JSON.stringify(sessionUser));
-        localStorage.setItem("vitalcore_session_profile", JSON.stringify(userProfile));
-      }
-
-      setUser(sessionUser);
-      setProfile(userProfile);
-      return { error: null };
     }
+    return { error: new Error("Supabase client is not initialized.") };
   };
 
   const signOut = async (): Promise<void> => {
-    if (isSupabaseConfigured && supabase) {
+    if (supabase) {
       await supabase.auth.signOut();
-    } else {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("vitalcore_session_user");
-        localStorage.removeItem("vitalcore_session_profile");
-      }
-      setUser(null);
-      setProfile(null);
     }
   };
 
   const updateProfile = async (updates: Partial<UserProfile>): Promise<{ error: Error | null }> => {
     if (!profile) return { error: new Error("No active session profile found.") };
 
-    if (isSupabaseConfigured && supabase) {
+    if (supabase) {
       const { data, error } = await supabase
         .from("profiles")
         .update(updates)
@@ -256,17 +188,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) return { error };
       setProfile(data as UserProfile);
       return { error: null };
-    } else {
-      // Mock database update logic
-      mockDb.updateRows<UserProfile>("profiles", { id: profile.id }, updates);
-      
-      const newProfile = { ...profile, ...updates };
-      if (typeof window !== "undefined") {
-        localStorage.setItem("vitalcore_session_profile", JSON.stringify(newProfile));
-      }
-      setProfile(newProfile);
-      return { error: null };
     }
+    return { error: new Error("Supabase client is not initialized.") };
   };
 
   return (
@@ -283,3 +206,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

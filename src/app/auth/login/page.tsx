@@ -58,12 +58,6 @@ export default function LoginPage() {
 
         <GlassCard glowColor="violet" className="border border-foreground/10 shadow-xl">
           
-          {isMockMode && (
-            <div className="mb-4 rounded-xl border border-secondary/15 bg-secondary/5 px-4 py-3 text-[13px] text-secondary leading-relaxed font-medium">
-              💡 <strong>Mock DB active:</strong> Enter any demo email and password to log in, or sign up a new local user instantly!
-            </div>
-          )}
-
           {errorMsg && (
             <div className="mb-4 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-[13px] text-rose-400 font-medium flex items-center gap-2">
               <span className="shrink-0">⚠️</span>
