@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Utensils, 
   Droplet, 
+  Flame,
   Sparkles, 
   AlertTriangle, 
   Apple, 
@@ -386,18 +387,13 @@ export default function NutritionPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 pb-10">
+      <div className="space-y-5 pb-10 max-w-5xl">
         
-        {/* Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
-          <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
-              <Utensils className="h-6 w-6 text-secondary animate-pulse" />
-              Smart Nutrition, Hydration & AI Food Scanner
-            </h1>
-            <p className="text-xs text-foreground/70 font-semibold uppercase tracking-wider">
-              Calorie limits, macromolecular matrix metrics, emotional triggers & real-time neural food scanning
-            </p>
+        {/* Page header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Nutrition & Hydration</h1>
+            <p className="text-sm text-[var(--muted)] mt-0.5">Track meals, macros, and daily water intake</p>
           </div>
         </div>
 
@@ -408,72 +404,70 @@ export default function NutritionPage() {
         )}
 
         {loadingLogs ? (
-          <div className="flex items-center justify-center p-20 text-xs text-foreground/45 font-bold">
-            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-            Synchronizing with Supabase nutrition logs...
+          <div className="flex items-center justify-center py-16 gap-2 text-sm text-[var(--muted)]">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            Loading nutrition data...
           </div>
         ) : (
           <>
             {/* 1. Daily Nutrition Overview & Macro Tracking Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               
-              {/* Calorie Target Card */}
-              <GlassCard glowColor="rose" className="p-6 flex flex-col justify-between min-h-[150px]">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Calories Consumed</span>
-                  <div className="text-2xl font-extrabold mt-1 text-foreground">{totalCalories} / {metrics.caloriesTarget * 3} kcal</div>
+              {/* Calorie card */}
+              <GlassCard glowColor="rose" className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium text-[var(--muted)]">Calories Consumed</span>
+                  <Flame className="h-4 w-4 text-rose-500" />
                 </div>
-                <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden my-3">
-                  <div className="bg-rose-500 h-full rounded-full transition-all duration-300" style={{ width: `${Math.min(100, (totalCalories / (metrics.caloriesTarget * 3)) * 100)}%` }} />
+                <div className="analytics-number text-[var(--foreground)]">{totalCalories}</div>
+                <div className="text-xs text-[var(--muted)] mt-0.5">/ {metrics.caloriesTarget * 3} kcal</div>
+                <div className="progress-bar mt-3">
+                  <div className="progress-bar-fill bg-rose-500" style={{ width: `${Math.min(100, (totalCalories / (metrics.caloriesTarget * 3)) * 100)}%` }} />
                 </div>
-                <p className="text-[10px] text-foreground/50 leading-relaxed font-semibold">
-                  Based on active parameters, your baseline fat-oxidative burn is primed.
-                </p>
               </GlassCard>
 
-              {/* Macromolecular targets */}
-              <GlassCard glowColor="violet" className="p-6 space-y-4">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Macro Matrix</span>
-                
-                <div className="grid grid-cols-3 gap-3 text-center text-[10px] font-extrabold">
-                  <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
-                    <span className="text-primary block font-bold">Protein</span>
-                    <span className="text-sm font-extrabold block mt-0.5 text-foreground">{totalProtein}g</span>
-                    <span className="text-[8px] text-foreground/50 block">Target: 140g</span>
+              {/* Macro Matrix */}
+              <GlassCard glowColor="violet" className="p-4">
+                <span className="text-xs font-medium text-[var(--muted)] block mb-3">Macro Breakdown</span>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
+                    <span className="text-xs font-semibold text-primary block">Protein</span>
+                    <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalProtein}g</span>
+                    <span className="text-[11px] text-[var(--muted)]">/ 140g</span>
                   </div>
-
-                  <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
-                    <span className="text-secondary block font-bold">Carbs</span>
-                    <span className="text-sm font-extrabold block mt-0.5 text-foreground">{totalCarbs}g</span>
-                    <span className="text-[8px] text-foreground/50 block">Target: 220g</span>
+                  <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
+                    <span className="text-xs font-semibold text-secondary block">Carbs</span>
+                    <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalCarbs}g</span>
+                    <span className="text-[11px] text-[var(--muted)]">/ 220g</span>
                   </div>
-
-                  <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
-                    <span className="text-accent block font-bold">Fats</span>
-                    <span className="text-sm font-extrabold block mt-0.5 text-foreground">{totalFat}g</span>
-                    <span className="text-[8px] text-foreground/50 block">Target: 60g</span>
+                  <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
+                    <span className="text-xs font-semibold text-amber-500 block">Fats</span>
+                    <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalFat}g</span>
+                    <span className="text-[11px] text-[var(--muted)]">/ 60g</span>
                   </div>
                 </div>
               </GlassCard>
 
               {/* Hydration Tracker */}
-              <GlassCard glowColor="emerald" className="p-6 flex flex-col justify-between min-h-[150px]">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Water Intake (Fluid Log)</span>
-                  <div className="text-2xl font-extrabold mt-1 text-foreground">{waterLogged} / {metrics.hydrationTarget} ml</div>
+              <GlassCard glowColor="emerald" className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium text-[var(--muted)]">Water Intake</span>
+                  <Droplet className="h-4 w-4 text-emerald-500" />
                 </div>
+                <div className="analytics-number text-[var(--foreground)]">{waterLogged}</div>
+                <div className="text-xs text-[var(--muted)] mt-0.5">/ {metrics.hydrationTarget} ml</div>
                 <div className="flex gap-2 mt-3">
                   <button 
                     onClick={() => handleLogWater(250)} 
-                    className="text-[10px] bg-secondary/10 hover:bg-secondary/20 border border-secondary/15 px-3 py-2.5 rounded-xl font-bold text-secondary flex-1 transition-all"
+                    className="text-xs bg-[var(--muted-bg)] hover:bg-secondary/10 border border-[var(--border)] hover:border-secondary/20 px-3 py-2 rounded-lg font-medium text-secondary flex-1 transition-all"
                   >
-                    +250ml (Cup)
+                    +250ml
                   </button>
                   <button 
                     onClick={() => handleLogWater(500)} 
-                    className="text-[10px] bg-secondary/10 hover:bg-secondary/20 border border-secondary/15 px-3 py-2.5 rounded-xl font-bold text-secondary flex-1 transition-all"
+                    className="text-xs bg-[var(--muted-bg)] hover:bg-secondary/10 border border-[var(--border)] hover:border-secondary/20 px-3 py-2 rounded-lg font-medium text-secondary flex-1 transition-all"
                   >
-                    +500ml (Bottle)
+                    +500ml
                   </button>
                 </div>
               </GlassCard>
@@ -487,9 +481,9 @@ export default function NutritionPage() {
               <div className="lg:col-span-7 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
                 
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
-                    <Scan className="h-4.5 w-4.5 text-primary" />
-                    AI Food Scanner Terminal
+                  <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
+                    <Scan className="h-4 w-4 text-primary" />
+                    AI Food Scanner
                   </h3>
                   <p className="text-[11px] text-foreground/75 leading-relaxed font-semibold">
                     Upload images, snap camera captures, or search barcodes to run automated chemical audits, portion sizes, glycemic spikes, and recovery swaps.
@@ -710,9 +704,9 @@ export default function NutritionPage() {
                 {/* Manual Nutrient Logger Form */}
                 <div className="rounded-2xl glass-panel p-6 border-foreground/5">
                   <form onSubmit={handleAddFood} className="space-y-4">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                      <Apple className="h-4.5 w-4.5 text-primary animate-bounce" />
-                      Manual Biometrics Logger
+                    <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
+                      <Apple className="h-4 w-4 text-primary" />
+                      Log Food Manually
                     </h3>
 
                     <div className="space-y-1.5">

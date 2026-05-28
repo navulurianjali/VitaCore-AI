@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 
 interface GlassCardProps {
   children: React.ReactNode;
@@ -20,25 +19,24 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   animate = true,
   onClick,
 }) => {
-  const glows = {
+  // Subtle, professional accent borders — no neon glows
+  const accents = {
     none: "",
-    violet: "shadow-[0_0_20px_rgba(139,92,246,0.06)] hover:shadow-[0_0_25px_rgba(139,92,246,0.15)] hover:border-violet-500/20",
-    emerald: "shadow-[0_0_20px_rgba(16,185,129,0.06)] hover:shadow-[0_0_25px_rgba(16,185,129,0.15)] hover:border-emerald-500/20",
-    rose: "shadow-[0_0_20px_rgba(244,63,94,0.06)] hover:shadow-[0_0_25px_rgba(244,63,94,0.15)] hover:border-rose-500/20",
-    amber: "shadow-[0_0_20px_rgba(245,158,11,0.06)] hover:shadow-[0_0_25px_rgba(245,158,11,0.15)] hover:border-amber-500/20",
+    violet: "hover:border-violet-500/20",
+    emerald: "hover:border-emerald-500/20",
+    rose: "hover:border-rose-500/20",
+    amber: "hover:border-amber-500/20",
   };
 
   return (
-    <motion.div
+    <div
       onClick={onClick}
-      whileHover={animate && hoverEffect ? { y: -4, scale: 1.005 } : undefined}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className={`glass-panel rounded-2xl p-6 transition-all duration-300 ${glows[glowColor]} ${
+      className={`glass-panel transition-all duration-200 ${accents[glowColor]} ${
         onClick ? "cursor-pointer" : ""
-      } ${className}`}
+      } ${hoverEffect ? "hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]" : ""} ${className}`}
     >
       {children}
-    </motion.div>
+    </div>
   );
 };
 export default GlassCard;

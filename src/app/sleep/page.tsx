@@ -223,27 +223,22 @@ export default function SleepPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 pb-10">
+      <div className="space-y-5 pb-10 max-w-5xl">
         
-        {/* Banner header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
-          <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
-              <Moon className="h-6 w-6 text-primary animate-pulse" />
-              Sleep Circadian & Recovery Terminal
-            </h1>
-            <p className="text-[11px] text-foreground/70 font-semibold uppercase tracking-wider">
-              Autonomous Sleep Architecture, Endocrine Stress Diagnostics, and Muscle Repair Synchronization
-            </p>
+        {/* Page header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Sleep & Recovery</h1>
+            <p className="text-sm text-[var(--muted)] mt-0.5">Track your sleep patterns and recovery quality</p>
           </div>
-
           <Button 
             variant="primary" 
+            size="sm"
             onClick={() => setShowLogForm(!showLogForm)} 
-            className="flex items-center gap-2 self-start sm:self-center"
+            className="gap-1.5 self-start sm:self-center"
           >
-            <Plus className="h-4 w-4" />
-            <span>Log Last Night's Sleep</span>
+            <Plus className="h-3.5 w-3.5" />
+            Log Sleep
           </Button>
         </div>
 
@@ -254,120 +249,104 @@ export default function SleepPage() {
         )}
 
         {loadingLogs ? (
-          <div className="flex items-center justify-center p-20 text-xs text-foreground/45 font-bold">
-            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-            Synchronizing with Supabase sleep registries...
+          <div className="flex items-center justify-center py-16 gap-2 text-sm text-[var(--muted)]">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            Loading sleep data...
           </div>
         ) : logs.length === 0 ? (
-          <div className="rounded-3xl glass-panel p-12 text-center flex flex-col items-center justify-center space-y-4 border border-foreground/10">
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-              <Moon className="h-8 w-8 text-primary animate-pulse" />
+          <div className="glass-panel p-10 text-center flex flex-col items-center gap-3">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Moon className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="text-lg font-bold tracking-tight text-foreground">No sleep telemetry recorded yet</h3>
-            <p className="text-xs text-foreground/60 max-w-md leading-relaxed font-semibold">
-              Log your first night's sleep to generate advanced circadian schedules, hormonal stress diagnostics, and muscle repair tracking vectors.
-            </p>
+            <div>
+              <h3 className="font-semibold text-[var(--foreground)]">No sleep logs yet</h3>
+              <p className="text-sm text-[var(--muted)] mt-1 max-w-sm">
+                Log your first night's sleep to see quality scores, trends, and recovery insights.
+              </p>
+            </div>
             <Button 
               variant="primary" 
+              size="sm"
               onClick={() => setShowLogForm(true)} 
-              className="flex items-center gap-2 mt-4"
+              className="gap-1.5 mt-1"
             >
-              <Plus className="h-4 w-4" />
-              <span>Log Your First Sleep</span>
+              <Plus className="h-3.5 w-3.5" />
+              Log Your First Sleep
             </Button>
           </div>
         ) : (
           <>
-            {/* Dynamic Warning Block */}
+            {/* Sleep warning */}
             {showAlert && latestLog && (
-              <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 flex gap-3 items-start relative overflow-hidden">
-                <AlertTriangle className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />
-                <div className="space-y-0.5">
-                  <h4 className="text-xs font-bold text-rose-500 uppercase tracking-wider">Circadian Impairment Alert</h4>
-                  <p className="text-[11px] text-foreground/75 leading-normal font-semibold">
-                    Critical: Sleep duration of {latestLog.duration}h falls significantly below your {targetSleep}h threshold. Night wakings ({latestLog.wakings}) have stimulated excessive cortisol release, raising stress loads by 35% and halting lean muscle protein synthesis. Avoid caffeine past 2:00 PM today.
+              <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 flex gap-3 items-start">
+                <AlertTriangle className="h-4.5 w-4.5 text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-rose-500">Low sleep detected</p>
+                  <p className="text-sm text-[var(--muted)] mt-0.5">
+                    Last night was {latestLog.duration}h — below your {targetSleep}h target. Try to avoid caffeine after 2 PM today.
                   </p>
                 </div>
               </div>
             )}
 
-            {/* 1. Core Sleep Telemetry Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Core sleep metric cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               
-              <GlassCard glowColor="violet" className="flex flex-col justify-between min-h-[140px] p-5">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Sleep Quality</span>
-                  {latestLog && <div className="text-2xl font-extrabold mt-1 text-foreground">{latestLog.quality * 10}%</div>}
-                </div>
-                <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden my-3">
-                  {latestLog && <div className="bg-primary h-full rounded-full" style={{ width: `${latestLog.quality * 10}%` }} />}
+              <GlassCard glowColor="violet" className="p-4">
+                <span className="text-xs font-medium text-[var(--muted)] block mb-2">Sleep Quality</span>
+                <div className="analytics-number text-[var(--foreground)]">{latestLog ? `${latestLog.quality * 10}%` : "—"}</div>
+                <div className="progress-bar mt-3">
+                  {latestLog && <div className="progress-bar-fill bg-primary" style={{ width: `${latestLog.quality * 10}%` }} />}
                 </div>
                 {latestLog && (
-                  <p className="text-[10px] text-foreground/50 leading-relaxed font-semibold">
-                    Deep & REM phases represented {Math.round(latestLog.quality * 5.2)}% of total sleep architectures.
-                  </p>
+                  <p className="text-xs text-[var(--muted)] mt-1.5">REM ~{Math.round(latestLog.quality * 5.2)}% of total</p>
                 )}
               </GlassCard>
 
-              <GlassCard glowColor="emerald" className="flex flex-col justify-between min-h-[140px] p-5">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Circadian consistency</span>
-                  <div className="text-2xl font-extrabold mt-1 text-foreground">{consistencyIndex}%</div>
+              <GlassCard glowColor="emerald" className="p-4">
+                <span className="text-xs font-medium text-[var(--muted)] block mb-2">Consistency</span>
+                <div className="analytics-number text-[var(--foreground)]">{consistencyIndex}%</div>
+                <div className="progress-bar mt-3">
+                  <div className="progress-bar-fill bg-emerald-500" style={{ width: `${consistencyIndex}%` }} />
                 </div>
-                <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden my-3">
-                  <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${consistencyIndex}%` }} />
-                </div>
-                <p className="text-[10px] text-foreground/50 leading-relaxed font-semibold">
-                  Your wakeup timing deviated by less than {Math.round((100 - consistencyIndex) * 0.8)} minutes over 7 days.
-                </p>
+                <p className="text-xs text-[var(--muted)] mt-1.5">{Math.round((100 - consistencyIndex) * 0.8)} min wakeup drift</p>
               </GlassCard>
 
-              <GlassCard glowColor="rose" className="flex flex-col justify-between min-h-[140px] p-5">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Sleep Debt Index</span>
-                  <div className="text-2xl font-extrabold mt-1 text-foreground">{sleepDebt} hours</div>
-                </div>
-                <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden my-3">
-                  <div className="bg-rose-500 h-full rounded-full" style={{ width: `${Math.min(100, (sleepDebt / 3) * 100)}%` }} />
+              <GlassCard glowColor="rose" className="p-4">
+                <span className="text-xs font-medium text-[var(--muted)] block mb-2">Sleep Debt</span>
+                <div className="analytics-number text-[var(--foreground)]">{sleepDebt}h</div>
+                <div className="progress-bar mt-3">
+                  <div className="progress-bar-fill bg-rose-500" style={{ width: `${Math.min(100, (sleepDebt / 3) * 100)}%` }} />
                 </div>
                 {latestLog && (
-                  <p className="text-[10px] text-foreground/50 leading-relaxed font-semibold">
-                    Requires {Math.round((latestLog.duration + sleepDebt) * 10) / 10} hours tonight to zero sleep deficit.
-                  </p>
+                  <p className="text-xs text-[var(--muted)] mt-1.5">Need {Math.round((latestLog.duration + sleepDebt) * 10) / 10}h tonight</p>
                 )}
               </GlassCard>
 
-              <GlassCard glowColor="violet" className="flex flex-col justify-between min-h-[140px] p-5">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Recovery Efficiency</span>
-                  <div className="text-2xl font-extrabold mt-1 text-foreground">{recoveryScore}%</div>
+              <GlassCard glowColor="none" className="p-4">
+                <span className="text-xs font-medium text-[var(--muted)] block mb-2">Recovery</span>
+                <div className="analytics-number text-[var(--foreground)]">{recoveryScore}%</div>
+                <div className="progress-bar mt-3">
+                  <div className="progress-bar-fill bg-sky-500" style={{ width: `${recoveryScore}%` }} />
                 </div>
-                <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden my-3">
-                  <div className="bg-sky-500 h-full rounded-full" style={{ width: `${recoveryScore}%` }} />
-                </div>
-                <p className="text-[10px] text-foreground/50 leading-relaxed font-semibold">
-                  Calculated using quality markers, night wakings, and refreshment.
-                </p>
+                <p className="text-xs text-[var(--muted)] mt-1.5">Quality, wakings & refreshment</p>
               </GlassCard>
 
             </div>
 
-            {/* 3. Deep Analytics and Recharts Visualizations */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               
-              {/* Chart 1: Sleep Duration vs Vitality */}
-              <div className="rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-4">
+              <div className="glass-panel p-4 flex flex-col gap-3">
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                    <TrendingUp className="h-4.5 w-4.5 text-primary" />
-                    Circadian Sleep Duration vs. Next-Day Vitality
+                  <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    Sleep Duration & Energy
                   </h3>
-                  <p className="text-[10px] text-foreground/50 font-semibold uppercase mt-0.5">
-                    Demonstrating the direct correlation of total sleep hours on energy and cognitive productivity
-                  </p>
+                  <p className="text-xs text-[var(--muted)] mt-0.5">7-day trend: sleep hours vs next-day energy</p>
                 </div>
 
-                <div className="h-64 w-full pt-4">
+                <div className="h-52 w-full">
                   {mounted ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={logs} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -414,19 +393,16 @@ export default function SleepPage() {
                 </div>
               </div>
 
-              {/* Chart 2: Sleep Quality vs Cortisol and Muscle Repair */}
-              <div className="rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-4">
+              <div className="glass-panel p-4 flex flex-col gap-3">
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                    <BrainCircuit className="h-4.5 w-4.5 text-secondary" />
-                    Circadian Sleep Quality vs. Cortisol Stress & Muscle Repair
+                  <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
+                    <BrainCircuit className="h-4 w-4 text-secondary" />
+                    Quality, Stress & Recovery
                   </h3>
-                  <p className="text-[10px] text-foreground/50 font-semibold uppercase mt-0.5">
-                    Cortisol (stress loads) is mitigated and cell repair accelerated during high-quality circadian structures
-                  </p>
+                  <p className="text-xs text-[var(--muted)] mt-0.5">Sleep quality vs cortisol load and muscle repair</p>
                 </div>
 
-                <div className="h-64 w-full pt-4">
+                <div className="h-52 w-full">
                   {mounted ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={logs} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -470,54 +446,42 @@ export default function SleepPage() {
 
             </div>
 
-            {/* 4. AI Coach Deep Predictive Insights */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            {/* Sleep schedule & insights */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               
-              {/* Circadian Schedule */}
-              <div className="lg:col-span-6 rounded-2xl glass-panel p-6 border-foreground/5 space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                  <Clock className="h-4.5 w-4.5 text-primary" />
-                  Optimal Circadian Phase Schedule
+              <div className="glass-panel p-4 space-y-3">
+                <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
+                  <Clock className="h-4 w-4 text-primary" />
+                  Optimal Sleep Schedule
                 </h3>
                 
-                <div className="space-y-3.5 pt-1">
-                  <div className="flex justify-between items-center py-2 border-b border-foreground/5 text-xs font-semibold">
-                    <span className="text-foreground/65">Ideal Sleep Onset Window</span>
-                    <span className="text-primary font-bold">9:45 PM - 10:20 PM</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-foreground/5 text-xs font-semibold">
-                    <span className="text-foreground/65">Melatonin Onset Secretion Peak</span>
-                    <span className="text-secondary font-bold">11:15 PM</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-foreground/5 text-xs font-semibold">
-                    <span className="text-foreground/65">Deep Stage-3 Restorative Focus</span>
-                    <span className="text-amber-400 font-bold">11:30 PM - 2:30 AM</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-foreground/5 text-xs font-semibold">
-                    <span className="text-foreground/65">Average Wakeup Drift Deviation</span>
-                    <span className="text-emerald-400 font-bold">± 12 minutes (Excellent)</span>
-                  </div>
+                <div className="space-y-0">
+                  {[
+                    { label: "Ideal Sleep Onset", value: "9:45 PM – 10:20 PM", color: "text-primary" },
+                    { label: "Melatonin Peak", value: "11:15 PM", color: "text-secondary" },
+                    { label: "Deep Sleep Window", value: "11:30 PM – 2:30 AM", color: "text-amber-500" },
+                    { label: "Wakeup Drift", value: "± 12 min (Excellent)", color: "text-emerald-500" },
+                  ].map((row) => (
+                    <div key={row.label} className="flex justify-between items-center py-2.5 border-b border-[var(--border)] last:border-0">
+                      <span className="text-sm text-[var(--muted)]">{row.label}</span>
+                      <span className={`text-sm font-medium ${row.color}`}>{row.value}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Educational Insights Panel */}
-              <div className="lg:col-span-6 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-4 bg-gradient-to-tr from-secondary/5 via-background to-primary/5">
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                    <Zap className="h-4.5 w-4.5 text-secondary animate-pulse" />
-                    Preventative Circadian intelligence
-                  </h3>
-                  <p className="text-[11px] text-foreground/75 leading-relaxed font-semibold">
-                    Sleeping under 7 hours induces a rapid surge in morning cortisol stress levels. High cortisol blocks muscle protein synthesis, stops metabolic fat loss mechanisms, and forces the body to prioritize glucose accumulation (increasing metabolic risks).
+              <div className="glass-panel p-4 space-y-3">
+                <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
+                  <Zap className="h-4 w-4 text-secondary" />
+                  Sleep Insights
+                </h3>
+                <p className="text-sm text-[var(--muted)] leading-relaxed">
+                  Sleeping under 7 hours raises cortisol levels, which blocks muscle protein synthesis and slows fat loss. Consistent sleep timing is one of the most impactful health habits.
+                </p>
+                <div className="p-3 bg-[var(--muted-bg)] rounded-lg border border-[var(--border)]">
+                  <p className="text-xs font-medium text-[var(--foreground)]">
+                    On nights with under 6.5h sleep, focus efficiency drops ~28% and anxiety increases ~42%. An extra 1.5h tonight significantly boosts recovery.
                   </p>
-                  <div className="p-3.5 bg-foreground/5 rounded-xl border border-foreground/5 text-xs font-semibold">
-                    <span className="text-secondary font-bold block mb-1">🧠 AI Sleep Correlation Analysis:</span>
-                    "Telemetry logs confirm that on days following under 6.5 hours of sleep, your focus efficiency declines by <span className="text-rose-400 font-bold">28%</span>, and reported emotional anxiety spikes by <span className="text-rose-400 font-bold">42%</span>. Restoring 8h sleep tonight will increase muscle repair velocity by <span className="text-emerald-400 font-bold">34%</span>."
-                  </div>
-                </div>
-
-                <div className="text-[10px] text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3">
-                  Preventative Indicator: Consistent circadian habits cut long-term obesity risks by <span className="text-secondary font-bold">18%</span> and cognitive fatigue rates by <span className="text-primary font-bold">31%</span>.
                 </div>
               </div>
 
@@ -527,161 +491,115 @@ export default function SleepPage() {
 
         {/* 2. Redesigned Sleep Logger Form Modal Overlay */}
         {showLogForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
-            <div className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 text-white rounded-3xl p-8 shadow-2xl space-y-6 select-none font-sans">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div className="relative w-full max-w-md bg-[var(--card-bg)] border border-[var(--border)] rounded-xl shadow-xl p-6 space-y-4">
               
-              <div className="flex justify-between items-center pb-3 border-b border-zinc-800">
-                <h3 className="text-base sm:text-lg font-extrabold uppercase tracking-widest text-primary flex items-center gap-2">
-                  <Moon className="h-5 w-5 text-primary animate-pulse" />
-                  Circadian Sleep Telemetry Logger
-                </h3>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <Moon className="h-4 w-4 text-primary" />
+                  <h3 className="font-semibold text-[var(--foreground)]">Log Sleep</h3>
+                </div>
                 <button 
                   onClick={() => setShowLogForm(false)}
-                  className="text-zinc-400 hover:text-white font-extrabold text-sm p-1.5 hover:bg-zinc-900 rounded-xl transition-all"
+                  className="text-[var(--muted)] hover:text-[var(--foreground)] text-sm px-2 py-1 rounded-lg hover:bg-[var(--muted-bg)] transition-all"
                   aria-label="Close sleep modal"
                 >
-                  ✕ Close
+                  Close
                 </button>
               </div>
 
-              <form onSubmit={handleAddLog} className="space-y-6">
+              <form onSubmit={handleAddLog} className="space-y-4">
                 
-                {/* Onset / Wake inputs */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-300 block">
-                      Sleep Onset Time
-                    </label>
+                {/* Time inputs */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label>Bedtime</label>
                     <input 
                       type="time" 
                       value={onset} 
                       onChange={(e) => setOnset(e.target.value)}
                       required
-                      className="w-full text-sm px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-semibold"
                     />
                   </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-300 block">
-                      Wakeup Time
-                    </label>
+                  <div>
+                    <label>Wake time</label>
                     <input 
                       type="time" 
                       value={wake} 
                       onChange={(e) => setWake(e.target.value)}
                       required
-                      className="w-full text-sm px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-semibold"
                     />
                   </div>
                 </div>
 
                 {/* Sleep Quality slider */}
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
-                    <span className="text-zinc-300">Sleep Quality (1 - 10)</span>
-                    <span className="text-sm font-extrabold text-primary bg-primary/10 border border-primary/20 px-3 py-1 rounded-xl">
-                      {quality} / 10
-                    </span>
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="mb-0">Sleep Quality</label>
+                    <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">{quality} / 10</span>
                   </div>
                   <input 
                     type="range" 
-                    min="1" 
-                    max="10" 
-                    step="0.5" 
+                    min="1" max="10" step="0.5" 
                     value={quality} 
                     onChange={(e) => setQuality(Number(e.target.value))}
-                    className="w-full h-2.5 rounded-lg appearance-none cursor-pointer bg-zinc-800 accent-primary focus:outline-none"
                   />
-                  <div className="flex justify-between text-[10px] text-zinc-500 font-bold">
-                    <span>Restless (1)</span>
-                    <span>Restorative Deep (10)</span>
+                  <div className="flex justify-between text-xs text-[var(--muted)] mt-1">
+                    <span>Poor (1)</span><span>Great (10)</span>
                   </div>
                 </div>
 
-                {/* Night Wakings and Refreshment */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-300 block">
-                      Night Wakings
-                    </label>
+                {/* Night wakings + refreshment */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label>Night Wakings</label>
                     <input 
-                      type="number" 
-                      min="0" 
-                      max="10" 
+                      type="number" min="0" max="10" 
                       value={wakings} 
                       onChange={(e) => setWakings(Number(e.target.value))}
-                      className="w-full text-sm px-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-bold"
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
-                      <span className="text-zinc-300">Refreshment</span>
-                      <span className="text-sm font-extrabold text-secondary bg-secondary/10 border border-secondary/20 px-3 py-1 rounded-xl">
-                        {refreshment} / 10
-                      </span>
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="mb-0">Refreshment</label>
+                      <span className="text-xs font-medium text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">{refreshment} / 10</span>
                     </div>
                     <input 
                       type="range" 
-                      min="1" 
-                      max="10" 
-                      step="0.5" 
+                      min="1" max="10" step="0.5" 
                       value={refreshment} 
                       onChange={(e) => setRefreshment(Number(e.target.value))}
-                      className="w-full h-2.5 rounded-lg appearance-none cursor-pointer bg-zinc-800 accent-secondary focus:outline-none mt-1"
                     />
                   </div>
-
                 </div>
 
-                {/* Mood and Stress Load sliders */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-zinc-800 pt-5">
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
-                      <span className="text-zinc-300">Next Day Mood</span>
-                      <span className="text-xs font-extrabold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-0.5 rounded-lg">
-                        {mood} / 10
-                      </span>
+                {/* Mood + Stress */}
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[var(--border)]">
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="mb-0">Morning Mood</label>
+                      <span className="text-xs font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">{mood}/10</span>
                     </div>
-                    <input 
-                      type="range" 
-                      min="1" 
-                      max="10" 
-                      value={mood} 
-                      onChange={(e) => setMood(Number(e.target.value))}
-                      className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-zinc-800 accent-emerald-400 mt-1"
-                    />
+                    <input type="range" min="1" max="10" value={mood} onChange={(e) => setMood(Number(e.target.value))} />
                   </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
-                      <span className="text-zinc-300">Stress Load</span>
-                      <span className="text-xs font-extrabold text-rose-400 bg-rose-400/10 border border-rose-400/20 px-2.5 py-0.5 rounded-lg">
-                        {stress} / 10
-                      </span>
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="mb-0">Stress Level</label>
+                      <span className="text-xs font-medium text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full">{stress}/10</span>
                     </div>
-                    <input 
-                      type="range" 
-                      min="1" 
-                      max="10" 
-                      value={stress} 
-                      onChange={(e) => setStress(Number(e.target.value))}
-                      className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-zinc-800 accent-rose-400 mt-1"
-                    />
+                    <input type="range" min="1" max="10" value={stress} onChange={(e) => setStress(Number(e.target.value))} />
                   </div>
-
                 </div>
 
-                {/* Submit button */}
                 <Button 
                   variant="primary" 
-                  type="submit" 
-                  className="w-full mt-6 py-4 text-xs font-extrabold uppercase tracking-widest bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 border border-primary/20 cursor-pointer flex items-center justify-center gap-2"
+                  type="submit"
+                  size="md"
+                  isLoading={loadingLogs}
+                  className="w-full gap-1.5"
                 >
-                  <CheckCircle2 className="h-4.5 w-4.5" />
-                  <span>Commit Night Biometrics</span>
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Save Sleep Log
                 </Button>
                 
               </form>
