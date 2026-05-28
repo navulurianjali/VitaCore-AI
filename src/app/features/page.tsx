@@ -51,7 +51,7 @@ export default function FeaturesPage() {
         
         {/* Header Title */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Preventative AI Architecture</h1>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Preventative AI Architecture</h1>
           <p className="text-sm text-foreground/70 max-w-2xl mx-auto leading-relaxed">
             VitalCore uses state-of-the-art predictive healthcare modeling to optimize longevity, cardiovascular strength, cognitive focus, and active recovery.
           </p>

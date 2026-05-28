@@ -37,8 +37,8 @@ export default function ContactPage() {
         
         {/* Title */}
         <div className="text-center space-y-3">
-          <h1 className="text-4xl font-extrabold tracking-tight">Connect with VitalCore Support</h1>
-          <p className="text-xs text-foreground/60 font-semibold tracking-wider uppercase">preventative engineering support</p>
+          <h1 className="text-4xl font-bold tracking-tight">Connect with VitalCore Support</h1>
+          <p className="text-xs text-foreground/60 font-semibold">preventative engineering support</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 border-t border-foreground/5 pt-10">

@@ -49,8 +49,8 @@ export default function LoginPage() {
           <Link href="/" className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
             <Activity className="h-5 w-5" />
           </Link>
-          <h2 className="auth-subtitle tracking-tight text-center font-extrabold">Access VitalCore Console</h2>
-          <p className="auth-helper uppercase tracking-wider text-[12px] flex items-center gap-1 justify-center">
+          <h2 className="auth-subtitle tracking-tight text-center font-bold">Access VitalCore Console</h2>
+          <p className="auth-helper text-[12px] flex items-center gap-1 justify-center">
             <ShieldCheck className="h-4 w-4 text-secondary/80" />
             Secure Session Gateway
           </p>

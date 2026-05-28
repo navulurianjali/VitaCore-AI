@@ -433,17 +433,17 @@ export default function NutritionPage() {
                   <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
                     <span className="text-xs font-semibold text-primary block">Protein</span>
                     <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalProtein}g</span>
-                    <span className="text-[11px] text-[var(--muted)]">/ 140g</span>
+                    <span className="text-xs text-[var(--muted)]">/ 140g</span>
                   </div>
                   <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
                     <span className="text-xs font-semibold text-secondary block">Carbs</span>
                     <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalCarbs}g</span>
-                    <span className="text-[11px] text-[var(--muted)]">/ 220g</span>
+                    <span className="text-xs text-[var(--muted)]">/ 220g</span>
                   </div>
                   <div className="bg-[var(--muted-bg)] p-2 rounded-lg border border-[var(--border)]">
                     <span className="text-xs font-semibold text-amber-500 block">Fats</span>
                     <span className="text-base font-bold text-[var(--foreground)] block mt-0.5">{totalFat}g</span>
-                    <span className="text-[11px] text-[var(--muted)]">/ 60g</span>
+                    <span className="text-xs text-[var(--muted)]">/ 60g</span>
                   </div>
                 </div>
               </GlassCard>
@@ -485,7 +485,7 @@ export default function NutritionPage() {
                     <Scan className="h-4 w-4 text-primary" />
                     AI Food Scanner
                   </h3>
-                  <p className="text-[11px] text-foreground/75 leading-relaxed font-semibold">
+                  <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
                     Upload images, snap camera captures, or search barcodes to run automated chemical audits, portion sizes, glycemic spikes, and recovery swaps.
                   </p>
 
@@ -506,7 +506,7 @@ export default function NutritionPage() {
                     </div>
                     <div className="text-center space-y-0.5">
                       <span className="text-xs font-bold text-foreground block">Drag & Drop Food Image here</span>
-                      <span className="text-[10px] text-foreground/50">or click to upload a snapshot</span>
+                      <span className="text-xs text-foreground/50">or click to upload a snapshot</span>
                     </div>
                   </div>
 
@@ -540,13 +540,13 @@ export default function NutritionPage() {
 
                   {/* Pre-sets */}
                   <div className="space-y-2 pt-2 border-t border-foreground/5">
-                    <span className="text-[9px] font-bold text-foreground/50 uppercase block">Instant Food Simulators</span>
+                    <span className="text-[9px] font-bold text-foreground/50 block">Instant Food Simulators</span>
                     <div className="flex flex-wrap gap-2">
                       {sampleFoods.map((s, idx) => (
                         <button
                           key={idx}
                           onClick={() => handleScanSimulation(s.query)}
-                          className="px-2.5 py-1.5 text-[10px] font-bold rounded-xl bg-foreground/5 border border-foreground/5 hover:border-primary/40 transition-all cursor-pointer text-foreground/80 hover:text-foreground"
+                          className="px-2.5 py-1.5 text-xs font-bold rounded-xl bg-foreground/5 border border-foreground/5 hover:border-primary/40 transition-all cursor-pointer text-foreground/80 hover:text-foreground"
                         >
                           {s.label}
                         </button>
@@ -560,16 +560,16 @@ export default function NutritionPage() {
                   {scanning && (
                     <div className="flex flex-col items-center gap-3 text-center py-6">
                       <div className="h-8 w-8 animate-spin rounded-full border-3 border-primary/20 border-t-primary" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-primary animate-pulse">Running Neural Food Scanner...</span>
-                      <p className="text-[10px] text-foreground/60 max-w-xs leading-normal">Extracting chemical additives, sodium matrices, portion weights, and macro ratios.</p>
+                      <span className="text-xs font-bold tracking-widest text-primary animate-pulse">Running Neural Food Scanner...</span>
+                      <p className="text-xs text-foreground/60 max-w-xs leading-normal">Extracting chemical additives, sodium matrices, portion weights, and macro ratios.</p>
                     </div>
                   )}
 
                   {!scanning && !scanResult && (
                     <div className="flex flex-col items-center gap-1.5 text-center py-6 text-foreground/40 select-none">
                       <Scan className="h-8 w-8 text-foreground/25 animate-pulse" />
-                      <span className="text-xs font-extrabold uppercase">Scanner Console Empty</span>
-                      <p className="text-[10px] max-w-xs leading-normal">Upload a snapshot or scan a packaging barcode to perform automated audits.</p>
+                      <span className="text-xs font-bold">Scanner Console Empty</span>
+                      <p className="text-xs max-w-xs leading-normal">Upload a snapshot or scan a packaging barcode to perform automated audits.</p>
                     </div>
                   )}
 
@@ -578,10 +578,10 @@ export default function NutritionPage() {
                       <div className="flex justify-between items-start gap-4">
                         <div className="space-y-0.5">
                           <div className="flex flex-wrap gap-1.5 items-center">
-                            <span className="rounded-full bg-primary/10 border border-primary/15 px-2.5 py-0.5 text-[9px] font-bold text-primary uppercase">
+                            <span className="rounded-full bg-primary/10 border border-primary/15 px-2.5 py-0.5 text-[9px] font-bold text-primary">
                               Portion: {scanResult.portionSize}
                             </span>
-                            <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase border ${
+                            <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold border ${
                               scanResult.healthScore >= 75
                                 ? "bg-emerald-500/10 border-emerald-500/15 text-emerald-400"
                                 : "bg-rose-500/10 border-rose-500/15 text-rose-400"
@@ -589,13 +589,13 @@ export default function NutritionPage() {
                               {scanResult.healthScore >= 75 ? "✓ Clean Whole Food" : "⚠ Processed glycemic hazard"}
                             </span>
                           </div>
-                          <h3 className="text-sm font-extrabold text-foreground mt-1">{scanResult.foodName}</h3>
+                          <h3 className="text-sm font-bold text-foreground mt-1">{scanResult.foodName}</h3>
                         </div>
 
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="text-right">
-                            <span className="text-[8px] font-bold text-foreground/40 block uppercase">Density Score</span>
-                            <span className="text-[11px] font-extrabold text-secondary block">{scanResult.nutrientDensity}/10</span>
+                            <span className="text-[8px] font-bold text-foreground/40 block">Density Score</span>
+                            <span className="text-xs font-bold text-secondary block">{scanResult.nutrientDensity}/10</span>
                           </div>
                           
                           <div className={`h-12 w-12 rounded-full border-2 flex flex-col items-center justify-center shrink-0 shadow-lg ${
@@ -603,44 +603,44 @@ export default function NutritionPage() {
                               ? "border-secondary text-secondary shadow-secondary/10"
                               : "border-rose-500 text-rose-500 shadow-rose-500/10"
                           }`}>
-                            <span className="text-[7px] font-bold uppercase">Health</span>
-                            <span className="text-sm font-extrabold">{scanResult.healthScore}</span>
+                            <span className="text-[7px] font-bold">Health</span>
+                            <span className="text-sm font-bold">{scanResult.healthScore}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Macros */}
-                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-[10px] font-extrabold">
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-xs font-bold">
                         <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
                           <span className="text-primary block font-bold">Protein</span>
-                          <span className="text-xs font-extrabold block mt-0.5 text-foreground">{scanResult.protein}g</span>
+                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.protein}g</span>
                         </div>
                         <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
                           <span className="text-secondary block font-bold">Carbs</span>
-                          <span className="text-xs font-extrabold block mt-0.5 text-foreground">{scanResult.carbs}g</span>
+                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.carbs}g</span>
                         </div>
                         <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
                           <span className="text-accent block font-bold">Fats</span>
-                          <span className="text-xs font-extrabold block mt-0.5 text-foreground">{scanResult.fat}g</span>
+                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.fat}g</span>
                         </div>
                         <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
                           <span className="text-rose-400 block font-bold">Sugars</span>
-                          <span className="text-xs font-extrabold block mt-0.5 text-foreground">{scanResult.sugar}g</span>
+                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.sugar}g</span>
                         </div>
                         <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
                           <span className="text-amber-500 block font-bold">Sodium</span>
-                          <span className="text-xs font-extrabold block mt-0.5 text-foreground">{scanResult.sodium}mg</span>
+                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.sodium}mg</span>
                         </div>
                         <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5">
                           <span className="text-teal-400 block font-bold">Fiber</span>
-                          <span className="text-xs font-extrabold block mt-0.5 text-foreground">{scanResult.fiber}g</span>
+                          <span className="text-xs font-bold block mt-0.5 text-foreground">{scanResult.fiber}g</span>
                         </div>
                       </div>
 
                       {/* Warnings & Swaps */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-foreground/5 pt-4">
                         <div className="space-y-2">
-                          <span className="text-[9px] font-bold text-rose-500 uppercase block">Auditing Alerts:</span>
+                          <span className="text-[9px] font-bold text-rose-500 block">Auditing Alerts:</span>
                           <div className="space-y-1.5 text-[9px] font-bold text-foreground/85">
                             {scanResult.sugarAlert && (
                               <div className="flex gap-1.5 items-center text-rose-400 bg-rose-400/5 rounded-lg px-2 py-1">
@@ -672,7 +672,7 @@ export default function NutritionPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <span className="text-[9px] font-bold text-secondary uppercase block">Longevity Swaps:</span>
+                          <span className="text-[9px] font-bold text-secondary block">Longevity Swaps:</span>
                           <div className="space-y-1.5">
                             {scanResult.alternatives.map((alt, idx) => (
                               <div key={idx} className="flex items-center gap-1.5 p-1.5 bg-secondary/5 rounded-lg border border-secondary/10 text-[9px] font-bold text-foreground/80">
@@ -710,7 +710,7 @@ export default function NutritionPage() {
                     </h3>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-foreground">Food item name</label>
+                      <label className="text-xs font-bold text-foreground">Food item name</label>
                       <input
                         type="text"
                         required
@@ -723,7 +723,7 @@ export default function NutritionPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-foreground">Meal Phase</label>
+                        <label className="text-xs font-bold text-foreground">Meal Phase</label>
                         <select
                           value={mealType}
                           onChange={(e) => setMealType(e.target.value)}
@@ -737,7 +737,7 @@ export default function NutritionPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-foreground">Kcal Consumed</label>
+                        <label className="text-xs font-bold text-foreground">Kcal Consumed</label>
                         <input
                           type="number"
                           required
@@ -811,7 +811,7 @@ export default function NutritionPage() {
                     {/* Stress Snack trigger */}
                     <div className="rounded-xl border border-foreground/5 bg-foreground/5 p-3 space-y-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-[10px] font-bold text-foreground flex items-center gap-1 cursor-pointer select-none">
+                        <label className="text-xs font-bold text-foreground flex items-center gap-1 cursor-pointer select-none">
                           <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
                           Flag as Emotional Snacking?
                         </label>
@@ -830,7 +830,7 @@ export default function NutritionPage() {
                             type="text"
                             value={stressTrigger}
                             onChange={(e) => setStressTrigger(e.target.value)}
-                            className="w-full text-[10px] px-2.5 py-1.5 rounded-lg border border-foreground/10 bg-background text-foreground focus:outline-none"
+                            className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-foreground/10 bg-background text-foreground focus:outline-none"
                           />
                         </div>
                       )}
@@ -846,13 +846,13 @@ export default function NutritionPage() {
                 {/* Meal History */}
                 <div className="rounded-2xl glass-panel p-6 border-foreground/5 flex-1 flex flex-col justify-between">
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-foreground flex items-center justify-between">
                       <span>Logged Meal History</span>
-                      <span className="text-[10px] text-foreground/50 font-medium">Daily Telemetry logs</span>
+                      <span className="text-xs text-foreground/50 font-medium">Daily Telemetry logs</span>
                     </h3>
 
                     {stressLogs.length > 0 && (
-                      <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-[10px] text-amber-500 font-semibold flex items-center gap-2">
+                      <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-500 font-semibold flex items-center gap-2">
                         <Info className="h-4 w-4 shrink-0" />
                         <span>AI Alert: {stressLogs.length} emotional logs isolated. Trigger: deadline inertias.</span>
                       </div>
@@ -863,7 +863,7 @@ export default function NutritionPage() {
                         <div className="text-center py-12 text-foreground/45 space-y-2">
                           <Utensils className="h-8 w-8 text-foreground/20 mx-auto animate-pulse" />
                           <span className="text-xs font-bold block">No meals logged today</span>
-                          <p className="text-[10px] text-foreground/50 max-w-[200px] mx-auto leading-normal">
+                          <p className="text-xs text-foreground/50 max-w-[200px] mx-auto leading-normal">
                             Log your first meal to generate nutrition analytics.
                           </p>
                         </div>
@@ -879,12 +879,12 @@ export default function NutritionPage() {
                           >
                             <div className="space-y-0.5">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-extrabold text-foreground">{log.food_name}</span>
+                                <span className="text-xs font-bold text-foreground">{log.food_name}</span>
                                 <span className="rounded-full bg-foreground/10 px-2 py-0.2 text-[8px] font-bold text-foreground/60 capitalize">
                                   {log.meal_type}
                                 </span>
                               </div>
-                              <p className="text-[10px] text-foreground/50 font-semibold">
+                              <p className="text-xs text-foreground/50 font-semibold">
                                 P: {log.protein_g}g | C: {log.carbs_g}g | F: {log.fat_g}g {log.sugar_g ? ` | S: ${log.sugar_g}g` : ""} {log.sodium_mg ? ` | Na: ${log.sodium_mg}mg` : ""}
                               </p>
                               {log.stress_eating && (
@@ -893,7 +893,7 @@ export default function NutritionPage() {
                                 </p>
                               )}
                             </div>
-                            <span className="text-xs font-extrabold text-foreground shrink-0 ml-3">
+                            <span className="text-xs font-bold text-foreground shrink-0 ml-3">
                               +{log.calories} kcal
                             </span>
                           </div>
@@ -902,7 +902,7 @@ export default function NutritionPage() {
                     </div>
                   </div>
 
-                  <div className="border-t border-foreground/5 pt-4 mt-6 text-[10px] text-foreground/50 font-semibold flex justify-between">
+                  <div className="border-t border-foreground/5 pt-4 mt-6 text-xs text-foreground/50 font-semibold flex justify-between">
                     <span>Preventive Analysis: Macro balance reduces obesity risk by 18%</span>
                     <span className="text-secondary font-bold">HIPAA Secure logs</span>
                   </div>
@@ -914,7 +914,7 @@ export default function NutritionPage() {
 
             {/* 3. AI NUTRITION INSIGHTS SECTION */}
             <div className="rounded-2xl glass-panel p-6 border-foreground/5 space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Sparkles className="h-4.5 w-4.5 text-secondary animate-pulse" />
                 AI preventive Nutrition Insights
               </h3>

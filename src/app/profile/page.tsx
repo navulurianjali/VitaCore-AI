@@ -71,11 +71,11 @@ export default function ProfilePage() {
         {/* Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
           <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <User className="h-6 w-6 text-primary animate-pulse" />
               Biometric Wellness Profile
             </h1>
-            <p className="text-xs text-foreground/70 font-semibold uppercase tracking-wider">
+            <p className="text-xs text-foreground/70 font-semibold">
               Chronological statistics, height & weight variables & Digital Twin personalization
             </p>
           </div>
@@ -87,7 +87,7 @@ export default function ProfilePage() {
           {/* Left panel: Biometrics input fields */}
           <div className="lg:col-span-7 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between">
             <form onSubmit={handleSaveProfile} className="space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <HeartPulse className="h-4.5 w-4.5 text-primary" />
                 Physical Parameter Loggers
               </h3>
@@ -99,7 +99,7 @@ export default function ProfilePage() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-foreground">Full Name</label>
+                <label className="text-xs font-bold text-foreground">Full Name</label>
                 <input
                   type="text"
                   required
@@ -111,7 +111,7 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-foreground">Chronological Weight (kg)</label>
+                  <label className="text-xs font-bold text-foreground">Chronological Weight (kg)</label>
                   <input
                     type="number"
                     required
@@ -122,7 +122,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-foreground">Chronological Height (cm)</label>
+                  <label className="text-xs font-bold text-foreground">Chronological Height (cm)</label>
                   <input
                     type="number"
                     required
@@ -134,7 +134,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-foreground">Active Preventive Focus Goal</label>
+                <label className="text-xs font-bold text-foreground">Active Preventive Focus Goal</label>
                 <select
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
@@ -157,12 +157,12 @@ export default function ProfilePage() {
           {/* Right panel: Digital Twin personalization metrics summary */}
           <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Sparkles className="h-4.5 w-4.5 text-secondary animate-pulse" />
                 Digital Twin Characteristics
               </h3>
               
-              <ul className="space-y-3 pt-2 text-[10px] text-foreground/75 font-semibold leading-normal">
+              <ul className="space-y-3 pt-2 text-xs text-foreground/75 font-semibold leading-normal">
                 <li className="flex gap-2">
                   <span className="text-primary font-bold">•</span>
                   <span>**Biological Age Estimate**: {profile?.biological_age || "28.5"} yrs (Actual age index correlates down with step consistency metrics).</span>
@@ -181,7 +181,7 @@ export default function ProfilePage() {
             <GlassCard glowColor="violet" className="p-4 flex gap-3 items-start border border-foreground/5">
               <ShieldCheck className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
               <div className="space-y-0.5">
-                <h4 className="text-[9px] font-bold text-secondary uppercase tracking-wider">Secure Biometric Storage</h4>
+                <h4 className="text-[9px] font-bold text-secondary">Secure Biometric Storage</h4>
                 <p className="text-[9px] text-foreground/75 leading-relaxed font-semibold">
                   Personal dimensions data synced locally inside session parameters. Encrypted in real Supabase schemas using strict standard access restrictions.
                 </p>

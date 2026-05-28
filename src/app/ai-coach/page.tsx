@@ -126,11 +126,11 @@ export default function AICoachPage() {
         {/* Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5 shrink-0">
           <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Brain className="h-6 w-6 text-primary animate-pulse" />
               AI Wellness Life Companion
             </h1>
-            <p className="text-xs text-foreground/70 font-semibold uppercase tracking-wider">
+            <p className="text-xs text-foreground/70 font-semibold">
               Conversational preventive health assistant
             </p>
           </div>
@@ -192,11 +192,11 @@ export default function AICoachPage() {
             {/* Quick Sample Prompts */}
             <GlassCard glowColor="violet" className="space-y-4 p-5 flex-1 flex flex-col justify-between">
               <div className="space-y-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <MessageSquare className="h-4 w-4 text-primary" />
                   Biomedical Prompts
                 </h3>
-                <p className="text-[10px] text-foreground/60 leading-normal font-semibold">
+                <p className="text-xs text-foreground/60 leading-normal font-semibold">
                   Select a predefined prompt to instantly query your Coach AI model:
                 </p>
               </div>
@@ -206,7 +206,7 @@ export default function AICoachPage() {
                   <button
                     key={idx}
                     onClick={() => setInputVal(prompt)}
-                    className="w-full text-left p-3 rounded-xl bg-foreground/5 border border-foreground/5 text-[11px] font-semibold text-foreground/80 hover:bg-foreground/10 hover:border-primary/20 transition-all leading-normal"
+                    className="w-full text-left p-3 rounded-xl bg-foreground/5 border border-foreground/5 text-xs font-semibold text-foreground/80 hover:bg-foreground/10 hover:border-primary/20 transition-all leading-normal"
                   >
                     "{prompt}"
                   </button>
@@ -216,14 +216,14 @@ export default function AICoachPage() {
 
             {/* AI Companion Memory specs */}
             <GlassCard glowColor="amber" className="p-5 space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Companion Memory</h3>
-              <ul className="space-y-2 text-[10px] text-foreground/75 font-semibold leading-normal">
+              <h3 className="text-xs font-bold text-foreground">Companion Memory</h3>
+              <ul className="space-y-2 text-xs text-foreground/75 font-semibold leading-normal">
                 <li className="flex gap-2">
-                  <span className="text-amber-500 font-extrabold">•</span>
+                  <span className="text-amber-500 font-bold">•</span>
                   <span>**Active excuse logged**: Skips activity when coding runs past 9:00 PM due to focus inertia.</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-amber-500 font-extrabold">•</span>
+                  <span className="text-amber-500 font-bold">•</span>
                   <span>**Cognitive stress correlation**: Macro food logs demonstrate a 25% sugar consumption surge when daily anxiety crosses 60%.</span>
                 </li>
               </ul>

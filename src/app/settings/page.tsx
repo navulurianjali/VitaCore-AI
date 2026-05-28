@@ -42,11 +42,11 @@ export default function SettingsPage() {
         {/* Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
           <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Settings className="h-6 w-6 text-primary animate-pulse" />
               Platform Settings Control Panel
             </h1>
-            <p className="text-xs text-foreground/70 font-semibold uppercase tracking-wider">
+            <p className="text-xs text-foreground/70 font-semibold">
               Visual accessibility scales, mock credentials, biometrics purging & RLS settings
             </p>
           </div>
@@ -61,11 +61,11 @@ export default function SettingsPage() {
               
               {/* Active visual mode toggle */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <Sparkles className="h-4 w-4 text-secondary" />
                   Biometric Engine UI Scale Modifiers
                 </h3>
-                <p className="text-[10px] text-foreground/60 leading-relaxed font-semibold">
+                <p className="text-xs text-foreground/60 leading-relaxed font-semibold">
                   Toggling scaling modes automatically mutates typography scale factors, line weights, contrast, and layout complexity parameters across the platform console:
                 </p>
 
@@ -88,7 +88,7 @@ export default function SettingsPage() {
 
               {/* Theme light dark mode toggle */}
               <div className="space-y-3 pt-3 border-t border-foreground/5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   {theme === "dark" ? <Moon className="h-4.5 w-4.5 text-primary" /> : <Sun className="h-4.5 w-4.5 text-amber-500" />}
                   Dynamic Interface Theme Color
                 </h3>
@@ -104,7 +104,7 @@ export default function SettingsPage() {
 
             </div>
 
-            <div className="text-[10px] text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3">
+            <div className="text-xs text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3">
               Accessibility compliance: Enabled and compliant with AAA rating under typography scaling modes.
             </div>
           </div>
@@ -112,16 +112,16 @@ export default function SettingsPage() {
           {/* Right panel: Security purger cache */}
           <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Trash2 className="h-4 w-4 text-red-500 animate-pulse" />
                 GDPR Local Cache Purger
               </h3>
-              <p className="text-[10px] text-foreground/60 leading-normal font-semibold">
+              <p className="text-xs text-foreground/60 leading-normal font-semibold">
                 Purge all biometric logs, workout lists, and custom sessions from your browser sandbox cache:
               </p>
 
               {cleared ? (
-                <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-3 py-2 text-[10px] text-red-500 font-semibold">
+                <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-500 font-semibold">
                   ⚠ All biometric databases wiped successfully! Redirecting...
                 </div>
               ) : (
@@ -135,7 +135,7 @@ export default function SettingsPage() {
             <GlassCard glowColor="rose" className="p-4 flex gap-3 items-start border border-foreground/5">
               <ShieldCheck className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
               <div className="space-y-0.5">
-                <h4 className="text-[9px] font-bold text-red-500 uppercase tracking-wider">HIPAA Inspired Isolation</h4>
+                <h4 className="text-[9px] font-bold text-red-500">HIPAA Inspired Isolation</h4>
                 <p className="text-[9px] text-foreground/75 leading-relaxed font-semibold">
                   Row level security is compiled in all active schemas. All credentials packets are validated against secure cryptographic JSON web token standard procedures.
                 </p>

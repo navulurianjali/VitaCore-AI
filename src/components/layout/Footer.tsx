@@ -44,14 +44,14 @@ export const Footer: React.FC = () => {
             <p className="text-xs text-foreground/60 leading-relaxed">
               Predictive AI wellness intelligence that identifies risks, optimizes biological age, and protects high-demand lifestyles.
             </p>
-            <p className="text-[10px] text-foreground/40 leading-relaxed font-medium">
+            <p className="text-xs text-foreground/40 leading-relaxed font-medium">
               HIPAA & GDPR Inspired Security Infrastructure.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground mb-4">Platform</h4>
+            <h4 className="text-xs font-bold text-foreground mb-4">Platform</h4>
             <ul className="space-y-2 text-xs text-foreground/75">
               <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link href="/features" className="hover:text-primary transition-colors">Preventative AI</Link></li>
@@ -62,7 +62,7 @@ export const Footer: React.FC = () => {
 
           {/* Legal Links */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground mb-4">Safety & Legal</h4>
+            <h4 className="text-xs font-bold text-foreground mb-4">Safety & Legal</h4>
             <ul className="space-y-2 text-xs text-foreground/75">
               <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
@@ -73,7 +73,7 @@ export const Footer: React.FC = () => {
 
           {/* Newsletter Form */}
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">Intelligence Digests</h4>
+            <h4 className="text-xs font-bold text-foreground">Intelligence Digests</h4>
             <p className="text-xs text-foreground/60 leading-relaxed">
               Subscribe to receive preventative healthcare recommendations and AI wellness science updates.
             </p>
@@ -101,7 +101,7 @@ export const Footer: React.FC = () => {
 
         </div>
 
-        <div className="mt-12 border-t border-foreground/5 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-foreground/50 font-medium">
+        <div className="mt-12 border-t border-foreground/5 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-foreground/50 font-medium">
           <span>&copy; {new Date().getFullYear()} VitalCore Inc. All rights reserved.</span>
           <div className="flex gap-4 mt-4 sm:mt-0">
             <span className="hover:text-primary cursor-pointer transition-all">Twitter / X</span>

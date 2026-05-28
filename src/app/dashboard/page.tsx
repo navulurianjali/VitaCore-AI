@@ -385,7 +385,7 @@ export default function DashboardPage() {
                   <div key={m.label} className="p-3 rounded-lg bg-[var(--muted-bg)] border border-[var(--border)]">
                     <span className={`text-xs font-semibold ${m.color} block`}>{m.label}</span>
                     <span className="text-lg font-bold text-[var(--foreground)] block mt-0.5">{m.value}</span>
-                    <span className="text-[11px] text-[var(--muted)]">Target</span>
+                    <span className="text-xs text-[var(--muted)]">Target</span>
                   </div>
                 ))}
               </div>

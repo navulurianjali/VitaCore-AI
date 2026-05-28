@@ -12,7 +12,7 @@ export default function AboutPage() {
         
         {/* Header Title */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Our Preventive Longevity Mission</h1>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Our Preventive Longevity Mission</h1>
           <p className="text-sm text-foreground/70 max-w-2xl mx-auto leading-relaxed">
             VitalCore was founded by clinical wellness practitioners and software engineers to transition healthcare from reactive intervention to proactive preventative intelligence.
           </p>
@@ -21,7 +21,7 @@ export default function AboutPage() {
         {/* Narrative Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center border-t border-b border-foreground/5 py-12">
           <div className="space-y-4">
-            <h2 className="text-xl font-extrabold text-foreground">The Paradigm Shift in Longevity</h2>
+            <h2 className="text-xl font-bold text-foreground">The Paradigm Shift in Longevity</h2>
             <p className="text-xs text-foreground/75 leading-relaxed font-medium">
               Modern medicine waits for systems to collapse before initiating treatment. We believe in tracking daily micro-declines—the invisible physiological drops in sleep metrics, heart rate variance stability, and systemic stress—to adapt routines before burnout or health degradation manifests.
             </p>
@@ -30,7 +30,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="rounded-3xl glass-panel p-8 border-foreground/5 flex flex-col gap-6 bg-gradient-to-tr from-primary/10 to-accent/5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-primary flex items-center gap-1.5">
               <Cpu className="h-4 w-4" />
               The VitalCore Engine Standard
             </h3>

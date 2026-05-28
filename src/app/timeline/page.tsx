@@ -54,11 +54,11 @@ export default function TimelinePage() {
         {/* Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
           <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Milestone className="h-6 w-6 text-primary animate-pulse" />
               Health Evolution & Digital Twin Simulator
             </h1>
-            <p className="text-xs text-foreground/70 font-semibold uppercase tracking-wider">
+            <p className="text-xs text-foreground/70 font-semibold">
               3-6 Months future trend forecasting, biological age & chronic stability indexes
             </p>
           </div>
@@ -69,22 +69,22 @@ export default function TimelinePage() {
           
           <GlassCard glowColor="violet" className="p-5 flex justify-between items-center min-h-[120px]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Wellness Stability index</span>
-              <h2 className="text-3xl font-extrabold">{metrics.stabilityScore}%</h2>
-              <p className="text-[10px] text-foreground/60 leading-normal font-semibold">Lifestyle stability is high. Hydration consistency protects organs.</p>
+              <span className="text-xs font-bold text-foreground/60">Wellness Stability index</span>
+              <h2 className="text-3xl font-bold">{metrics.stabilityScore}%</h2>
+              <p className="text-xs text-foreground/60 leading-normal font-semibold">Lifestyle stability is high. Hydration consistency protects organs.</p>
             </div>
-            <div className="h-10 w-10 rounded-full bg-primary/15 flex items-center justify-center text-primary font-extrabold text-sm shrink-0">
+            <div className="h-10 w-10 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
               S
             </div>
           </GlassCard>
 
           <GlassCard glowColor="emerald" className="p-5 flex justify-between items-center min-h-[120px]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/60">Biological Age Estimator</span>
-              <h2 className="text-3xl font-extrabold">{metrics.biologicalAge} yrs</h2>
-              <p className="text-[10px] text-foreground/60 leading-normal font-semibold"> lifestyle is {metrics.biologicalAge < 30 ? "younger" : "older"} than chronological benchmark.</p>
+              <span className="text-xs font-bold text-foreground/60">Biological Age Estimator</span>
+              <h2 className="text-3xl font-bold">{metrics.biologicalAge} yrs</h2>
+              <p className="text-xs text-foreground/60 leading-normal font-semibold"> lifestyle is {metrics.biologicalAge < 30 ? "younger" : "older"} than chronological benchmark.</p>
             </div>
-            <div className="h-10 w-10 rounded-full bg-secondary/15 flex items-center justify-center text-secondary font-extrabold text-sm shrink-0">
+            <div className="h-10 w-10 rounded-full bg-secondary/15 flex items-center justify-center text-secondary font-bold text-sm shrink-0">
               A
             </div>
           </GlassCard>
@@ -97,7 +97,7 @@ export default function TimelinePage() {
           {/* Left panel: Digital Twin forecasting table */}
           <div className="lg:col-span-7 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Layers className="h-4.5 w-4.5 text-primary" />
                 Digital Twin 6-Month forecasting Simulator
               </h3>
@@ -107,7 +107,7 @@ export default function TimelinePage() {
 
               {/* Forecast points list */}
               <div className="space-y-2 pt-2">
-                <div className="grid grid-cols-3 text-[10px] font-bold uppercase tracking-wider text-foreground/60 pb-2 border-b border-foreground/5 text-center">
+                <div className="grid grid-cols-3 text-xs font-bold text-foreground/60 pb-2 border-b border-foreground/5 text-center">
                   <span>Timeline</span>
                   <span className="text-secondary">Constructive path</span>
                   <span className="text-red-500">Destructive decay</span>
@@ -116,15 +116,15 @@ export default function TimelinePage() {
                 {twinPoints.map((pt, idx) => (
                   <div key={idx} className="grid grid-cols-3 text-xs font-semibold py-2.5 border-b border-foreground/5 text-center items-center">
                     <span className="text-foreground/70">{pt.month}</span>
-                    <span className="text-secondary font-extrabold">{pt.constructiveScore}% Stability</span>
-                    <span className="text-red-500 font-extrabold">{pt.destructiveScore}% Stability</span>
+                    <span className="text-secondary font-bold">{pt.constructiveScore}% Stability</span>
+                    <span className="text-red-500 font-bold">{pt.destructiveScore}% Stability</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="flex justify-between items-center pt-4 border-t border-foreground/5">
-              <span className="text-[10px] text-foreground/50 font-semibold uppercase">Twin forecaster model: Active</span>
+              <span className="text-xs text-foreground/50 font-semibold">Twin forecaster model: Active</span>
               <div className="flex gap-2">
                 <Button variant="glass" size="sm" onClick={() => setSimulationMonths(3)} className={simulationMonths === 3 ? "border-primary text-primary" : ""}>3 months</Button>
                 <Button variant="glass" size="sm" onClick={() => setSimulationMonths(6)} className={simulationMonths === 6 ? "border-primary text-primary" : ""}>6 months</Button>
@@ -134,7 +134,7 @@ export default function TimelinePage() {
 
           {/* Right panel: Timeline events list */}
           <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 space-y-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Health Evolution Logs</h3>
+            <h3 className="text-xs font-bold text-foreground">Health Evolution Logs</h3>
             
             <div className="space-y-5 pt-3 relative pl-4 border-l border-foreground/5">
               {timelineEvents.map((ev, idx) => (
@@ -144,7 +144,7 @@ export default function TimelinePage() {
                   
                   <span className="text-[9px] font-bold text-foreground/50">{ev.date}</span>
                   <h4 className="text-xs font-bold text-foreground">{ev.title}</h4>
-                  <p className="text-[10px] text-foreground/70 leading-normal font-semibold">{ev.description}</p>
+                  <p className="text-xs text-foreground/70 leading-normal font-semibold">{ev.description}</p>
                 </div>
               ))}
             </div>

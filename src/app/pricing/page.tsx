@@ -58,7 +58,7 @@ export default function PricingPage() {
         
         {/* Header Title */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Transparent Biometric Plans</h1>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Transparent Biometric Plans</h1>
           <p className="text-sm text-foreground/70 max-w-2xl mx-auto leading-relaxed">
             Choose the depth of preventative health simulation that matches your lifestyle complexity.
           </p>
@@ -75,16 +75,16 @@ export default function PricingPage() {
               }`}
             >
               {plan.highlighted && (
-                <span className="absolute -top-3 right-6 rounded-full bg-primary px-3 py-1 text-[9px] font-bold text-white uppercase tracking-wider">
+                <span className="absolute -top-3 right-6 rounded-full bg-primary px-3 py-1 text-[9px] font-bold text-white">
                   Recommended AI Mode
                 </span>
               )}
               
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">{plan.name}</h3>
+                <h3 className="text-sm font-bold text-foreground">{plan.name}</h3>
                 <div className="flex items-baseline">
-                  <span className="text-4xl font-extrabold">$</span>
-                  <span className="text-5xl font-extrabold tracking-tight">{plan.price}</span>
+                  <span className="text-4xl font-bold">$</span>
+                  <span className="text-5xl font-bold tracking-tight">{plan.price}</span>
                   <span className="text-xs text-foreground/60 font-semibold ml-1">/ month</span>
                 </div>
                 <p className="text-xs text-foreground/70 font-medium leading-relaxed">{plan.description}</p>

@@ -112,7 +112,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 scrollbar-none">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="px-2 mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+            <p className="px-2 mb-1 text-xs font-semibold text-[var(--muted)]">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -135,7 +135,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
                     <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-primary" : link.highlight ? "text-secondary" : ""}`} />
                     <span>{link.name}</span>
                     {link.highlight && !isActive && (
-                      <span className="ml-auto text-[10px] font-semibold bg-secondary/10 text-secondary px-1.5 py-0.5 rounded-full">
+                      <span className="ml-auto text-xs font-semibold bg-secondary/10 text-secondary px-1.5 py-0.5 rounded-full">
                         AI
                       </span>
                     )}
@@ -149,7 +149,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
         {/* Admin link */}
         {user?.email === "admin@vitalcore.ai" && (
           <div>
-            <p className="px-2 mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)]">Admin</p>
+            <p className="px-2 mb-1 text-xs font-semibold text-[var(--muted)]">Admin</p>
             <Link
               href="/admin"
               className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 ${

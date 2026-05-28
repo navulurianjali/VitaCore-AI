@@ -66,11 +66,11 @@ export default function AdminPage() {
         {/* Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
           <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <Shield className="h-6 w-6 text-primary animate-pulse" />
               Administrative Security Control Panel
             </h1>
-            <p className="text-xs text-foreground/70 font-semibold uppercase tracking-wider">
+            <p className="text-xs text-foreground/70 font-semibold">
               PostgreSQL audit trails, Row-Level-Security validation logs & system monitoring
             </p>
           </div>
@@ -81,7 +81,7 @@ export default function AdminPage() {
           <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 flex gap-3 items-start text-xs font-semibold text-amber-500">
             <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <p className="font-extrabold">💡 DEMO MODE: You are currently viewing the admin dashboard in Preview Mode.</p>
+              <p className="font-bold">💡 DEMO MODE: You are currently viewing the admin dashboard in Preview Mode.</p>
               <p className="text-foreground/70 font-medium">To experience this console in complete production lockdown, register and log in with the administrative email credentials: `admin@vitalcore.ai`.</p>
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function AdminPage() {
           {/* Left panel: Security Audit Logs */}
           <div className="lg:col-span-8 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Terminal className="h-4.5 w-4.5 text-primary" />
                 PostgreSQL RLS Security Audit Logs
               </h3>
@@ -102,8 +102,8 @@ export default function AdminPage() {
                 {logs.map((log, idx) => (
                   <div key={idx} className="p-3.5 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1.5 text-xs font-semibold">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-foreground/50">{log.timestamp}</span>
-                      <span className={`rounded-full px-2 py-0.2 text-[8px] font-bold uppercase border ${
+                      <span className="text-xs text-foreground/50">{log.timestamp}</span>
+                      <span className={`rounded-full px-2 py-0.2 text-[8px] font-bold border ${
                         log.status === "success" 
                           ? "bg-secondary/15 border-secondary/20 text-secondary" 
                           : log.status === "warning"
@@ -115,9 +115,9 @@ export default function AdminPage() {
                     </div>
                     <div className="flex justify-between items-center font-bold text-foreground text-xs">
                       <span>{log.event}</span>
-                      <span className="text-[10px] text-foreground/55 font-medium">IP: {log.ip}</span>
+                      <span className="text-xs text-foreground/55 font-medium">IP: {log.ip}</span>
                     </div>
-                    <p className="text-[10px] text-foreground/75 leading-relaxed font-semibold">
+                    <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
                       {log.details}
                     </p>
                   </div>
@@ -125,7 +125,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="text-[10px] text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3">
+            <div className="text-xs text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3">
               Security Compliances: HIPAA and GDPR inspired policies evaluated automatically at each session token broadcast.
             </div>
           </div>
@@ -134,8 +134,8 @@ export default function AdminPage() {
           <div className="lg:col-span-4 flex flex-col gap-6">
             
             <GlassCard glowColor="violet" className="p-5 space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Database Clusters Status</h3>
-              <ul className="space-y-3 text-[10px] text-foreground/75 font-semibold leading-normal">
+              <h3 className="text-xs font-bold text-foreground">Database Clusters Status</h3>
+              <ul className="space-y-3 text-xs text-foreground/75 font-semibold leading-normal">
                 <li className="flex justify-between">
                   <span>Active Client Connections</span>
                   <span className="text-secondary font-bold">12 (Healthy)</span>
@@ -154,7 +154,7 @@ export default function AdminPage() {
             <GlassCard glowColor="emerald" className="p-5 flex gap-3 items-start border border-foreground/5">
               <Info className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
               <div className="space-y-0.5">
-                <h4 className="text-[9px] font-bold text-secondary uppercase tracking-wider">Audit Log Compliance</h4>
+                <h4 className="text-[9px] font-bold text-secondary">Audit Log Compliance</h4>
                 <p className="text-[9px] text-foreground/75 leading-relaxed font-semibold">
                   Every CRUD transaction executing in the user profiles or biometrics timelines leaves an audited cryptographic telemetry log automatically.
                 </p>

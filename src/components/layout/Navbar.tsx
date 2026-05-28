@@ -55,7 +55,7 @@ export const Navbar: React.FC = () => {
               <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                 VitalCore
               </span>
-              <span className="hidden sm:inline-block rounded-full bg-secondary/15 px-2 py-0.5 text-[10px] font-semibold text-secondary">
+              <span className="hidden sm:inline-block rounded-full bg-secondary/15 px-2 py-0.5 text-xs font-semibold text-secondary">
                 AI Health
               </span>
             </Link>

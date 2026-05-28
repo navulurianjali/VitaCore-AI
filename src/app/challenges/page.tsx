@@ -71,11 +71,11 @@ export default function ChallengesPage() {
         {/* Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
           <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
               <CheckSquare className="h-6 w-6 text-primary animate-pulse" />
               AI Habit Breakdowns & Challenges
             </h1>
-            <p className="text-xs text-foreground/70 font-semibold uppercase tracking-wider">
+            <p className="text-xs text-foreground/70 font-semibold">
               Gamified challenges, excuse detection algorithms & cognitive habit loops
             </p>
           </div>
@@ -87,7 +87,7 @@ export default function ChallengesPage() {
           {/* Left panel: Smart Challenges list */}
           <div className="lg:col-span-7 space-y-6 flex flex-col justify-between">
             <div className="space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Award className="h-4.5 w-4.5 text-primary" />
                 Active Biometric Sprint Challenges
               </h3>
@@ -102,11 +102,11 @@ export default function ChallengesPage() {
                         </span>
                         <h4 className="text-xs font-bold text-foreground mt-1">{ch.title}</h4>
                       </div>
-                      <span className="text-[10px] font-bold text-secondary">
+                      <span className="text-xs font-bold text-secondary">
                         +{ch.xpReward} XP
                       </span>
                     </div>
-                    <p className="text-[10px] text-foreground/70 font-semibold leading-normal">{ch.description}</p>
+                    <p className="text-xs text-foreground/70 font-semibold leading-normal">{ch.description}</p>
                     <div className="space-y-1">
                       <div className="flex justify-between text-[9px] font-bold">
                         <span>Exertion sprint completion</span>
@@ -121,7 +121,7 @@ export default function ChallengesPage() {
               </div>
             </div>
 
-            <div className="text-[10px] text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3 mt-4">
+            <div className="text-xs text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3 mt-4">
               Biomedical Impact: Completing focus challenges reinforces biological stability scores by <span className="text-secondary font-bold">14.8%</span>.
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function ChallengesPage() {
           {/* Right panel: Habits list & input logger */}
           <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Habits Registry</h3>
+              <h3 className="text-xs font-bold text-foreground">Habits Registry</h3>
               
               {/* Habits list */}
               <div className="space-y-3 max-h-[300px] overflow-y-auto scrollbar-none pr-1">
@@ -137,7 +137,7 @@ export default function ChallengesPage() {
                   <div key={h.id} className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 flex justify-between items-center text-xs">
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-extrabold text-foreground">{h.name}</span>
+                        <span className="font-bold text-foreground">{h.name}</span>
                         <span className="text-[8px] bg-foreground/10 px-1.5 py-0.2 rounded font-bold text-foreground/60">{h.category}</span>
                       </div>
                       <p className="text-[9px] text-foreground/55 font-bold">Streak: {h.streak} days | Max: {h.maxStreak}</p>
@@ -168,7 +168,7 @@ export default function ChallengesPage() {
                   required
                   value={newHabit}
                   onChange={(e) => setNewHabit(e.target.value)}
-                  className="w-full text-[10px] px-3.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground placeholder-foreground/45 focus:outline-none"
+                  className="w-full text-xs px-3.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground placeholder-foreground/45 focus:outline-none"
                   placeholder="Queue new habit (e.g. read 15 min)"
                 />
                 <Button variant="primary" type="submit" className="p-2 rounded-xl shrink-0 text-xs font-bold">
@@ -182,7 +182,7 @@ export default function ChallengesPage() {
 
         {/* 3. DEDICATED AI EXCUSE ANALYSIS */}
         <div className="space-y-4 pt-4 border-t border-foreground/5">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+          <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
             <ShieldAlert className="h-4.5 w-4.5 text-amber-500 animate-bounce" />
             AI Excuse Breakdown Analysis
           </h3>
@@ -191,9 +191,9 @@ export default function ChallengesPage() {
             {habits.slice(0, 3).map((h, idx) => (
               <GlassCard key={idx} glowColor="amber" className="p-5 space-y-3 flex flex-col justify-between">
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 uppercase">Habit: {h.name}</span>
+                  <span className="text-[9px] font-bold text-foreground/50">Habit: {h.name}</span>
                   <h4 className="text-xs font-bold text-amber-500 leading-normal">excuse memory trigger:</h4>
-                  <p className="text-[10px] text-foreground/75 font-semibold italic leading-normal">
+                  <p className="text-xs text-foreground/75 font-semibold italic leading-normal">
                     "{h.excuseTrigger}"
                   </p>
                 </div>
