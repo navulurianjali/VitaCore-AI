@@ -442,11 +442,6 @@ export const getAICoachReply = (
 ): string => {
   const lowercase = message.toLowerCase();
   
-  const cloudActive = isLLMCloudActive();
-  const cloudWarning = !cloudActive
-    ? "\n\n💡 [Tip: Connect an AI API key in your settings to unlock deeper, personalized wellness guidance!]"
-    : "\n\n🌐 [AI Coach running in premium Cloud Mode]";
-
   // Constructive context injection if user filled onboarding data
   const injuryMention = onboardingData?.previous_injuries && onboardingData.previous_injuries !== "none"
     ? `Since you noted a health history of "${onboardingData.previous_injuries}", we must be extremely careful to protect those joints during active drills.`
@@ -474,5 +469,5 @@ export const getAICoachReply = (
     reply = `VitalCore AI Coach: Hello! I'm tracking your health stability parameters. Currently, your Wellness Stability is at ${baseMetrics.stabilityScore}% (Healthy). I have optimized your fluid intake targets and focus zones for the day. ${injuryMention} What part of your preventive routine would you like to refine?`;
   }
 
-  return reply + cloudWarning;
+  return reply;
 };

@@ -16,17 +16,17 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
 
   // STEP 1: Basic Info
-  const [age, setAge] = useState(28);
+  const [age, setAge] = useState<number | "">(28);
   const [gender, setGender] = useState("male");
-  const [weight, setWeight] = useState(72);
-  const [height, setHeight] = useState(178);
+  const [weight, setWeight] = useState<number | "">(72);
+  const [height, setHeight] = useState<number | "">(178);
   const [occupation, setOccupation] = useState("Software Engineer");
   const [timezone, setTimezone] = useState("UTC+5:30");
 
   // STEP 2: Fitness Info
   const [fitnessLevel, setFitnessLevel] = useState("intermediate");
   const [goal, setGoal] = useState("burnout_protection");
-  const [workoutDuration, setWorkoutDuration] = useState(30);
+  const [workoutDuration, setWorkoutDuration] = useState<number | "">(30);
   const [workoutTime, setWorkoutTime] = useState("morning");
   const [homeGym, setHomeGym] = useState("home");
 
@@ -46,26 +46,40 @@ export default function OnboardingPage() {
   const [motivation, setMotivation] = useState(80);
 
   // STEP 5: Lifestyle & Smart Sync
-  const [screenTime, setScreenTime] = useState(9);
-  const [sittingHours, setSittingHours] = useState(8);
+  const [screenTime, setScreenTime] = useState<number | "">(9);
+  const [sittingHours, setSittingHours] = useState<number | "">(8);
   const [wearableType, setWearableType] = useState("apple_health");
   const [loading, setLoading] = useState(false);
   const [chosenMode, setChosenMode] = useState<"wellness" | "performance" | "elderly">("wellness");
 
   // Math variables
-  const heightM = height / 100;
-  const bmi = Math.round((weight / (heightM * heightM)) * 10) / 10;
-  const bodyFat = Math.round(
-    (1.20 * bmi + 0.23 * age - (gender === "male" ? 16.2 : 5.4)) * 10
-  ) / 10;
+  const heightM = height ? Number(height) / 100 : 0;
+  const bmi = heightM > 0 && weight ? Math.round((Number(weight) / (heightM * heightM)) * 10) / 10 : 0;
+  const bodyFat = heightM > 0 && weight && age ? Math.round(
+    (1.20 * bmi + 0.23 * Number(age) - (gender === "male" ? 16.2 : 5.4)) * 10
+  ) / 10 : 0;
 
   const handleNext = () => {
     // When transitioning to step 6, pre-fill the recommended mode
     if (step === 5) {
       let recommended: "wellness" | "performance" | "elderly" = "wellness";
-      if (goal === "burnout_protection") recommended = "wellness";
-      if (fitnessLevel === "advanced" || goal === "stamina_optimization") recommended = "performance";
-      if (age > 65) recommended = "elderly";
+      if (
+        goal === "burnout_protection" ||
+        goal === "stress_resilience" ||
+        goal === "sleep_restoration" ||
+        goal === "posture_mobility"
+      ) {
+        recommended = "wellness";
+      }
+      if (
+        fitnessLevel === "advanced" ||
+        goal === "stamina_optimization" ||
+        goal === "muscle_hypertrophy" ||
+        goal === "weight_management"
+      ) {
+        recommended = "performance";
+      }
+      if (age && Number(age) > 65) recommended = "elderly";
       setChosenMode(recommended);
     }
     setStep((prev) => Math.min(6, prev + 1));
@@ -164,8 +178,11 @@ export default function OnboardingPage() {
                     <label className="text-xs font-bold text-foreground">Chronological Age</label>
                     <input
                       type="number"
-                      value={age}
-                      onChange={(e) => setAge(Number(e.target.value))}
+                      value={age === 0 ? "" : age}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAge(val === "" ? 0 : Number(val));
+                      }}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
                     />
                   </div>
@@ -188,8 +205,11 @@ export default function OnboardingPage() {
                     <label className="text-xs font-bold text-foreground">Chronological Weight (kg)</label>
                     <input
                       type="number"
-                      value={weight}
-                      onChange={(e) => setWeight(Number(e.target.value))}
+                      value={weight === 0 ? "" : weight}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setWeight(val === "" ? 0 : Number(val));
+                      }}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
                     />
                   </div>
@@ -198,8 +218,11 @@ export default function OnboardingPage() {
                     <label className="text-xs font-bold text-foreground">Chronological Height (cm)</label>
                     <input
                       type="number"
-                      value={height}
-                      onChange={(e) => setHeight(Number(e.target.value))}
+                      value={height === 0 ? "" : height}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setHeight(val === "" ? 0 : Number(val));
+                      }}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
                     />
                   </div>
@@ -243,8 +266,11 @@ export default function OnboardingPage() {
                     <label className="text-xs font-bold text-foreground">Screen time (hours / day)</label>
                     <input
                       type="number"
-                      value={screenTime}
-                      onChange={(e) => setScreenTime(Number(e.target.value))}
+                      value={screenTime === 0 ? "" : screenTime}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setScreenTime(val === "" ? 0 : Number(val));
+                      }}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
                     />
                   </div>
@@ -253,8 +279,11 @@ export default function OnboardingPage() {
                     <label className="text-xs font-bold text-foreground">Sedentary sitting hours</label>
                     <input
                       type="number"
-                      value={sittingHours}
-                      onChange={(e) => setSittingHours(Number(e.target.value))}
+                      value={sittingHours === 0 ? "" : sittingHours}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setSittingHours(val === "" ? 0 : Number(val));
+                      }}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
                     />
                   </div>
@@ -283,6 +312,11 @@ export default function OnboardingPage() {
                       <option value="burnout_protection">CNS Burnout Protection</option>
                       <option value="stamina_optimization">Cardiovascular Stamina</option>
                       <option value="longevity_maintenance">Biological Longevity</option>
+                      <option value="weight_management">Healthy Weight Management</option>
+                      <option value="muscle_hypertrophy">Strength & Muscle Hypertrophy</option>
+                      <option value="stress_resilience">Mind-Body Stress Resilience</option>
+                      <option value="sleep_restoration">Deep Sleep & Circadian Restoration</option>
+                      <option value="posture_mobility">Posture, Flexibility & Mobility</option>
                     </select>
                   </div>
 
@@ -304,8 +338,11 @@ export default function OnboardingPage() {
                   <label className="text-xs font-bold text-foreground">Workout Duration Preference (minutes)</label>
                   <input
                     type="number"
-                    value={workoutDuration}
-                    onChange={(e) => setWorkoutDuration(Number(e.target.value))}
+                    value={workoutDuration === 0 ? "" : workoutDuration}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setWorkoutDuration(val === "" ? 0 : Number(val));
+                    }}
                     className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
                   />
                 </div>
