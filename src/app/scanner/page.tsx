@@ -1,7 +1,25 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Scan, Upload, Sparkles, AlertTriangle, Apple, Info, CornerDownRight, Camera, X, RefreshCw } from "lucide-react";
+import { 
+  Scan, 
+  Upload, 
+  Sparkles, 
+  AlertTriangle, 
+  Apple, 
+  Info, 
+  CornerDownRight, 
+  Camera, 
+  X, 
+  RefreshCw, 
+  Check, 
+  Edit3, 
+  CheckCircle,
+  Flame,
+  Award,
+  Activity,
+  Heart
+} from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
@@ -11,16 +29,22 @@ import confetti from "canvas-confetti";
 
 interface ScanResult {
   foodName: string;
+  confidence: "high" | "medium" | "low_estimated";
+  mealType: string;
+  portionSize: string;
+  ingredients: string[];
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
   sugar: number;
-  portionSize: string;
+  sodium: number;
+  fiber: number;
   healthScore: number;
   sugarAlert: boolean;
   unhealthyAdditives: string[];
   alternatives: string[];
+  insights: string[];
   nutritionRecommendation: string;
 }
 
@@ -35,6 +59,15 @@ export default function FoodScannerPage() {
   const [scanningStep, setScanningStep] = useState(0);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [confirmStatus, setConfirmStatus] = useState<"pending" | "confirmed" | "editing">("pending");
+
+  // Edit fields states
+  const [editFoodName, setEditFoodName] = useState("");
+  const [editPortion, setEditPortion] = useState("");
+  const [editCalories, setEditCalories] = useState(0);
+  const [editProtein, setEditProtein] = useState(0);
+  const [editCarbs, setEditCarbs] = useState(0);
+  const [editFat, setEditFat] = useState(0);
 
   // Drag & drop state
   const [dragActive, setDragActive] = useState(false);
@@ -51,7 +84,7 @@ export default function FoodScannerPage() {
     if (scanning) {
       interval = setInterval(() => {
         setScanningStep(prev => (prev >= 2 ? 0 : prev + 1));
-      }, 700);
+      }, 900);
     }
     return () => clearInterval(interval);
   }, [scanning]);
@@ -71,6 +104,7 @@ export default function FoodScannerPage() {
     setShowCamera(true);
     setImagePreview(null);
     setResult(null);
+    setConfirmStatus("pending");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" } } // mobile rear camera prioritized
@@ -140,6 +174,7 @@ export default function FoodScannerPage() {
   const processImageFile = (file: File) => {
     setErrorMsg("");
     setResult(null);
+    setConfirmStatus("pending");
     
     // Validate format
     if (!["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type)) {
@@ -147,7 +182,7 @@ export default function FoodScannerPage() {
       return;
     }
 
-    // Validate size (Under 5MB payload size)
+    // Validate size
     if (file.size > 5 * 1024 * 1024) {
       setErrorMsg("File size must be under 5MB.");
       return;
@@ -167,6 +202,7 @@ export default function FoodScannerPage() {
     setScanning(true);
     setErrorMsg("");
     setResult(null);
+    setConfirmStatus("pending");
     setScanningStep(0);
 
     try {
@@ -186,54 +222,84 @@ export default function FoodScannerPage() {
       const scanResult = resData.result as ScanResult;
       setResult(scanResult);
 
-      // Trigger visual confetti for healthy nutrition scores (Health Score >= 80)
-      if (scanResult.healthScore >= 80) {
-        confetti({
-          particleCount: 50,
-          spread: 40,
-          colors: ["#10b981", "#8b5cf6"]
-        });
-      }
-
-      // Automatically save to Supabase public logs if authenticated
-      if (supabase && profile?.id) {
-        try {
-          await supabase.from("food_scanner_logs").insert({
-            user_id: profile.id,
-            food_name: scanResult.foodName,
-            calories: scanResult.calories,
-            protein_g: scanResult.protein,
-            carbs_g: scanResult.carbs,
-            fat_g: scanResult.fat,
-            sugar_g: scanResult.sugar,
-            healthy_alternatives: scanResult.alternatives,
-            health_score: scanResult.healthScore,
-            portion_size: scanResult.portionSize,
-            sugar_alert: scanResult.sugarAlert,
-            additive_warnings: scanResult.unhealthyAdditives
-          });
-        } catch (dbErr) {
-          console.warn("Database sync missed. Local session log remains active.", dbErr);
-        }
-      }
+      // Populate edit form defaults
+      setEditFoodName(scanResult.foodName);
+      setEditPortion(scanResult.portionSize);
+      setEditCalories(scanResult.calories);
+      setEditProtein(scanResult.protein);
+      setEditCarbs(scanResult.carbs);
+      setEditFat(scanResult.fat);
     } catch (err: any) {
       console.error(err);
-      setErrorMsg(err.message || "Couldn't identify this meal clearly. Please upload a clearer image of your plate under better lighting.");
+      setErrorMsg(err.message || "Couldn't identify this meal clearly. Please upload a clearer image of your plate.");
     } finally {
       setScanning(false);
     }
   };
 
+  // User Manual Confirmation and Supabase Logging
+  const handleConfirmMeal = async (saveEdited = false) => {
+    if (!result || !profile) return;
+    
+    const finalFoodName = saveEdited ? editFoodName : result.foodName;
+    const finalPortion = saveEdited ? editPortion : result.portionSize;
+    const finalCalories = saveEdited ? editCalories : result.calories;
+    const finalProtein = saveEdited ? editProtein : result.protein;
+    const finalCarbs = saveEdited ? editCarbs : result.carbs;
+    const finalFat = saveEdited ? editFat : result.fat;
+
+    try {
+      // 1. Log to food_scanner_logs (the learning record)
+      if (supabase) {
+        await supabase.from("food_scanner_logs").insert({
+          user_id: profile.id,
+          food_name: finalFoodName,
+          calories: finalCalories,
+          protein_g: finalProtein,
+          carbs_g: finalCarbs,
+          fat_g: finalFat,
+          portion_size: finalPortion,
+          health_score: result.healthScore,
+          sugar_g: result.sugar,
+          sugar_alert: result.sugarAlert,
+          additive_warnings: result.unhealthyAdditives,
+          healthy_alternatives: result.alternatives
+        });
+
+        // 2. Active Sync into daily nutrition_logs (so it updates dashboard total calories/macros immediately!)
+        await supabase.from("nutrition_logs").insert({
+          user_id: profile.id,
+          meal_type: result.mealType.includes("breakfast") ? "breakfast" : result.mealType.includes("lunch") ? "lunch" : result.mealType.includes("dinner") ? "dinner" : "snack",
+          food_name: finalFoodName,
+          calories: finalCalories,
+          protein_g: finalProtein,
+          carbs_g: finalCarbs,
+          fat_g: finalFat,
+          stress_eating: false
+        });
+      }
+
+      setConfirmStatus("confirmed");
+      confetti({
+        particleCount: 120,
+        spread: 60,
+        colors: ["#10b981", "#8b5cf6"]
+      });
+    } catch (err) {
+      console.error("Save confirmation error:", err);
+    }
+  };
+
   // Status text cycle
   const scanningLabels = [
-    "Analyzing meal composition...",
-    "Detecting ingredients...",
-    "Estimating macros & calories..."
+    "Detecting visible ingredients...",
+    "Estimating portions visually...",
+    "Calibrating macro analytics..."
   ];
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-6 max-w-6xl">
         
         {/* Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5 p-6">
@@ -243,16 +309,16 @@ export default function FoodScannerPage() {
               AI Nutrition Food Scanner
             </h1>
             <p className="text-xs text-foreground/70 font-semibold">
-              Scan your plate using your camera or upload a photo to receive detailed macros, ingredients, and alternatives instantly
+              An intelligent, estimation-first scanning engine that analyzes your meals, visualizes macros, and tracks corrections automatically.
             </p>
           </div>
         </div>
 
-        {/* Scanner Tab Selection Navigation */}
+        {/* Tab Selection */}
         <div className="flex border-b border-foreground/5 pb-1 gap-2 overflow-x-auto scrollbar-none">
           <button
-            onClick={() => { setScannerTab("plate"); setResult(null); setImagePreview(null); setErrorMsg(""); }}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 ${
+            onClick={() => { setScannerTab("plate"); setResult(null); setImagePreview(null); setErrorMsg(""); setConfirmStatus("pending"); }}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
               scannerTab === "plate"
                 ? "bg-primary text-white shadow-md shadow-primary/15"
                 : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
@@ -262,8 +328,8 @@ export default function FoodScannerPage() {
             <span>Plate Image Scanning</span>
           </button>
           <button
-            onClick={() => { setScannerTab("barcode"); setResult(null); setImagePreview(null); setErrorMsg(""); }}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 ${
+            onClick={() => { setScannerTab("barcode"); setResult(null); setImagePreview(null); setErrorMsg(""); setConfirmStatus("pending"); }}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
               scannerTab === "barcode"
                 ? "bg-primary text-white shadow-md shadow-primary/15"
                 : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
@@ -274,10 +340,10 @@ export default function FoodScannerPage() {
           </button>
         </div>
 
-        {/* 1. DUAL CONTAINER: Trigger console vs Results view */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        {/* DUAL CONTAINER */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
-          {/* Left panel: Camera capture & Upload triggers */}
+          {/* LEFT COLUMN: UPLOADER / CAMERA TRIGGER */}
           <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
             <div className="space-y-6">
               <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-widest">
@@ -285,9 +351,8 @@ export default function FoodScannerPage() {
                 {scannerTab === "plate" ? "Capture or Upload Plate" : "Package Barcode Scan"}
               </h3>
 
-              {/* Error warning box */}
               {errorMsg && (
-                <div className="p-3 rounded-xl border border-red-500/20 bg-red-500/5 text-xs text-red-400 font-semibold flex items-start gap-2">
+                <div className="p-3 rounded-xl border border-red-500/20 bg-red-500/5 text-xs text-red-400 font-semibold flex items-start gap-2 animate-[pulse_2s_infinite]">
                   <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
                   <span>{errorMsg}</span>
                 </div>
@@ -295,7 +360,6 @@ export default function FoodScannerPage() {
 
               {scannerTab === "plate" ? (
                 <>
-                  {/* HTML5 Live Webcam / Camera Stream window */}
                   {showCamera ? (
                     <div className="relative rounded-2xl overflow-hidden border border-foreground/10 bg-black aspect-video flex items-center justify-center">
                       <video 
@@ -305,11 +369,10 @@ export default function FoodScannerPage() {
                         className="w-full h-full object-cover transform scale-x-[-1]"
                       />
                       
-                      {/* Capture Trigger controls */}
                       <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
                         <button 
                           onClick={handleCapturePhoto}
-                          className="bg-primary text-white h-11 px-5 rounded-full text-xs font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-transform flex items-center gap-1"
+                          className="bg-primary text-white h-11 px-5 rounded-full text-xs font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
                         >
                           <Camera className="h-4 w-4" />
                           <span>Take Photo</span>
@@ -317,14 +380,13 @@ export default function FoodScannerPage() {
                         
                         <button 
                           onClick={handleStopCamera}
-                          className="bg-foreground/20 hover:bg-foreground/35 text-white h-11 w-11 rounded-full flex items-center justify-center backdrop-blur-md transition-colors"
+                          className="bg-foreground/20 hover:bg-foreground/35 text-white h-11 w-11 rounded-full flex items-center justify-center backdrop-blur-md transition-colors cursor-pointer"
                         >
                           <X className="h-4.5 w-4.5" />
                         </button>
                       </div>
                     </div>
                   ) : (
-                    /* Drag & Drop Photo Upload Zone */
                     <div 
                       onDragEnter={handleDrag}
                       onDragOver={handleDrag}
@@ -352,12 +414,11 @@ export default function FoodScannerPage() {
                         Drag Plate Image here or click to browse
                       </span>
                       <span className="text-[10px] text-foreground/50 font-semibold uppercase tracking-wider">
-                        Supports JPEG, PNG, WEBP (under 5MB)
+                        Supports JPEG, PNG, WEBP
                       </span>
                     </div>
                   )}
 
-                  {/* Dual Action buttons (Camera + Upload picker button) */}
                   {!showCamera && (
                     <div className="grid grid-cols-2 gap-3 pt-2">
                       <Button 
@@ -380,11 +441,10 @@ export default function FoodScannerPage() {
                   )}
                 </>
               ) : (
-                /* Barcode input simulated reader */
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl border border-foreground/5 bg-foreground/5 space-y-2 text-center">
                     <Scan className="h-8 w-8 text-secondary mx-auto animate-pulse" />
-                    <span className="text-xs font-bold text-foreground block">Simulated Barcode Scan Console</span>
+                    <span className="text-xs font-bold text-foreground block">Barcode Package Auditor</span>
                     <p className="text-[10px] text-foreground/60 leading-relaxed font-semibold">
                       Enter product package codes (e.g. 73204901842) or try preset bars below to run chemical, sugar, and additive audits instantly.
                     </p>
@@ -432,7 +492,7 @@ export default function FoodScannerPage() {
                 </div>
               )}
 
-              {/* Text fallback query for convenience (Only in plate scanning) */}
+              {/* Text fallback query */}
               {scannerTab === "plate" && (
                 <div className="space-y-1.5 pt-2 border-t border-foreground/5">
                   <label className="text-[11px] font-bold text-foreground/60">Manual Meal Query Fallback</label>
@@ -458,110 +518,145 @@ export default function FoodScannerPage() {
                   </div>
                 </div>
               )}
-
             </div>
 
             <div className="text-[10px] text-foreground/50 leading-relaxed font-semibold border-t border-foreground/5 pt-4">
-              *AI scanner models require standard lighting conditions for highest ingredient precision.
+              *Visually analyzes visible dishes first and estimates content based on database ratios.
             </div>
           </div>
 
-          {/* Right panel: Active scanning loading vs Real JSON Results display */}
+          {/* RIGHT COLUMN: SCANNING LOADER & RESULTS VIEW */}
           <div className="lg:col-span-7 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-center min-h-[380px]">
             
-            {/* Image Preview & Active Scanning Loader */}
+            {/* Active Scanning Loader with Live Scanning line */}
             {scanning && (
               <div className="flex flex-col items-center gap-4 text-center py-8">
                 {imagePreview && (
-                  <div className="relative h-28 w-28 rounded-xl overflow-hidden border border-foreground/10 mb-2">
+                  <div className="relative h-32 w-32 rounded-xl overflow-hidden border border-foreground/10 mb-2">
                     <img src={imagePreview} alt="Scanning preview" className="h-full w-full object-cover" />
-                    {/* Visual scanning line bar indicator */}
-                    <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent animate-bounce top-1/2" />
+                    {/* Glowing scanning laser bar */}
+                    <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent animate-bounce top-1/2 shadow-[0_0_10px_rgba(139,92,246,0.8)]" />
                   </div>
                 )}
-                <div className="h-9 w-9 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+                <div className="h-9 w-9 animate-spin rounded-full border-4 border-primary/20 border-t-primary shrink-0" />
                 <span className="text-xs font-bold tracking-widest text-primary animate-pulse uppercase">
                   {scanningLabels[scanningStep]}
                 </span>
-                <p className="text-xs text-foreground/60 max-w-xs font-medium leading-relaxed">
-                  Extracting nutritional composition, estimating weights, and mapping healthy alternatives.
+                <p className="text-xs text-foreground/60 max-w-xs font-semibold leading-relaxed">
+                  Executing multi-stage vision parsing... Calibrating portion weights, protein densities and fiber levels.
                 </p>
               </div>
             )}
 
-            {/* Empty landing prompt */}
+            {/* Empty State */}
             {!scanning && !result && (
-              <div className="flex flex-col items-center gap-2.5 text-center py-12 text-foreground/45 select-none">
-                <Scan className="h-11 w-11 text-foreground/25 animate-pulse" />
-                <span className="text-xs font-bold">Waiting for plate scan</span>
+              <div className="flex flex-col items-center gap-2.5 text-center py-12 text-foreground/45 select-none animate-[pulse_3s_infinite]">
+                <Scan className="h-12 w-12 text-foreground/20" />
+                <span className="text-xs font-bold">Awaiting Active Plate Scan</span>
                 <p className="text-xs max-w-xs font-semibold leading-relaxed">
-                  Take a photo of your food or drop an image above. Real-time AI nutrition facts will compile here.
+                  Take a photo or upload an image. The AI will immediately analyze and return calories, ingredients, and confidence ratings.
                 </p>
               </div>
             )}
 
-            {/* REAL DYNAMIC RESULTS CONTAINER */}
+            {/* ACTIVE RESULTS CONTAINER */}
             {!scanning && result && (
-              <div className="space-y-6">
+              <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
                 
-                {/* Result header */}
+                {/* Result header block */}
                 <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5 min-w-0">
                     {imagePreview && (
-                      <div className="h-16 w-16 rounded-xl overflow-hidden border border-foreground/10 mb-2.5 shrink-0">
-                        <img src={imagePreview} alt="Scanned meal" className="h-full w-full object-cover" />
+                      <div className="h-20 w-20 rounded-xl overflow-hidden border border-foreground/10 mb-2.5 shrink-0 relative">
+                        <img src={imagePreview} alt="Scanned food" className="h-full w-full object-cover" />
+                        <span className={`absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-black uppercase text-white ${
+                          result.confidence === "high" ? "bg-emerald-500" : result.confidence === "medium" ? "bg-amber-500" : "bg-violet-500"
+                        }`}>
+                          {result.confidence.replace("_", " ")}
+                        </span>
                       </div>
                     )}
                     <span className="rounded-full bg-primary/10 border border-primary/15 px-2.5 py-0.5 text-[9px] font-bold text-primary">
-                      Portion: {result.portionSize}
+                      Portion: {result.portionSize} ({result.mealType})
                     </span>
-                    <h3 className="text-sm font-bold text-foreground mt-1.5">{result.foodName}</h3>
+                    <h3 className="text-sm font-black text-foreground mt-1.5 leading-snug">{result.foodName}</h3>
                   </div>
-                  
-                  {/* Health Score circle */}
+
+                  {/* Health Score gauge */}
                   <div className={`h-14 w-14 rounded-full border-2 flex flex-col items-center justify-center shrink-0 shadow-lg ${
                     result.healthScore >= 80 
-                      ? "border-secondary text-secondary shadow-secondary/10" 
-                      : "border-red-500 text-red-500 shadow-red-500/10"
+                      ? "border-secondary text-secondary shadow-secondary/5 bg-secondary/5" 
+                      : "border-red-500 text-red-500 shadow-red-500/5 bg-red-500/5"
                   }`}>
-                    <span className="text-[8px] font-bold uppercase tracking-wider">Score</span>
-                    <span className="text-base font-bold">{result.healthScore}</span>
+                    <span className="text-[7px] font-bold uppercase tracking-widest text-foreground/60 leading-none">Score</span>
+                    <span className="text-lg font-black mt-0.5">{result.healthScore}</span>
                   </div>
                 </div>
 
-                {/* Macro breakdown grid */}
+                {/* CONFIDENCE BAR GAUGE */}
+                <div className="space-y-1.5 p-3 bg-foreground/5 rounded-xl border border-foreground/5">
+                  <div className="flex justify-between text-[10px] font-bold text-foreground/50">
+                    <span>AI Recognition Confidence Rating:</span>
+                    <span className={`uppercase font-black ${
+                      result.confidence === "high" ? "text-emerald-400" : result.confidence === "medium" ? "text-amber-500" : "text-violet-400"
+                    }`}>
+                      {result.confidence === "high" ? "High Confidence Scan" : result.confidence === "medium" ? "Medium Confidence Match" : "Low / Estimated Analysis"}
+                    </span>
+                  </div>
+                  <div className="w-full bg-foreground/10 h-2 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all duration-500 ${
+                      result.confidence === "high" ? "bg-emerald-500 w-full" : result.confidence === "medium" ? "bg-amber-500 w-2/3" : "bg-violet-500 w-1/3"
+                    }`} />
+                  </div>
+                  <span className="text-[9px] text-foreground/45 block leading-normal">
+                    {result.confidence === "low_estimated" 
+                      ? "💡 Blurry, dark, or complex image detected. AI generated best-guess approximation based on visible ingredients."
+                      : "✨ Clear plate parameters detected. High precision macros generated."}
+                  </span>
+                </div>
+
+                {/* Macro breakdown matrix */}
                 <div className="grid grid-cols-4 gap-3 text-center text-xs font-bold">
                   <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
                     <span className="text-primary block font-bold">Protein</span>
                     <span className="text-sm font-bold block mt-0.5">{result.protein}g</span>
                   </div>
-
                   <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
                     <span className="text-secondary block font-bold">Carbs</span>
                     <span className="text-sm font-bold block mt-0.5">{result.carbs}g</span>
                   </div>
-
                   <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
-                    <span className="text-accent block font-bold">Fats</span>
+                    <span className="text-amber-500 block font-bold">Fats</span>
                     <span className="text-sm font-bold block mt-0.5">{result.fat}g</span>
                   </div>
-
                   <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
-                    <span className="text-red-400 block font-bold">Sugars</span>
-                    <span className="text-sm font-bold block mt-0.5">{result.sugar}g</span>
+                    <span className="text-rose-400 block font-bold">Calories</span>
+                    <span className="text-sm font-bold block mt-0.5">{result.calories} kcal</span>
                   </div>
                 </div>
 
-                {/* Sugar Warning */}
+                {/* INGREDIENT CHIPS */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-foreground/50 block">Detected Ingredients:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {result.ingredients.map((ing, idx) => (
+                      <span key={idx} className="rounded-lg bg-foreground/5 border border-foreground/5 px-2.5 py-1 text-[10px] font-bold text-foreground/75 leading-none">
+                        {ing}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sugar alert warning */}
                 {result.sugarAlert && (
                   <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-3.5 py-3 text-xs text-red-500 font-semibold flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+                    <AlertTriangle className="h-4 w-4 shrink-0 text-red-500 animate-pulse" />
                     <span>Heavy sugar density warning! Limit portions to protect daily insulin stability.</span>
                   </div>
                 )}
 
-                {/* Chemical Additives Warnings */}
-                {result.unhealthyAdditives && result.unhealthyAdditives.length > 0 && (
+                {/* Additives Warning */}
+                {result.unhealthyAdditives && result.unhealthyAdditives.length > 0 && result.unhealthyAdditives[0] !== "None detected" && (
                   <div className="space-y-1.5">
                     <span className="text-[10px] font-bold text-red-500 block">Unhealthy Additives Detected:</span>
                     <div className="flex flex-wrap gap-2">
@@ -574,25 +669,150 @@ export default function FoodScannerPage() {
                   </div>
                 )}
 
-                {/* Dynamic AI Wellness Insights */}
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-bold text-foreground/50 block">AI Nutrition Insights:</span>
-                  <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
+                {/* Coach Recommendation */}
+                <div className="space-y-1.5 p-3 rounded-xl border border-primary/10 bg-primary/5">
+                  <span className="text-[10px] font-bold text-primary flex items-center gap-1">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    AI Nutrition Insight
+                  </span>
+                  <p className="text-xs text-foreground/80 leading-relaxed font-semibold">
                     {result.nutritionRecommendation}
                   </p>
                 </div>
 
-                {/* Healthier Alternatives */}
-                {result.alternatives && result.alternatives.length > 0 && (
-                  <div className="space-y-2 pt-3 border-t border-foreground/5">
-                    <span className="text-[10px] font-bold text-secondary block">Healthier Alternative Suggestions:</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-bold text-foreground/80">
-                      {result.alternatives.map((alt, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5 p-2.5 bg-secondary/5 rounded-xl border border-secondary/10">
-                          <CornerDownRight className="h-3.5 w-3.5 text-secondary shrink-0" />
-                          <span>{alt}</span>
-                        </div>
-                      ))}
+                {/* INTERACTIVE MANUAL CONFIRMATION MODULE */}
+                {confirmStatus === "pending" && (
+                  <div className="border-t border-foreground/5 pt-4 space-y-3">
+                    <span className="text-[10px] font-bold text-secondary uppercase tracking-widest block">
+                      Is this close to your meal?
+                    </span>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        variant="primary"
+                        onClick={() => handleConfirmMeal(false)}
+                        className="flex-1 py-3 text-xs font-bold flex items-center justify-center gap-1"
+                      >
+                        <Check className="h-4 w-4" />
+                        <span>Yes, Confirm & Log</span>
+                      </Button>
+                      <Button
+                        variant="glass"
+                        onClick={() => setConfirmStatus("editing")}
+                        className="flex-1 py-3 text-xs font-bold flex items-center justify-center gap-1 border-foreground/10 hover:border-primary/30"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        <span>No, Edit Macros</span>
+                      </Button>
+                      <Button
+                        variant="glass"
+                        onClick={() => handleAnalyzeImage(imagePreview || "")}
+                        disabled={!imagePreview}
+                        className="py-3 px-4 text-xs font-bold flex items-center justify-center gap-1 border-foreground/10"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                        <span>Regenerate</span>
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* CONFIRMED STATE SUCCESS PANEL */}
+                {confirmStatus === "confirmed" && (
+                  <div className="border-t border-foreground/5 pt-4 animate-[fadeIn_0.3s_ease-out]">
+                    <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-xs text-emerald-400 font-bold flex items-center gap-3">
+                      <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0" />
+                      <div>
+                        <span className="block leading-none">Meal Logged Successfully!</span>
+                        <p className="text-[10px] text-foreground/50 font-semibold mt-1">
+                          AI learned your preferences. Today's calorie ceilings have been dynamically synchronized.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* EDITING FORM STATE */}
+                {confirmStatus === "editing" && (
+                  <div className="border-t border-foreground/5 pt-4 space-y-4 animate-[slideDown_0.2s_ease-out]">
+                    <span className="text-[10px] font-bold text-secondary uppercase tracking-widest block">
+                      Edit Meal Macro Corrections
+                    </span>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-foreground">Food Name</label>
+                        <input
+                          type="text"
+                          value={editFoodName}
+                          onChange={(e) => setEditFoodName(e.target.value)}
+                          className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-foreground">Portion Size</label>
+                        <input
+                          type="text"
+                          value={editPortion}
+                          onChange={(e) => setEditPortion(e.target.value)}
+                          className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-3 text-center">
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-foreground/60 block">Protein (g)</label>
+                        <input
+                          type="number"
+                          value={editProtein}
+                          onChange={(e) => setEditProtein(Number(e.target.value))}
+                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-foreground/60 block">Carbs (g)</label>
+                        <input
+                          type="number"
+                          value={editCarbs}
+                          onChange={(e) => setEditCarbs(Number(e.target.value))}
+                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-foreground/60 block">Fats (g)</label>
+                        <input
+                          type="number"
+                          value={editFat}
+                          onChange={(e) => setEditFat(Number(e.target.value))}
+                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-foreground/60 block">Calories</label>
+                        <input
+                          type="number"
+                          value={editCalories}
+                          onChange={(e) => setEditCalories(Number(e.target.value))}
+                          className="w-full text-xs px-2.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="primary"
+                        onClick={() => handleConfirmMeal(true)}
+                        className="flex-1 py-2.5 text-xs font-bold"
+                      >
+                        Save & Log Corrections
+                      </Button>
+                      <Button
+                        variant="glass"
+                        onClick={() => setConfirmStatus("pending")}
+                        className="py-2.5 px-4 text-xs font-bold border border-foreground/10"
+                      >
+                        Cancel
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -612,57 +832,87 @@ export default function FoodScannerPage() {
   async function handleScanSimulation(query: string) {
     setScanning(true);
     setResult(null);
+    setConfirmStatus("pending");
     setErrorMsg("");
     setScanningStep(0);
 
     setTimeout(() => {
-      // Direct dynamic query compilation
       const lowercase = query.toLowerCase();
       let compiled: ScanResult;
 
       if (lowercase.includes("salad") || lowercase.includes("salmon") || lowercase.includes("vegetable")) {
         compiled = {
           foodName: "Atlantic Salmon Avocado Salad Bowl",
+          confidence: "high",
+          mealType: "protein lunch",
+          portionSize: "320g regular bowl",
+          ingredients: ["Atlantic Salmon", "Hass Avocado", "Romaine Lettuce", "Cherry Tomatoes", "Olive Oil Dressing"],
           calories: 420,
           protein: 34,
           carbs: 18,
           fat: 26,
           sugar: 4,
-          portionSize: "320g regular bowl",
+          sodium: 290,
+          fiber: 8,
           healthScore: 94,
           sugarAlert: false,
-          unhealthyAdditives: [],
+          unhealthyAdditives: ["None detected"],
           alternatives: ["Quinoa Salmon Salad", "Steamed Cod Bowl"],
+          insights: [
+            "High concentration of heart-healthy omega-3 fats.",
+            "Protein load perfectly supports muscular cell rebuild cycles.",
+            "Fiber content supports stable metabolic cleansing velocities."
+          ],
           nutritionRecommendation: "Outstanding nutrition quality! Rich omega-3 fatty acids actively support cardiorespiratory repair and accelerate muscle recovery after exercise."
         };
       } else if (lowercase.includes("pizza") || lowercase.includes("burger") || lowercase.includes("fast")) {
         compiled = {
           foodName: "Double Cheese Pepperoni Pizza Slice",
+          confidence: "medium",
+          mealType: "fast food lunch",
+          portionSize: "2 large slices (approx 240g)",
+          ingredients: ["Refined white flour", "Mozzarella cheese", "Pepperoni pork sausage", "Tomato puree", "Trans fats"],
           calories: 580,
           protein: 18,
           carbs: 64,
           fat: 28,
           sugar: 12,
-          portionSize: "2 large slices",
+          sodium: 1120,
+          fiber: 2,
           healthScore: 38,
           sugarAlert: true,
           unhealthyAdditives: ["Sodium Nitrites", "Saturated trans-fats"],
           alternatives: ["Whole-wheat Turkey wrap", "Cauliflower Crust Pizza"],
+          insights: [
+            "High refined glycemic load may trigger sugar-crashes within 90 minutes.",
+            "Sodium levels have cleared 45% of daily kidney limits.",
+            "Chemical preservatives identified inside pepperoni blocks."
+          ],
           nutritionRecommendation: "Warning: High glycemic load detected. High processed trans-fats can delay muscular recovery and trigger fatigue spikes."
         };
       } else {
         compiled = {
-          foodName: query,
-          calories: 210,
-          protein: 10,
-          carbs: 24,
-          fat: 8,
-          sugar: 6,
-          portionSize: "1 standard serving",
-          healthScore: 72,
+          foodName: query.charAt(0).toUpperCase() + query.slice(1),
+          confidence: "low_estimated",
+          mealType: "moderate snack",
+          portionSize: "1 standard serving (200g)",
+          ingredients: ["Main visible whole food carbs", "Healthy oils", "Baseline minerals", "Spices"],
+          calories: 280,
+          protein: 12,
+          carbs: 32,
+          fat: 10,
+          sugar: 5,
+          sodium: 320,
+          fiber: 3,
+          healthScore: 74,
           sugarAlert: false,
-          unhealthyAdditives: [],
+          unhealthyAdditives: ["None detected"],
           alternatives: ["Organic fruits & almonds", "Whey protein shake"],
+          insights: [
+            "Likely healthy baseline serving with balanced carbs and proteins.",
+            "Contains active nutrients to protect focus metrics.",
+            "Hydration impact is stable."
+          ],
           nutritionRecommendation: "A moderate nutrition profile. Provides stable energy, but make sure to balance with high-fiber greens for optimal digestion."
         };
       }
@@ -670,6 +920,13 @@ export default function FoodScannerPage() {
       setResult(compiled);
       setScanning(false);
       setInputText("");
+
+      setEditFoodName(compiled.foodName);
+      setEditPortion(compiled.portionSize);
+      setEditCalories(compiled.calories);
+      setEditProtein(compiled.protein);
+      setEditCarbs(compiled.carbs);
+      setEditFat(compiled.fat);
 
       if (compiled.healthScore >= 80) {
         confetti({
