@@ -7,7 +7,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { getBaseMetrics, getAICoachReply, DailyMetrics } from "@/utils/mockData";
+import { useHealthData } from "@/hooks/useHealthData";
 
 interface ChatMessage {
   id: string;
@@ -20,25 +20,23 @@ export default function AICoachPage() {
   const { profile } = useAuth();
   const { activeMode } = useTheme();
   
-  const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
+  const { metrics, loading } = useHealthData();
   const [inputVal, setInputVal] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const base = getBaseMetrics(activeMode);
-    setMetrics(base);
-    
-    // Initialize welcome message
-    setMessages([
-      {
-        id: "msg-welcome",
-        sender: "ai",
-        text: `Hi ${profile?.full_name || "friend"}! I hope you're having a wonderful day. I've had a look at your recent activity – your wellness score is looking great at ${base.stabilityScore}%, but you got slightly less sleep than usual last night. How are you feeling today? What would you like to focus on or chat about?`,
-        timestamp: new Date()
-      }
-    ]);
-  }, [activeMode, profile]);
+    if (metrics && messages.length === 0) {
+      setMessages([
+        {
+          id: "msg-welcome",
+          sender: "ai",
+          text: `Hi ${profile?.full_name || "friend"}! I hope you're having a wonderful day. I've had a look at your recent activity – your wellness score is looking great at ${metrics.stabilityScore}%, but I'm here to help you improve it further. How are you feeling today?`,
+          timestamp: new Date()
+        }
+      ]);
+    }
+  }, [metrics, profile]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });

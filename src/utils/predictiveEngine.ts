@@ -160,3 +160,83 @@ export function calculateFutureHealthPredictions(data: TelemetryData): Predictio
     aiInsights
   };
 }
+
+export interface TwinForecastPoint {
+  month: string;
+  constructiveScore: number;
+  destructiveScore: number;
+}
+
+export const getDigitalTwinForecast = (
+  baseStability: number,
+  months: number = 6
+): TwinForecastPoint[] => {
+  const points: TwinForecastPoint[] = [];
+  let currentCon = baseStability;
+  let currentDes = baseStability;
+
+  for (let i = 0; i <= months; i++) {
+    points.push({
+      month: `Month ${i}`,
+      constructiveScore: Math.round(Math.min(100, currentCon)),
+      destructiveScore: Math.round(Math.max(10, currentDes))
+    });
+    
+    currentCon += (100 - currentCon) * 0.18 + Math.random() * 2;
+    currentDes -= (currentDes * 0.12) + Math.random() * 3;
+  }
+  return points;
+};
+
+export interface EnvironmentInfo {
+  weather: string;
+  temperatureCelsius: number;
+  pollutionIndexAqi: number;
+  workloadHours: number;
+  travelStatus: boolean;
+}
+
+export const getEnvironmentAdjustedRoutine = (
+  env: EnvironmentInfo,
+  baseMetrics: any,
+  mode: string = "standard"
+) => {
+  let hydrationModifier = 0;
+  let workoutIntensity = "Medium";
+  let workoutRecommendation = "Dynamic functional aerobic training";
+  let alerts: string[] = [];
+
+  // Weather and Temp check
+  if (env.temperatureCelsius >= 32) {
+    hydrationModifier += 600;
+    workoutIntensity = mode === "elderly" ? "Very Low" : "Low";
+    workoutRecommendation = "Indoor light stretching or yoga in a cool, air-conditioned room";
+    alerts.push(`It's quite warm today (${env.temperatureCelsius}°C). Let's take it easy and drink a bit more water.`);
+  } else if (env.temperatureCelsius < 5) {
+    hydrationModifier -= 200;
+    workoutRecommendation = "Warm up indoors for about 15 minutes before any light outdoor walk or jog";
+    alerts.push(`It's freezing outside (${env.temperatureCelsius}°C). Make sure to warm up thoroughly indoors before your exercise.`);
+  }
+
+  // Air Pollution Check
+  if (env.pollutionIndexAqi > 150) {
+    workoutRecommendation = "A cozy, strength-focused indoor workout";
+    alerts.push(`Air quality is a bit poor today (AQI ${env.pollutionIndexAqi}). Let's stay indoors for our exercise.`);
+  } else if (env.pollutionIndexAqi > 100) {
+    alerts.push(`Air quality is slightly off today (AQI ${env.pollutionIndexAqi}). It's recommended to train indoors if you have sensitive lungs.`);
+  }
+
+  // Workload Check
+  if (env.workloadHours > 9) {
+    workoutIntensity = "Low";
+    workoutRecommendation = "A relaxing walk and some gentle stretching to unwind";
+    alerts.push(`You've worked a long day (${env.workloadHours} hours). Let's do a lighter workout to help you unwind and rest.`);
+  }
+
+  return {
+    hydrationTarget: baseMetrics.hydrationTarget + hydrationModifier,
+    workoutIntensity,
+    workoutRecommendation,
+    alerts
+  };
+};

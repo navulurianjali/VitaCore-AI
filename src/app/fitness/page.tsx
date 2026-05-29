@@ -12,7 +12,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { getBaseMetrics, DailyMetrics } from "@/utils/mockData";
+import { useHealthData } from "@/hooks/useHealthData";
 import { supabase } from "@/utils/supabase";
 import confetti from "canvas-confetti";
 
@@ -71,7 +71,7 @@ export default function FitnessPage() {
   const { profile } = useAuth();
   const { activeMode } = useTheme();
   
-  const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
+  const { metrics, loading, refetch } = useHealthData();
   const [activeTab, setActiveTab] = useState<"coach" | "history" | "progress" | "routines" | "recovery" | "posture_check">("coach");
   const [coachState, setCoachState] = useState<"form" | "generating" | "preview" | "active" | "summary">("form");
 
@@ -1053,39 +1053,17 @@ export default function FitnessPage() {
     };
   }, [isWebcamActive, currentExerciseIdx, coachState, postureCheckState, isFrontCamera]);
 
-  // Load metrics and local logs on mount
+  // Load routines and scan history on mount
   useEffect(() => {
-    const base = getBaseMetrics(activeMode);
-    setMetrics(base);
-
     setSavedRoutines([
       { id: "r1", name: "Everyday Core Decompression", focus: "core", duration: 15, exercisesCount: 3 },
       { id: "r2", name: "Hamstring Recovery Flow", focus: "mobility", duration: 20, exercisesCount: 3 }
     ]);
 
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("vitalcore_workout_history");
-      if (stored) {
-        setWorkoutHistory(JSON.parse(stored));
-      } else {
-        const dummyHistory = [
-          { date: "May 25, 2026", focus: "Mobility", duration: 15, calories: 75, completed: true, rating: "Light Restorative" },
-          { date: "May 20, 2026", focus: "Full Body", duration: 30, calories: 210, completed: true, rating: "Moderate Training" }
-        ];
-        setWorkoutHistory(dummyHistory);
-        localStorage.setItem("vitalcore_workout_history", JSON.stringify(dummyHistory));
-      }
-
       const storedScans = localStorage.getItem("vitalcore_posture_history");
       if (storedScans) {
         setScanScoreHistory(JSON.parse(storedScans));
-      } else {
-        const dummyScans = [
-          { date: "May 27, 2026, 09:15 AM", score: 94, cervicalLoad: 3.1, type: "Excellent Alignment Check" },
-          { date: "May 26, 2026, 08:30 AM", score: 81, cervicalLoad: 12.4, type: "Postural Strain Detected" }
-        ];
-        setScanScoreHistory(dummyScans);
-        localStorage.setItem("vitalcore_posture_history", JSON.stringify(dummyScans));
       }
     }
   }, [activeMode]);

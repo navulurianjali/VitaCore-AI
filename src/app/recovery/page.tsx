@@ -7,14 +7,33 @@ import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { getBaseMetrics, getEnvironmentAdjustedRoutine, DailyMetrics, EnvironmentInfo } from "@/utils/mockData";
+import { useHealthData } from "@/hooks/useHealthData";
+import { getEnvironmentAdjustedRoutine, EnvironmentInfo } from "@/utils/predictiveEngine";
 import { supabase } from "@/utils/supabase";
 
 export default function RecoveryPage() {
   const { profile } = useAuth();
   const { activeMode } = useTheme();
-  const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
+  const { metrics, loading } = useHealthData();
   const [recentWorkouts, setRecentWorkouts] = useState(0);
+
+  // Fetch recent workouts for workout load calculation
+  useEffect(() => {
+    async function fetchWorkouts() {
+      if (!supabase || !profile?.id) return;
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+      const { data: workoutData } = await supabase
+        .from("workouts")
+        .select("id")
+        .eq("user_id", profile.id)
+        .gte("created_at", threeDaysAgo.toISOString());
+      if (workoutData) {
+        setRecentWorkouts(workoutData.length);
+      }
+    }
+    fetchWorkouts();
+  }, [profile]);
   
   // Lifestyle atmospheric factors
   const [temp, setTemp] = useState(34); // High heat to trigger adaptive override
@@ -42,71 +61,7 @@ export default function RecoveryPage() {
     return () => clearInterval(interval);
   }, [breathingActive, selectedSession]);
 
-  const fetchRecoveryMetrics = async () => {
-    if (!supabase || !profile) return;
-    try {
-      const todayStr = new Date().toISOString().split("T")[0];
-
-      // 1. Fetch Hydration
-      const { data: waterData } = await supabase
-        .from("hydration_logs")
-        .select("amount_ml")
-        .eq("user_id", profile.id)
-        .gte("created_at", `${todayStr}T00:00:00Z`);
-      let water = 0;
-      if (waterData) {
-        water = waterData.reduce((sum, log: { amount_ml: number }) => sum + Number(log.amount_ml), 0);
-      }
-
-      // 2. Fetch Sleep
-      const { data: sleepData } = await supabase
-        .from("sleep_logs")
-        .select("sleep_hours, recovery_quality")
-        .eq("user_id", profile.id)
-        .order("created_at", { ascending: false })
-        .limit(1);
-      let sleep = 0;
-      let recovery = 0;
-      if (sleepData && sleepData.length > 0) {
-        sleep = Number(sleepData[0].sleep_hours);
-        recovery = Number(sleepData[0].recovery_quality || 0);
-      }
-
-      // 3. Fetch recent workouts (last 3 days) to estimate muscle soreness
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-      const { data: workoutData } = await supabase
-        .from("workouts")
-        .select("id")
-        .eq("user_id", profile.id)
-        .gte("created_at", threeDaysAgo.toISOString());
-      if (workoutData) {
-        setRecentWorkouts(workoutData.length);
-      }
-
-      const base = getBaseMetrics(activeMode);
-      setMetrics({
-        ...base,
-        hydrationMl: water,
-        sleepHours: sleep,
-        recoveryPercentage: recovery > 0 ? recovery : base.recoveryPercentage
-      });
-    } catch (e) {
-      console.error("Recovery supabase fetch error:", e);
-    }
-  };
-
-  // profile is declared at top of component via useAuth()
-
-  useEffect(() => {
-    if (profile?.id) {
-      fetchRecoveryMetrics();
-    } else {
-      setMetrics(getBaseMetrics(activeMode));
-    }
-  }, [activeMode, profile]);
-
-  if (!metrics) return null;
+  if (loading || !metrics) return <div className="p-8 text-center text-[var(--muted)]">Loading recovery telemetry...</div>;
 
   const envInfo: EnvironmentInfo = {
     weather: "Sunny / Heatwave",

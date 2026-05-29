@@ -7,24 +7,23 @@ import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { getBaseMetrics, getDigitalTwinForecast, DailyMetrics, TwinForecastPoint } from "@/utils/mockData";
-
+import { useHealthData } from "@/hooks/useHealthData";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { calculateFutureHealthPredictions } from "@/utils/predictiveEngine";
+import { calculateFutureHealthPredictions, getDigitalTwinForecast, TwinForecastPoint } from "@/utils/predictiveEngine";
 
 export default function TimelinePage() {
   const { activeMode } = useTheme();
-  const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
+  const { metrics, loading } = useHealthData();
   const [simulationMonths, setSimulationMonths] = useState(6);
   const [twinPoints, setTwinPoints] = useState<TwinForecastPoint[]>([]);
 
   useEffect(() => {
-    const base = getBaseMetrics(activeMode);
-    setMetrics(base);
-    setTwinPoints(getDigitalTwinForecast(base.stabilityScore, simulationMonths));
-  }, [activeMode, simulationMonths]);
+    if (metrics) {
+      setTwinPoints(getDigitalTwinForecast(metrics.stabilityScore, simulationMonths));
+    }
+  }, [metrics, simulationMonths]);
 
-  if (!metrics) return null;
+  if (loading || !metrics) return <div className="p-8 text-center">Loading Future Health Forecast...</div>;
 
   const predictions = calculateFutureHealthPredictions({
     sleepHours: metrics.sleepHours,
