@@ -185,7 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (profileError) {
           console.error("Error creating user profile:", profileError);
         } else {
-          setProfile(newProfile);
+          setProfile({ ...newProfile, email } as unknown as UserProfile);
         }
       }
       
