@@ -138,7 +138,32 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [breathingActive]);
 
-  if (!metrics) return null;
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-[var(--muted)] font-medium text-sm animate-pulse">Syncing your telemetry...</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!metrics) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+          <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+            <Activity className="h-8 w-8 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold">No Data Available</h2>
+          <p className="text-[var(--muted)] text-sm max-w-md text-center">
+            We couldn't load your health metrics. Please log in or try refreshing the page.
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const handleToggleMed = (idx: number) => {
     setMeds(prev => prev.map((m, i) => i === idx ? { ...m, taken: !m.taken } : m));

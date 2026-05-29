@@ -23,7 +23,21 @@ export default function TimelinePage() {
     }
   }, [metrics, simulationMonths]);
 
-  if (loading || !metrics) return <div className="p-8 text-center">Loading Future Health Forecast...</div>;
+  if (loading || !metrics) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+          <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+            <Milestone className="h-8 w-8 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold">Initializing Timeline</h2>
+          <p className="text-[var(--muted)] text-sm max-w-md text-center animate-pulse">
+            Loading your Future Health Forecast...
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const predictions = calculateFutureHealthPredictions({
     sleepHours: metrics.sleepHours,

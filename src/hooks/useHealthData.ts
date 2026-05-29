@@ -136,6 +136,34 @@ export function useHealthData() {
     } catch (err: any) {
       console.error("Error fetching health data:", err);
       setError("Failed to load your health telemetry.");
+      
+      // Fallback zero-state metrics if database tables are missing
+      setMetrics({
+        caloriesBurned: 0,
+        caloriesTarget: 600,
+        caloriesConsumed: 0,
+        hydrationMl: 0,
+        hydrationTarget: 2500,
+        steps: 0,
+        stepsTarget: 10000,
+        sleepHours: 0,
+        sleepTarget: 8.0,
+        sleepQuality: 50,
+        stressLevel: 50,
+        mood: "neutral",
+        recoveryPercentage: 50,
+        fatigueScore: 50,
+        physicalFatigue: 50,
+        mentalFatigue: 50,
+        energyLevel: 50,
+        biologicalAge: profile.biological_age || 30,
+        stabilityScore: profile.stability_score || 80,
+        metabolicEfficiency: 80, 
+        lifestyleSustainability: 80,
+        glycemicIndexLoad: "medium",
+        sedentaryPostureRisk: "low",
+        micronutrientDeficiencies: []
+      });
     } finally {
       setLoading(false);
     }
