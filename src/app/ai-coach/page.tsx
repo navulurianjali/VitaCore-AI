@@ -84,14 +84,15 @@ export default function AICoachPage() {
       });
 
       if (!response.ok) {
-        throw new Error("AI Coach API Error");
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "AI Coach API Error");
       }
 
       const resData = await response.json();
       fullResponse = resData.reply || resData.error;
-    } catch (err) {
+    } catch (err: any) {
       console.error("AI Coach API failed:", err);
-      fullResponse = "I'm having trouble connecting to my neural core right now. Please check your network or API keys and try again.";
+      fullResponse = err.message || "I'm having trouble connecting to my neural core right now.";
     }
 
     // Stream word-by-word

@@ -543,6 +543,40 @@ export default function SleepPage() {
           </>
         )}
 
+        {/* History Table */}
+        {!loadingLogs && logs.length > 0 && (
+          <div className="glass-panel p-4 space-y-4">
+            <h3 className="font-semibold text-sm text-[var(--foreground)] flex items-center gap-1.5">
+              <Calendar className="h-4 w-4 text-primary" />
+              Sleep History
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-white/5 text-xs text-[var(--muted)]">
+                    <th className="pb-2 font-medium">Date</th>
+                    <th className="pb-2 font-medium">Duration</th>
+                    <th className="pb-2 font-medium">Quality</th>
+                    <th className="pb-2 font-medium">Recovery</th>
+                    <th className="pb-2 font-medium text-right">Energy</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm divide-y divide-white/5">
+                  {logs.map((log, i) => (
+                    <tr key={i} className="hover:bg-white/5 transition-colors">
+                      <td className="py-3 text-[var(--foreground)]">{log.date}</td>
+                      <td className="py-3 font-semibold text-primary">{log.duration}h</td>
+                      <td className="py-3">{log.quality}/10</td>
+                      <td className="py-3">{log.muscleRepair}%</td>
+                      <td className="py-3 text-right text-emerald-500 font-medium">{log.energy}/10</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* 2. Redesigned Sleep Logger Form Modal Overlay */}
         {showLogForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">

@@ -1250,17 +1250,29 @@ export default function FitnessPage() {
   };
 
   const handleMarkComplete = () => {
-    const updated = [...completedExercises];
-    updated[currentExerciseIdx] = true;
-    setCompletedExercises(updated);
-
-    const nextIdx = currentExerciseIdx + 1;
-    if (nextIdx < generatedWorkout.length) {
-      setIsResting(true);
-      setTimeLeft(generatedWorkout[currentExerciseIdx].restSeconds);
-      setTimerRunning(true);
+    if (isResting) {
+      setIsResting(false);
+      const nextIdx = currentExerciseIdx + 1;
+      if (nextIdx < generatedWorkout.length) {
+        setCurrentExerciseIdx(nextIdx);
+        setTimeLeft(generatedWorkout[nextIdx].durationSeconds);
+        setTimerRunning(true);
+      } else {
+        finishWorkoutSession();
+      }
     } else {
-      finishWorkoutSession();
+      const updated = [...completedExercises];
+      updated[currentExerciseIdx] = true;
+      setCompletedExercises(updated);
+
+      const nextIdx = currentExerciseIdx + 1;
+      if (nextIdx < generatedWorkout.length) {
+        setIsResting(true);
+        setTimeLeft(generatedWorkout[currentExerciseIdx].restSeconds);
+        setTimerRunning(true);
+      } else {
+        finishWorkoutSession();
+      }
     }
   };
 

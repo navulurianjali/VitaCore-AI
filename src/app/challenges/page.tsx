@@ -30,6 +30,13 @@ export default function HealthyHabitsPage() {
   const [joinedGroups, setJoinedGroups] = useState<string[]>([]);
 
   useEffect(() => {
+    const savedGroups = localStorage.getItem("vitalcore_joined_groups");
+    if (savedGroups) {
+      setJoinedGroups(JSON.parse(savedGroups));
+    }
+  }, []);
+
+  useEffect(() => {
     fetchChallenges();
   }, [profile]);
 
@@ -305,7 +312,9 @@ export default function HealthyHabitsPage() {
                   className={`text-xs font-bold ${joinedGroups.includes(g.name) ? "opacity-50" : ""}`}
                   onClick={() => {
                     if (!joinedGroups.includes(g.name)) {
-                      setJoinedGroups(prev => [...prev, g.name]);
+                      const newGroups = [...joinedGroups, g.name];
+                      setJoinedGroups(newGroups);
+                      localStorage.setItem("vitalcore_joined_groups", JSON.stringify(newGroups));
                     }
                   }}
                 >
@@ -313,6 +322,27 @@ export default function HealthyHabitsPage() {
                 </Button>
               </GlassCard>
             ))}
+            
+            {joinedGroups.length > 0 && (
+              <div className="mt-6 space-y-3 pt-4 border-t border-foreground/10">
+                <h3 className="text-sm font-bold text-foreground">My Active Group Progress</h3>
+                {joinedGroups.map((gName, idx) => (
+                  <GlassCard key={idx} className="p-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-bold text-primary">{gName}</span>
+                      <span className="text-[10px] font-bold text-foreground/50">Level {Math.floor(Math.random() * 5) + 1}</span>
+                    </div>
+                    <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden">
+                      <div 
+                        className="bg-primary h-full rounded-full"
+                        style={{ width: `${Math.floor(Math.random() * 60) + 20}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-[9px] text-foreground/40 mt-1.5 text-right font-medium">Keep it up! 🏃</p>
+                  </GlassCard>
+                ))}
+              </div>
+            )}
             
             <Button variant="glass" className="w-full mt-2 border-dashed border-2 py-4 text-sm font-bold text-foreground/60 hover:text-foreground">
               <Share2 className="h-4 w-4 mr-2 inline" />
