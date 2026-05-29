@@ -263,6 +263,7 @@ export default function SmartAINutritionPlansPage() {
           fat_g: Number(d.fat_g || 0),
           created_at: d.created_at
         }));
+        }
       }
 
       // Add local storage fallback
