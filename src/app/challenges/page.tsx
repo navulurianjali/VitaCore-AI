@@ -28,6 +28,38 @@ export default function HealthyHabitsPage() {
   
   // Dummy state for groups
   const [joinedGroups, setJoinedGroups] = useState<string[]>([]);
+  const [selectedChallenge, setSelectedChallenge] = useState<any>(null);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+
+  const AVAILABLE_GROUPS = [
+    { 
+      id: "g1", 
+      name: "Office Fitness Group", 
+      members: "24 members", 
+      icon: "🏢",
+      description: "A group for staying active during work hours. We share quick desk stretches and remind each other to stay hydrated.",
+      timings: "Daily, 10:00 AM & 3:00 PM",
+      whatToDo: ["Drink 1 glass of water", "Do 5 desk squats", "Rest eyes from screen for 2 mins"]
+    },
+    { 
+      id: "g2", 
+      name: "Healthy Eating Club", 
+      members: "128 members", 
+      icon: "🥗",
+      description: "Share healthy recipes, meal prep tips, and keep each other accountable for avoiding processed sugars.",
+      timings: "Weekly Recipe Share on Sundays",
+      whatToDo: ["Share a healthy lunch photo", "Log your daily meals", "Try one new vegetable this week"]
+    },
+    { 
+      id: "g3", 
+      name: "Evening Walk Team", 
+      members: "52 members", 
+      icon: "🚶",
+      description: "Wind down the day with a relaxing evening walk. Great for digestion and better sleep.",
+      timings: "Daily at 7:00 PM",
+      whatToDo: ["Walk for at least 20 mins", "Share your step count", "Listen to a wellness podcast"]
+    },
+  ];
 
   useEffect(() => {
     const savedGroups = localStorage.getItem("vitalcore_joined_groups");
@@ -144,6 +176,33 @@ export default function HealthyHabitsPage() {
     }
   };
 
+  const handleCompleteChallenge = async (userChallenge: any) => {
+    // Optimistic UI update
+    const updatedUc = userChallenges.map(uc => {
+      if (uc.challenge_id === userChallenge.challenge_id) {
+        return { ...uc, progress_percentage: 100, completed: true };
+      }
+      return uc;
+    });
+    setUserChallenges(updatedUc);
+    setSelectedChallenge(null);
+
+    // Persist
+    if (profile?.id && supabase) {
+      try {
+        await supabase
+          .from("user_challenges")
+          .update({ progress_percentage: 100, completed: true })
+          .eq("user_id", profile.id)
+          .eq("challenge_id", userChallenge.challenge_id);
+      } catch (err) {
+        console.error("Error completing challenge", err);
+      }
+    } else {
+      localStorage.setItem("vitalcore_user_challenges", JSON.stringify(updatedUc));
+    }
+  };
+
   // Helper to check if joined
   const hasJoined = (id: string) => {
     return userChallenges.some((uc: any) => uc.challenge_id === id);
@@ -232,7 +291,7 @@ export default function HealthyHabitsPage() {
                       <span className="text-xs font-bold text-foreground/50">{uc.progress_percentage || 5}%</span>
                     </div>
                   </div>
-                  <Button variant="glass" size="sm" className="text-xs font-bold px-4">
+                  <Button onClick={() => setSelectedChallenge(uc)} variant="glass" size="sm" className="text-xs font-bold px-4">
                     View Details
                   </Button>
                 </GlassCard>
@@ -300,11 +359,7 @@ export default function HealthyHabitsPage() {
           </h2>
           
           <div className="space-y-3">
-            {[
-              { name: "Office Fitness Group", members: "24 members", icon: "🏢" },
-              { name: "Healthy Eating Club", members: "128 members", icon: "🥗" },
-              { name: "Evening Walk Team", members: "52 members", icon: "🚶" },
-            ].map((g, i) => (
+            {AVAILABLE_GROUPS.map((g, i) => (
               <GlassCard key={i} className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center text-lg">
@@ -335,8 +390,11 @@ export default function HealthyHabitsPage() {
             {joinedGroups.length > 0 && (
               <div className="mt-6 space-y-3 pt-4 border-t border-foreground/10">
                 <h3 className="text-sm font-bold text-foreground">My Active Group Progress</h3>
-                {joinedGroups.map((gName, idx) => (
-                  <GlassCard key={idx} className="p-3">
+                {joinedGroups.map((gName, idx) => {
+                  const group = AVAILABLE_GROUPS.find(g => g.name === gName);
+                  if (!group) return null;
+                  return (
+                  <GlassCard key={idx} className="p-3 cursor-pointer hover:bg-foreground/5 transition-colors" onClick={() => setSelectedGroup(group)}>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs font-bold text-primary">{gName}</span>
                       <span className="text-[10px] font-bold text-foreground/50">Level {Math.floor(Math.random() * 5) + 1}</span>
@@ -349,7 +407,7 @@ export default function HealthyHabitsPage() {
                     </div>
                     <p className="text-[9px] text-foreground/40 mt-1.5 text-right font-medium">Keep it up! 🏃</p>
                   </GlassCard>
-                ))}
+                )})}
               </div>
             )}
             
@@ -418,6 +476,97 @@ export default function HealthyHabitsPage() {
               <Button onClick={handleCreateChallenge} variant="primary" className="flex-1 font-bold">
                 {loading ? "Publishing..." : "Publish Challenge"}
               </Button>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* Challenge Details Modal */}
+      {selectedChallenge && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <GlassCard className="w-full max-w-md p-6 space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-bold">{selectedChallenge.challenge?.title || "Custom Challenge"}</h3>
+                <p className="text-sm text-foreground/60 mt-1">{selectedChallenge.challenge?.category || "Community"}</p>
+              </div>
+              <button onClick={() => setSelectedChallenge(null)} className="text-foreground/50 hover:text-foreground">✕</button>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-sm font-medium leading-relaxed bg-foreground/5 p-4 rounded-xl">
+                {selectedChallenge.challenge?.description || "Complete this challenge to earn points and improve your health."}
+              </p>
+              
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="p-3 rounded-xl bg-foreground/5">
+                  <span className="block text-xs text-foreground/50 font-bold mb-1">Duration</span>
+                  <span className="font-bold">{selectedChallenge.challenge?.duration_days || 7} Days</span>
+                </div>
+                <div className="p-3 rounded-xl bg-foreground/5">
+                  <span className="block text-xs text-foreground/50 font-bold mb-1">Current Progress</span>
+                  <span className="font-bold text-orange-500">{selectedChallenge.progress_percentage || 0}%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="pt-2 flex gap-3">
+              <Button onClick={() => setSelectedChallenge(null)} variant="glass" className="flex-1 font-bold">Close</Button>
+              <Button 
+                onClick={() => handleCompleteChallenge(selectedChallenge)} 
+                variant="primary" 
+                className={`flex-1 font-bold border-0 ${selectedChallenge.progress_percentage === 100 ? "bg-emerald-500 hover:bg-emerald-600" : "bg-orange-500 hover:bg-orange-600"} text-white`}
+                disabled={selectedChallenge.progress_percentage === 100}
+              >
+                {selectedChallenge.progress_percentage === 100 ? "Completed ✓" : "Mark as Complete"}
+              </Button>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* Group Details Modal */}
+      {selectedGroup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <GlassCard className="w-full max-w-md p-6 space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center text-2xl">
+                  {selectedGroup.icon}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">{selectedGroup.name}</h3>
+                  <p className="text-sm text-foreground/60 mt-0.5">{selectedGroup.members}</p>
+                </div>
+              </div>
+              <button onClick={() => setSelectedGroup(null)} className="text-foreground/50 hover:text-foreground">✕</button>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-sm font-medium leading-relaxed text-foreground/80">
+                {selectedGroup.description}
+              </p>
+              
+              <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-2">
+                <Activity className="h-4 w-4 text-primary" />
+                <span className="text-sm font-bold text-primary">{selectedGroup.timings}</span>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold text-foreground/50 mb-2 uppercase tracking-wider">What to do</h4>
+                <ul className="space-y-2">
+                  {selectedGroup.whatToDo.map((task: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2 text-sm font-medium bg-foreground/5 p-2.5 rounded-lg">
+                      <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                      {task}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            
+            <div className="pt-2">
+              <Button onClick={() => setSelectedGroup(null)} variant="primary" className="w-full font-bold">Awesome, got it!</Button>
             </div>
           </GlassCard>
         </div>
