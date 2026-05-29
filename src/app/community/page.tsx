@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Users, Sparkles, Smile, ShieldCheck, HeartPulse, Send, Award } from "lucide-react";
+import { Users, Sparkles, Smile, ShieldCheck, HeartPulse, Send, Award, ThumbsUp } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
+import { useAuth } from "@/context/AuthContext";
 
 interface CircleMember {
   id: string;
@@ -17,9 +18,12 @@ interface CircleMember {
 }
 
 export default function CommunityPage() {
+  const { profile } = useAuth();
   const [members, setMembers] = useState<CircleMember[]>([]);
   const [invitedEmail, setInvitedEmail] = useState("");
   const [inviteSent, setInviteSent] = useState(false);
+  const [statusUpdate, setStatusUpdate] = useState("");
+  const [cheeredMembers, setCheeredMembers] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     // Generate initial simulated circle members
@@ -66,6 +70,28 @@ export default function CommunityPage() {
     }, 4000);
   };
 
+  const handlePostUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!statusUpdate.trim()) return;
+
+    const newMember: CircleMember = {
+      id: "member-self-" + Date.now(),
+      name: profile?.email ? profile.email.split('@')[0] : "You",
+      avatar: profile?.email ? profile.email[0].toUpperCase() : "Y",
+      streak: 5,
+      stabilityScore: 90,
+      lastActive: "Just now",
+      status: statusUpdate,
+    };
+
+    setMembers([newMember, ...members]);
+    setStatusUpdate("");
+  };
+
+  const handleCheer = (id: string) => {
+    setCheeredMembers(prev => ({ ...prev, [id]: true }));
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -88,10 +114,28 @@ export default function CommunityPage() {
           
           {/* Left panel: Member list & active status updates */}
           <div className="lg:col-span-8 space-y-4">
-            <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-              <HeartPulse className="h-4.5 w-4.5 text-primary" />
-              Circle Activity Feed
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <HeartPulse className="h-4.5 w-4.5 text-primary" />
+                Circle Activity Feed
+              </h3>
+            </div>
+
+            <div className="bg-foreground/5 border border-foreground/10 rounded-2xl p-4 mb-6">
+              <form onSubmit={handlePostUpdate} className="flex gap-3">
+                <input
+                  type="text"
+                  value={statusUpdate}
+                  onChange={(e) => setStatusUpdate(e.target.value)}
+                  placeholder="Share how you're feeling today..."
+                  className="flex-1 bg-background/50 border border-foreground/10 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-primary/50 text-foreground"
+                />
+                <Button variant="primary" type="submit" className="py-2.5 px-4 flex items-center gap-2 text-xs">
+                  <Send className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Post</span>
+                </Button>
+              </form>
+            </div>
 
             <div className="space-y-4">
               {members.map((m) => (
@@ -112,16 +156,25 @@ export default function CommunityPage() {
                   </div>
 
                   <div className="flex gap-4 items-center shrink-0 text-xs font-bold text-foreground/80 mt-3 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-foreground/5 w-full sm:w-auto justify-between sm:justify-start">
-                    <div>
-                      <span className="text-[9px] text-foreground/50 block font-semibold">Streak</span>
-                      <span className="text-secondary font-bold">{m.streak} days</span>
+                    <div className="flex gap-4">
+                      <div>
+                        <span className="text-[9px] text-foreground/50 block font-semibold">Streak</span>
+                        <span className="text-secondary font-bold">{m.streak} days</span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-foreground/50 block font-semibold">Habit Score</span>
+                        <span className={`font-bold ${m.stabilityScore < 60 ? "text-red-500" : "text-secondary"}`}>
+                          {m.stabilityScore}%
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[9px] text-foreground/50 block font-semibold">Habit Score</span>
-                      <span className={`font-bold ${m.stabilityScore < 60 ? "text-red-500" : "text-secondary"}`}>
-                        {m.stabilityScore}%
-                      </span>
-                    </div>
+                    <button 
+                      onClick={() => handleCheer(m.id)}
+                      className={`ml-2 p-2 rounded-xl border transition-all flex items-center justify-center shrink-0 ${cheeredMembers[m.id] ? "bg-primary/20 border-primary/30 text-primary scale-110" : "bg-foreground/5 border-foreground/10 text-foreground/50 hover:text-primary hover:bg-primary/10 hover:border-primary/30"}`}
+                      title="Cheer"
+                    >
+                      <ThumbsUp className="h-4 w-4" />
+                    </button>
                   </div>
                 </GlassCard>
               ))}

@@ -110,7 +110,7 @@ export default function TimelinePage() {
         </div>
 
         {/* 1. STABILITY & BIOLOGICAL TWIN AGE SHIFT */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           
           {/* Consistency Score Card */}
           <GlassCard glowColor="violet" className="p-5 flex justify-between items-center min-h-[130px]">
@@ -123,22 +123,6 @@ export default function TimelinePage() {
             </div>
             <div className="h-12 w-12 rounded-2xl bg-primary/15 text-primary flex items-center justify-center font-bold text-lg shrink-0">
               📈
-            </div>
-          </GlassCard>
-
-          {/* Health Age Card */}
-          <GlassCard glowColor="emerald" className="p-5 flex justify-between items-center min-h-[130px]">
-            <div className="space-y-2 pr-4">
-              <span className="text-xs font-bold text-foreground/60">Your Body's Age</span>
-              <h2 className="text-3xl font-black text-secondary">
-                {metrics.biologicalAge + predictions.biologicalAgeShift} years
-              </h2>
-              <p className="text-xs text-foreground/60 leading-relaxed font-semibold">
-                Amazing! Your good habits are helping you feel and stay younger than your calendar age.
-              </p>
-            </div>
-            <div className="h-12 w-12 rounded-2xl bg-secondary/15 text-secondary flex items-center justify-center font-bold text-lg shrink-0">
-              🌱
             </div>
           </GlassCard>
 

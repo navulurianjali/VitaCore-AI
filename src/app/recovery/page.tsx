@@ -44,21 +44,63 @@ export default function RecoveryPage() {
   const [breathingActive, setBreathingActive] = useState(false);
   const [breathPhase, setBreathPhase] = useState("Ready");
   const [selectedSession, setSelectedSession] = useState<"box" | "sleep" | "cns">("box");
+  const [phaseSize, setPhaseSize] = useState<"large" | "small" | "ready">("ready");
+  const [phaseDuration, setPhaseDuration] = useState(0);
 
-  // Box breathing timer
+  // Breathing timer
   useEffect(() => {
-    if (!breathingActive) return;
-    let count = 0;
-    const interval = setInterval(() => {
-      count = (count + 1) % 4;
-      const phases = selectedSession === "box"
-        ? ["Inhale (4s)", "Hold (4s)", "Exhale (4s)", "Hold (4s)"]
-        : selectedSession === "sleep"
-        ? ["Inhale (4s)", "Hold (7s)", "Exhale (8s)", "Rest (2s)"]
-        : ["Inhale (5s)", "Hold (2s)", "Exhale (5s)", "Rest (2s)"];
-      setBreathPhase(phases[count]);
-    }, selectedSession === "box" ? 4000 : selectedSession === "sleep" ? 5250 : 3500);
-    return () => clearInterval(interval);
+    if (!breathingActive) {
+      setPhaseSize("ready");
+      return;
+    }
+    
+    let isCancelled = false;
+    let timeout: NodeJS.Timeout;
+
+    const runPhase = (phaseIndex: number) => {
+      if (isCancelled) return;
+      
+      const sessionConfig = {
+        box: [
+          { text: "Inhale (4s)", duration: 4000, size: "large" },
+          { text: "Hold (4s)", duration: 4000, size: "large" },
+          { text: "Exhale (4s)", duration: 4000, size: "small" },
+          { text: "Hold (4s)", duration: 4000, size: "small" },
+        ],
+        sleep: [
+          { text: "Inhale (4s)", duration: 4000, size: "large" },
+          { text: "Hold (7s)", duration: 7000, size: "large" },
+          { text: "Exhale (8s)", duration: 8000, size: "small" },
+          { text: "Rest (2s)", duration: 2000, size: "small" },
+        ],
+        cns: [
+          { text: "Inhale (5s)", duration: 5000, size: "large" },
+          { text: "Hold (2s)", duration: 2000, size: "large" },
+          { text: "Exhale (5s)", duration: 5000, size: "small" },
+          { text: "Rest (2s)", duration: 2000, size: "small" },
+        ],
+      } as const;
+      
+      const phases = sessionConfig[selectedSession];
+      const currentPhase = phases[phaseIndex];
+      
+      setBreathPhase(currentPhase.text);
+      setPhaseSize(currentPhase.size as "large" | "small");
+      setPhaseDuration(currentPhase.duration);
+      
+      timeout = setTimeout(() => {
+        if (!isCancelled) {
+          runPhase((phaseIndex + 1) % phases.length);
+        }
+      }, currentPhase.duration);
+    };
+
+    runPhase(0);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeout);
+    };
   }, [breathingActive, selectedSession]);
 
   if (loading || !metrics) {
@@ -378,11 +420,15 @@ export default function RecoveryPage() {
               <span className="text-[9px] font-bold text-foreground/45 uppercase tracking-wider block">Breath Synchronization Sphere</span>
               
               {/* Expanding/Contracting Breathing Indicator */}
-              <div className="relative flex items-center justify-center h-28 w-28 rounded-full border-4 border-secondary/20 bg-secondary/5 shadow-inner shrink-0">
+              <div className="relative flex items-center justify-center h-28 w-28 rounded-full border-4 border-secondary/20 bg-secondary/5 shadow-inner shrink-0 overflow-hidden">
                 <div
-                  className={`absolute rounded-full bg-secondary/15 transition-all duration-[4000ms] ${
-                    breathingActive ? "h-24 w-24 opacity-100 animate-pulse" : "h-12 w-12 opacity-60"
-                  }`}
+                  className={`absolute rounded-full bg-secondary/15 transition-all ease-in-out`}
+                  style={{
+                    height: phaseSize === "large" ? "100%" : phaseSize === "small" ? "35%" : "50%",
+                    width: phaseSize === "large" ? "100%" : phaseSize === "small" ? "35%" : "50%",
+                    transitionDuration: breathingActive ? `${phaseDuration}ms` : '1000ms',
+                    opacity: breathingActive ? 1 : 0.6,
+                  }}
                 />
                 <span className="relative z-10 text-xs font-black text-secondary text-center leading-tight">
                   {breathingActive ? breathPhase : "Ready"}
