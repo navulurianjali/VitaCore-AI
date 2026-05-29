@@ -135,7 +135,16 @@ export const Navbar: React.FC = () => {
             </button>
 
             {/* User Session Info Buttons */}
-            {user ? (
+            {(!user || pathname === "/" || pathname === "/auth/onboarding") ? (
+              <div className="flex items-center gap-2">
+                <Link href="/auth/login">
+                  <Button variant="glass" size="sm">Log In</Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button variant="primary" size="sm">Get Started</Button>
+                </Link>
+              </div>
+            ) : (
               <div className="flex items-center gap-2">
                 <Link href="/dashboard">
                   <Button variant="glass" size="sm" className="flex items-center gap-1">
@@ -150,15 +159,6 @@ export const Navbar: React.FC = () => {
                 >
                   <LogOut className="h-4.5 w-4.5" />
                 </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link href="/auth/login">
-                  <Button variant="glass" size="sm">Log In</Button>
-                </Link>
-                <Link href="/auth/signup">
-                  <Button variant="primary" size="sm">Get Started</Button>
-                </Link>
               </div>
             )}
           </div>
@@ -225,16 +225,7 @@ export const Navbar: React.FC = () => {
               </div>
 
               <div className="border-t border-foreground/5 my-3 pt-3 flex flex-col gap-2">
-                {user ? (
-                  <>
-                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="primary" className="w-full">Dashboard</Button>
-                    </Link>
-                    <Button variant="glass" onClick={handleSignOut} className="w-full">
-                      <LogOut className="h-4 w-4 mr-2" /> Log Out
-                    </Button>
-                  </>
-                ) : (
+                {(!user || pathname === "/" || pathname === "/auth/onboarding") ? (
                   <>
                     <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="glass" className="w-full">Log In</Button>
@@ -242,6 +233,15 @@ export const Navbar: React.FC = () => {
                     <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="primary" className="w-full">Get Started</Button>
                     </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="primary" className="w-full">Dashboard</Button>
+                    </Link>
+                    <Button variant="glass" onClick={handleSignOut} className="w-full">
+                      <LogOut className="h-4 w-4 mr-2" /> Log Out
+                    </Button>
                   </>
                 )}
               </div>
