@@ -107,6 +107,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
       if (data && !error) {
         setProfile(data as UserProfile);
+      } else if (error && error.code === 'PGRST116') {
+        console.warn("Profile not found in database. Auto-healing by recreating profile...");
+        const { data: authData } = await supabase.auth.getUser();
+        if (authData?.user) {
+          const email = authData.user.email || "";
+          const fullName = authData.user.user_metadata?.full_name || "User";
+          const username = authData.user.user_metadata?.username || `user_${uid.substring(0,6)}`;
+          
+          const newProfile = {
+            id: uid,
+            email: email,
+            full_name: fullName,
+            username: username,
+            active_mode: "wellness" as const,
+            onboarding_completed: false,
+            soreness_level: 0,
+            biological_age: 30,
+            stability_score: 100,
+          };
+          const { data: newDbProfile, error: insertError } = await supabase.from("profiles").insert(newProfile).select().single();
+          if (newDbProfile && !insertError) {
+             setProfile(newDbProfile as UserProfile);
+          } else {
+             console.error("Auto-heal profile insertion failed:", insertError);
+          }
+        }
       }
     } catch (e) {
       console.error(e);
