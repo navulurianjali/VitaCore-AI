@@ -1,211 +1,306 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { CheckSquare, Sparkles, AlertTriangle, ArrowRight, ShieldAlert, Award, Plus, Trash } from "lucide-react";
+import React, { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
-import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "@/context/ThemeContext";
-import { getBaseMetrics, getActiveChallenges, getDefaultHabits, DailyMetrics, ChallengeItem, HabitItem } from "@/utils/mockData";
+import { 
+  Target, Users, Award, CheckCircle, 
+  Droplets, Moon, Utensils, Activity, Plus,
+  MessageCircle, Heart, Share2, Flame, UserPlus
+} from "lucide-react";
 
-export default function ChallengesPage() {
-  const { activeMode } = useTheme();
-  
-  const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
-  const [challenges, setChallenges] = useState<ChallengeItem[]>([]);
-  const [habits, setHabits] = useState<HabitItem[]>([]);
-  const [newHabit, setNewHabit] = useState("");
-  const [newHabitCategory, setNewHabitCategory] = useState("Fitness");
-
-  useEffect(() => {
-    setMetrics(getBaseMetrics(activeMode));
-    setChallenges(getActiveChallenges());
-    setHabits(getDefaultHabits());
-  }, [activeMode]);
-
-  const handleAddHabit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newHabit.trim()) return;
-
-    const added: HabitItem = {
-      id: `habit-${Date.now()}`,
-      name: newHabit,
-      category: newHabitCategory,
-      streak: 0,
-      maxStreak: 0,
-      excuseTrigger: "Unmapped. Continue routine to seed AI excuse trackers.",
-      habitBreakdown: "AI correlation seeding: Habit logged recently. Continue logging for 7 days to trigger excuse diagnostics.",
-      consistencyScore: 100
-    };
-
-    setHabits(prev => [...prev, added]);
-    setNewHabit("");
-  };
-
-  const handleCheckInHabit = (id: string) => {
-    setHabits(prev => prev.map(h => {
-      if (h.id === id) {
-        const newStreak = h.streak + 1;
-        return {
-          ...h,
-          streak: newStreak,
-          maxStreak: Math.max(h.maxStreak, newStreak),
-          consistencyScore: Math.min(100, Math.round(h.consistencyScore + 5))
-        };
-      }
-      return h;
-    }));
-  };
-
-  const handleDeleteHabit = (id: string) => {
-    setHabits(prev => prev.filter(h => h.id !== id));
-  };
-
-  if (!metrics) return null;
+export default function HealthyHabitsPage() {
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-10 max-w-6xl mx-auto pb-10 font-sans">
         
         {/* Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5">
-          <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-              <CheckSquare className="h-6 w-6 text-primary animate-pulse" />
-              AI Habit Breakdowns & Challenges
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-emerald-500/10 via-background to-blue-500/5 border border-foreground/5">
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
+              <Users className="h-7 w-7 text-emerald-500" />
+              Healthy Habits
             </h1>
-            <p className="text-xs text-foreground/70 font-semibold">
-              Gamified challenges, excuse detection algorithms & cognitive habit loops
+            <p className="text-sm text-foreground/70 font-medium">
+              Join challenges, build great habits, and reach your goals together.
             </p>
           </div>
         </div>
 
-        {/* 1. DUAL COLUMNS: Smart Challenges vs Habit Logger */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          
-          {/* Left panel: Smart Challenges list */}
-          <div className="lg:col-span-7 space-y-6 flex flex-col justify-between">
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                <Award className="h-4.5 w-4.5 text-primary" />
-                Active Biometric Sprint Challenges
-              </h3>
-
-              <div className="grid grid-cols-1 gap-4">
-                {challenges.map((ch) => (
-                  <GlassCard key={ch.id} glowColor={ch.progress === 100 ? "emerald" : "violet"} className="p-4 space-y-3 relative overflow-hidden">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <span className="rounded-full bg-foreground/5 border border-foreground/5 px-2 py-0.5 text-[8px] font-bold text-foreground/60 capitalize">
-                          {ch.category}
-                        </span>
-                        <h4 className="text-xs font-bold text-foreground mt-1">{ch.title}</h4>
-                      </div>
-                      <span className="text-xs font-bold text-secondary">
-                        +{ch.xpReward} XP
-                      </span>
-                    </div>
-                    <p className="text-xs text-foreground/70 font-semibold leading-normal">{ch.description}</p>
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-[9px] font-bold">
-                        <span>Exertion sprint completion</span>
-                        <span>{ch.progress}%</span>
-                      </div>
-                      <div className="w-full bg-foreground/10 h-1 rounded-full overflow-hidden">
-                        <div className="bg-primary h-full rounded-full transition-all duration-300" style={{ width: `${ch.progress}%` }} />
-                      </div>
-                    </div>
-                  </GlassCard>
-                ))}
-              </div>
-            </div>
-
-            <div className="text-xs text-foreground/50 leading-normal font-semibold border-t border-foreground/5 pt-3 mt-4">
-              Biomedical Impact: Completing focus challenges reinforces biological stability scores by <span className="text-secondary font-bold">14.8%</span>.
-            </div>
-          </div>
-
-          {/* Right panel: Habits list & input logger */}
-          <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-foreground">Habits Registry</h3>
-              
-              {/* Habits list */}
-              <div className="space-y-3 max-h-[300px] overflow-y-auto scrollbar-none pr-1">
-                {habits.map((h) => (
-                  <div key={h.id} className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 flex justify-between items-center text-xs">
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-foreground">{h.name}</span>
-                        <span className="text-[8px] bg-foreground/10 px-1.5 py-0.2 rounded font-bold text-foreground/60">{h.category}</span>
-                      </div>
-                      <p className="text-[9px] text-foreground/55 font-bold">Streak: {h.streak} days | Max: {h.maxStreak}</p>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0 ml-3">
-                      <button 
-                        onClick={() => handleCheckInHabit(h.id)}
-                        className="text-[9px] bg-secondary/15 hover:bg-secondary/20 text-secondary border border-secondary/10 px-2 py-1 rounded font-bold transition-all"
-                      >
-                        Check-in
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteHabit(h.id)}
-                        className="p-1 hover:text-red-500 transition-all text-foreground/40"
-                      >
-                        <Trash className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add Habit form inline */}
-              <form onSubmit={handleAddHabit} className="border-t border-foreground/5 pt-4 flex gap-2">
-                <input
-                  type="text"
-                  required
-                  value={newHabit}
-                  onChange={(e) => setNewHabit(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2 rounded-xl border border-foreground/10 bg-foreground/5 text-foreground placeholder-foreground/45 focus:outline-none"
-                  placeholder="Queue new habit (e.g. read 15 min)"
-                />
-                <Button variant="primary" type="submit" className="p-2 rounded-xl shrink-0 text-xs font-bold">
-                  Add
-                </Button>
-              </form>
-            </div>
-          </div>
-
-        </div>
-
-        {/* 3. DEDICATED AI EXCUSE ANALYSIS */}
-        <div className="space-y-4 pt-4 border-t border-foreground/5">
-          <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-            <ShieldAlert className="h-4.5 w-4.5 text-amber-500 animate-bounce" />
-            AI Excuse Breakdown Analysis
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {habits.slice(0, 3).map((h, idx) => (
-              <GlassCard key={idx} glowColor="amber" className="p-5 space-y-3 flex flex-col justify-between">
-                <div className="space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50">Habit: {h.name}</span>
-                  <h4 className="text-xs font-bold text-amber-500 leading-normal">excuse memory trigger:</h4>
-                  <p className="text-xs text-foreground/75 font-semibold italic leading-normal">
-                    "{h.excuseTrigger}"
-                  </p>
+        {/* SECTION 1 - TODAY'S GOAL */}
+        <section className="space-y-4">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <Target className="h-5 w-5 text-blue-500" />
+            Today's Goal
+          </h2>
+          <GlassCard className="p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+            <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 blur-3xl rounded-full pointer-events-none"></div>
+            
+            <div className="space-y-4 flex-1 w-full">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-blue-500/10 rounded-2xl">
+                  <Activity className="h-6 w-6 text-blue-500" />
                 </div>
-                <div className="border-t border-foreground/5 pt-3 mt-2 text-[9px] text-foreground/70 font-semibold leading-relaxed">
-                  {h.habitBreakdown}
+                <div>
+                  <h3 className="text-xl font-bold">Walk 8,000 Steps</h3>
+                  <p className="text-sm text-foreground/60 font-medium">Daily Walking Challenge</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2 max-w-md">
+                <div className="flex justify-between text-sm font-bold">
+                  <span className="text-foreground/70">Progress</span>
+                  <span>6,200 / 8,000</span>
+                </div>
+                <div className="w-full bg-foreground/5 h-3 rounded-full overflow-hidden">
+                  <div className="bg-blue-500 h-full rounded-full transition-all duration-500" style={{ width: '78%' }} />
+                </div>
+                <p className="text-sm text-foreground/60 pt-2 font-medium">
+                  You are almost there. A short evening walk will complete today's goal.
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0 w-full md:w-auto">
+              <Button variant="primary" className="w-full md:w-auto px-8 py-3 text-sm font-bold shadow-lg shadow-blue-500/20">
+                Continue Progress
+              </Button>
+            </div>
+          </GlassCard>
+        </section>
+
+        {/* SECTION 5 - MY CHALLENGES */}
+        <section className="space-y-4">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <Flame className="h-5 w-5 text-orange-500" />
+            My Active Challenges
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <GlassCard className="p-5 flex items-center justify-between gap-4 border-l-4 border-l-orange-500">
+              <div className="space-y-1">
+                <h4 className="font-bold text-base">Daily Walking Challenge</h4>
+                <p className="text-sm text-foreground/60 font-medium">Day 6 of 14</p>
+                <div className="flex items-center gap-2 pt-2">
+                  <div className="w-24 bg-foreground/10 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-orange-500 h-full rounded-full" style={{ width: '42%' }} />
+                  </div>
+                  <span className="text-xs font-bold text-foreground/50">42%</span>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="text-xs font-bold px-4">
+                View Details
+              </Button>
+            </GlassCard>
+
+            <GlassCard className="p-5 flex items-center justify-between gap-4 border-l-4 border-l-emerald-500">
+              <div className="space-y-1">
+                <h4 className="font-bold text-base">Drink Water Challenge</h4>
+                <p className="text-sm text-foreground/60 font-medium">Day 2 of 7</p>
+                <div className="flex items-center gap-2 pt-2">
+                  <div className="w-24 bg-foreground/10 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-emerald-500 h-full rounded-full" style={{ width: '28%' }} />
+                  </div>
+                  <span className="text-xs font-bold text-foreground/50">28%</span>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="text-xs font-bold px-4">
+                View Details
+              </Button>
+            </GlassCard>
+          </div>
+        </section>
+
+        {/* SECTION 2 - POPULAR CHALLENGES */}
+        <section className="space-y-4">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <Users className="h-5 w-5 text-violet-500" />
+            Popular Challenges
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            {[
+              { title: "Drink Water Challenge", desc: "Drink enough water for 7 days.", icon: Droplets, color: "text-blue-500", bg: "bg-blue-500/10", joined: "1,240", duration: "7 days" },
+              { title: "Daily Walking Challenge", desc: "Reach your daily step goal for 14 days.", icon: Activity, color: "text-emerald-500", bg: "bg-emerald-500/10", joined: "3,800", duration: "14 days" },
+              { title: "Better Sleep Challenge", desc: "Sleep at least 7 hours for one week.", icon: Moon, color: "text-indigo-500", bg: "bg-indigo-500/10", joined: "850", duration: "7 days" },
+              { title: "Healthy Eating Challenge", desc: "Log healthy meals for 10 days.", icon: Utensils, color: "text-orange-500", bg: "bg-orange-500/10", joined: "2,100", duration: "10 days" },
+            ].map((ch, idx) => (
+              <GlassCard key={idx} className="p-5 space-y-4 flex flex-col justify-between hover:scale-[1.02] transition-transform duration-300">
+                <div className="space-y-3">
+                  <div className={`w-10 h-10 ${ch.bg} rounded-xl flex items-center justify-center`}>
+                    <ch.icon className={`h-5 w-5 ${ch.color}`} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base">{ch.title}</h3>
+                    <p className="text-xs text-foreground/60 font-medium mt-1 leading-relaxed">{ch.desc}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3 pt-3 border-t border-foreground/5">
+                  <div className="flex items-center justify-between text-xs font-bold text-foreground/50">
+                    <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {ch.joined} joined</span>
+                    <span>{ch.duration}</span>
+                  </div>
+                  <Button variant="primary" className="w-full text-xs font-bold py-2">
+                    Join Challenge
+                  </Button>
                 </div>
               </GlassCard>
             ))}
+
           </div>
+        </section>
+
+        {/* SECTION 3 - COMMUNITY CHALLENGES & SECTION 4 - FRIENDS & GROUPS */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Community Challenges */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Users className="h-5 w-5 text-pink-500" />
+                Community Challenges
+              </h2>
+              <Button onClick={() => setShowCreateModal(true)} variant="outline" size="sm" className="text-xs font-bold flex items-center gap-1.5">
+                <Plus className="h-3.5 w-3.5" />
+                Create Challenge
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              {[
+                { title: "Walk 10,000 Steps Daily", author: "Sarah M.", likes: 45, comments: 12 },
+                { title: "Drink 3 Liters Water", author: "Mike T.", likes: 112, comments: 8 },
+                { title: "Morning Yoga Club", author: "Elena R.", likes: 89, comments: 24 },
+                { title: "30-Day Weight Loss Journey", author: "David K.", likes: 230, comments: 45 },
+              ].map((c, i) => (
+                <GlassCard key={i} className="p-4 flex items-center justify-between hover:bg-foreground/[0.02] transition-colors">
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-sm">{c.title}</h4>
+                    <p className="text-xs text-foreground/50 font-medium">Created by {c.author}</p>
+                  </div>
+                  <div className="flex items-center gap-4 text-foreground/40">
+                    <button className="flex items-center gap-1 hover:text-pink-500 transition-colors">
+                      <Heart className="h-4 w-4" />
+                      <span className="text-xs font-bold">{c.likes}</span>
+                    </button>
+                    <button className="flex items-center gap-1 hover:text-blue-500 transition-colors">
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="text-xs font-bold">{c.comments}</span>
+                    </button>
+                    <button className="hover:text-emerald-500 transition-colors">
+                      <Share2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </GlassCard>
+              ))}
+            </div>
+          </section>
+
+          {/* Friends & Groups */}
+          <section className="space-y-4">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <UserPlus className="h-5 w-5 text-teal-500" />
+              Friends & Groups
+            </h2>
+            
+            <div className="space-y-3">
+              {[
+                { name: "Office Fitness Group", members: "24 members", icon: "🏢" },
+                { name: "Healthy Eating Club", members: "128 members", icon: "🥗" },
+                { name: "Evening Walk Team", members: "52 members", icon: "🚶" },
+              ].map((g, i) => (
+                <GlassCard key={i} className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center text-lg">
+                      {g.icon}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm">{g.name}</h4>
+                      <p className="text-xs text-foreground/50 font-medium">{g.members}</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="text-xs font-bold">
+                    Join Group
+                  </Button>
+                </GlassCard>
+              ))}
+              
+              <Button variant="outline" className="w-full mt-2 border-dashed border-2 py-4 text-sm font-bold text-foreground/60 hover:text-foreground">
+                <Share2 className="h-4 w-4 mr-2 inline" />
+                Invite Friends via Link
+              </Button>
+            </div>
+          </section>
+          
         </div>
 
+        {/* SECTION 6 - ACHIEVEMENTS */}
+        <section className="space-y-4">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <Award className="h-5 w-5 text-yellow-500" />
+            Recent Achievements
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { title: "First Workout Completed", icon: "🏆", color: "from-yellow-500/20 to-yellow-500/5" },
+              { title: "7 Day Hydration Streak", icon: "💧", color: "from-blue-500/20 to-blue-500/5" },
+              { title: "Sleep Champion", icon: "😴", color: "from-indigo-500/20 to-indigo-500/5" },
+              { title: "100K Steps Milestone", icon: "🚶", color: "from-emerald-500/20 to-emerald-500/5" },
+            ].map((ach, idx) => (
+              <GlassCard key={idx} className={`p-5 text-center flex flex-col items-center justify-center gap-3 bg-gradient-to-b ${ach.color}`}>
+                <div className="text-3xl drop-shadow-md">{ach.icon}</div>
+                <h4 className="font-bold text-sm leading-tight max-w-[120px]">{ach.title}</h4>
+              </GlassCard>
+            ))}
+          </div>
+        </section>
+
       </div>
+
+      {/* Create Challenge Modal (Placeholder) */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <GlassCard className="w-full max-w-md p-6 space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold">Create New Challenge</h3>
+              <button onClick={() => setShowCreateModal(false)} className="text-foreground/50 hover:text-foreground">✕</button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-foreground/70">Challenge Title</label>
+                <input type="text" placeholder="e.g. Morning Yoga Club" className="w-full p-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-sm outline-none focus:border-primary transition-colors" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-foreground/70">Description</label>
+                <textarea placeholder="What's the goal of this challenge?" rows={3} className="w-full p-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-sm outline-none focus:border-primary transition-colors resize-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-foreground/70">Duration (Days)</label>
+                  <input type="number" placeholder="7" className="w-full p-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-sm outline-none focus:border-primary transition-colors" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-foreground/70">Privacy</label>
+                  <select className="w-full p-2.5 rounded-xl border border-foreground/10 bg-foreground/5 text-sm outline-none focus:border-primary transition-colors">
+                    <option>Public</option>
+                    <option>Private (Invite Only)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div className="pt-2 flex gap-3">
+              <Button onClick={() => setShowCreateModal(false)} variant="outline" className="flex-1 font-bold">Cancel</Button>
+              <Button variant="primary" className="flex-1 font-bold">Publish Challenge</Button>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
     </DashboardLayout>
   );
 }

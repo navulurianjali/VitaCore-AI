@@ -76,7 +76,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
         { name: "Sleep", href: "/sleep", icon: Moon },
         { name: "Energy & Rest", href: "/recovery", icon: HeartPulse },
         { name: "Health Journey", href: "/timeline", icon: Milestone },
-        { name: "Challenges", href: "/challenges", icon: CheckSquare },
+        { name: "Healthy Habits", href: "/challenges", icon: CheckSquare },
         { name: "Community", href: "/community", icon: Users },
       ]
     }

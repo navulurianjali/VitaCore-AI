@@ -240,18 +240,20 @@ export default function SmartAINutritionPlansPage() {
 
   // Fetch logged meals
   const fetchLogs = async () => {
-    if (!supabase || !profile) return;
+    const userId = profile?.id || "guest_user";
     try {
       setLoadingHistory(true);
-      const { data: foodData } = await supabase
-        .from("nutrition_logs")
-        .select("*")
-        .eq("user_id", profile.id)
-        .order("created_at", { ascending: false });
-
       let dbLogs: any[] = [];
-      if (foodData) {
-        dbLogs = foodData.map((d: any) => ({
+      
+      if (supabase && profile?.id) {
+        const { data: foodData } = await supabase
+          .from("nutrition_logs")
+          .select("*")
+          .eq("user_id", profile.id)
+          .order("created_at", { ascending: false });
+
+        if (foodData) {
+          dbLogs = foodData.map((d: any) => ({
           id: d.id,
           meal_type: d.meal_type,
           food_name: d.food_name,
@@ -265,7 +267,7 @@ export default function SmartAINutritionPlansPage() {
 
       // Add local storage fallback
       const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
-      const userLocalLogs = localLogs.filter((l: any) => l.user_id === profile.id);
+      const userLocalLogs = localLogs.filter((l: any) => l.user_id === userId);
       
       const allLogs = [...dbLogs, ...userLocalLogs].sort((a, b) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -273,15 +275,17 @@ export default function SmartAINutritionPlansPage() {
       setFoodLogs(allLogs);
 
       const todayStr = new Date().toISOString().split("T")[0];
-      const { data: waterData } = await supabase
-        .from("hydration_logs")
-        .select("*")
-        .eq("user_id", profile.id)
-        .gte("created_at", `${todayStr}T00:00:00Z`);
+      if (supabase && profile?.id) {
+        const { data: waterData } = await supabase
+          .from("hydration_logs")
+          .select("*")
+          .eq("user_id", profile.id)
+          .gte("created_at", `${todayStr}T00:00:00Z`);
 
-      if (waterData) {
-        const total = waterData.reduce((sum: number, log: any) => sum + log.amount_ml, 0);
-        setWaterLogged(total);
+        if (waterData) {
+          const total = waterData.reduce((sum: number, log: any) => sum + log.amount_ml, 0);
+          setWaterLogged(total);
+        }
       }
     } catch (e) {
       console.error("Supabase load error:", e);
@@ -291,11 +295,7 @@ export default function SmartAINutritionPlansPage() {
   };
 
   useEffect(() => {
-    if (profile?.id) {
-      fetchLogs();
-    } else {
-      setLoadingHistory(false);
-    }
+    fetchLogs();
   }, [profile]);
 
   // Loading text cycler
@@ -439,10 +439,10 @@ export default function SmartAINutritionPlansPage() {
 
   // Add meal to Supabase Eaten Logs
   const handleMarkEaten = async (meal: Meal) => {
-    if (!profile) return;
+    const userId = profile?.id || "guest_user";
     try {
       const logData = {
-        user_id: profile.id,
+        user_id: userId,
         meal_type: meal.mealType,
         food_name: meal.name,
         calories: Number(meal.calories),
@@ -452,13 +452,23 @@ export default function SmartAINutritionPlansPage() {
         stress_eating: false
       };
 
-      const { error } = await supabase
-        .from("nutrition_logs")
-        .insert(logData);
+      if (supabase && profile?.id) {
+        const { error } = await supabase
+          .from("nutrition_logs")
+          .insert(logData);
 
-      if (error) {
-        console.error("Supabase error saving meal, falling back to local storage:", error);
-        // Fallback to local storage if DB is not configured or RLS fails
+        if (error) {
+          console.error("Supabase error saving meal, falling back to local storage:", error);
+          const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
+          localLogs.push({
+            ...logData,
+            id: `local-${Date.now()}`,
+            created_at: new Date().toISOString()
+          });
+          localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
+        }
+      } else {
+        // Guest user local storage log
         const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
         localLogs.push({
           ...logData,
@@ -470,8 +480,9 @@ export default function SmartAINutritionPlansPage() {
     } catch (err) {
       console.error("Error logging meal:", err);
       // Fallback in catch block as well for complete robustness
+      const userId = profile?.id || "guest_user";
       const logData = {
-        user_id: profile.id, meal_type: meal.mealType, food_name: meal.name,
+        user_id: userId, meal_type: meal.mealType, food_name: meal.name,
         calories: Number(meal.calories), protein_g: Number(meal.protein), carbs_g: Number(meal.carbs),
         fat_g: Number(meal.fat), stress_eating: false
       };
