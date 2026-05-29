@@ -536,7 +536,17 @@ export default function FoodScannerPage() {
 
   // User Manual Confirmation and Supabase Logging
   const handleConfirmMeal = async (saveEdited = false) => {
-    if (!result || !profile) return;
+    if (!result) return;
+    
+    const saveToLocalStorage = (data: any) => {
+      const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
+      localLogs.push({
+        ...data,
+        id: `local-${Date.now()}`,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
+    };
     
     const finalFoodName = saveEdited ? editFoodName : result.foodName;
     const finalPortion = saveEdited ? editPortion : result.portionSize;
@@ -547,7 +557,7 @@ export default function FoodScannerPage() {
 
     try {
       // 1. Log to food_scanner_logs (the learning record)
-      if (supabase) {
+      if (supabase && profile) {
         await supabase.from("food_scanner_logs").insert({
           user_id: profile.id,
           food_name: finalFoodName,
@@ -577,14 +587,20 @@ export default function FoodScannerPage() {
         const { error } = await supabase.from("nutrition_logs").insert(nutritionData);
         if (error) {
           console.error("Supabase error saving meal, falling back to local storage:", error);
-          const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
-          localLogs.push({
-            ...nutritionData,
-            id: `local-${Date.now()}`,
-            created_at: new Date().toISOString()
-          });
-          localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
+          saveToLocalStorage(nutritionData);
         }
+      } else {
+        // Fallback for missing profile
+        const localData = {
+          meal_type: result.mealType.includes("breakfast") ? "breakfast" : result.mealType.includes("lunch") ? "lunch" : result.mealType.includes("dinner") ? "dinner" : "snack",
+          food_name: finalFoodName,
+          calories: finalCalories,
+          protein_g: finalProtein,
+          carbs_g: finalCarbs,
+          fat_g: finalFat,
+          stress_eating: false
+        };
+        saveToLocalStorage(localData);
       }
 
       setConfirmStatus("confirmed");

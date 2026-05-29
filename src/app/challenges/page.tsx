@@ -25,6 +25,9 @@ export default function HealthyHabitsPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [newDuration, setNewDuration] = useState("7");
+  
+  // Dummy state for groups
+  const [joinedGroups, setJoinedGroups] = useState<string[]>([]);
 
   useEffect(() => {
     fetchChallenges();
@@ -296,8 +299,17 @@ export default function HealthyHabitsPage() {
                     <p className="text-xs text-foreground/50 font-medium">{g.members}</p>
                   </div>
                 </div>
-                <Button variant="glass" size="sm" className="text-xs font-bold">
-                  Join Group
+                <Button 
+                  variant={joinedGroups.includes(g.name) ? "secondary" : "glass"} 
+                  size="sm" 
+                  className={`text-xs font-bold ${joinedGroups.includes(g.name) ? "opacity-50" : ""}`}
+                  onClick={() => {
+                    if (!joinedGroups.includes(g.name)) {
+                      setJoinedGroups(prev => [...prev, g.name]);
+                    }
+                  }}
+                >
+                  {joinedGroups.includes(g.name) ? "Joined" : "Join Group"}
                 </Button>
               </GlassCard>
             ))}
