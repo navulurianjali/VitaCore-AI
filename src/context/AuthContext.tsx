@@ -117,7 +117,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           const newProfile = {
             id: uid,
-            email: email,
             full_name: fullName,
             username: username,
             active_mode: "wellness" as const,
@@ -174,7 +173,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         const newProfile = {
           id: data.user.id,
-          email: email,
           full_name: fullName,
           username: username,
           active_mode: "wellness" as const,
