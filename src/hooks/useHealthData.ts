@@ -171,6 +171,16 @@ export function useHealthData() {
 
   useEffect(() => {
     fetchRealData();
+    
+    // Add event listener for global data updates
+    const handleDataUpdate = () => {
+      fetchRealData();
+    };
+    
+    window.addEventListener("vitalcore-data-updated", handleDataUpdate);
+    return () => {
+      window.removeEventListener("vitalcore-data-updated", handleDataUpdate);
+    };
   }, [fetchRealData]);
 
   return { metrics, loading, error, refetch: fetchRealData };

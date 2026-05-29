@@ -1199,6 +1199,9 @@ export default function FitnessPage() {
       filteredList = originalList;
     }
 
+    // Shuffle the filtered list for dynamic routines
+    filteredList = [...filteredList].sort(() => 0.5 - Math.random());
+
     let finalIntensity = intensity;
     let restBuffer = 0;
     

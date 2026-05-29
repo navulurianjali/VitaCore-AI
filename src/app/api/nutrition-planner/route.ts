@@ -162,22 +162,71 @@ function generateFallbackPlan(goal: string, preference: string, metrics: any) {
   let snackWhy = "Nutrient-dense healthy fats and vitamins to curb afternoon fatigue.";
 
   if (isVeg) {
-    breakfastName = preference === "South Indian" 
-      ? "Steamed idlis with sambar and coconut chutney"
-      : "Spiced tofu scramble with avocado on sourdough toast";
-    lunchName = preference === "South Indian"
-      ? "Brown rice with lentils (dal), spinach poriyal and curd"
-      : "Paneer and chickpea quinoa bowl with lemon tahini";
-    dinnerName = preference === "South Indian"
-      ? "Ragi dosa with vegetable kurma and roasted chickpeas"
-      : "Lentil coconut curry with steamed brown rice and broccoli";
-    snackName = "Roasted makhana (foxnuts) and a banana";
+    const southBreakfasts = [
+      { n: "Steamed idlis with sambar and coconut chutney", w: "Fermented idlis are easy on digestion and provide sustained morning stamina." },
+      { n: "Pesarattu (Green gram dosa) with upma", w: "High protein lentil base provides sustained energy and muscle repair." },
+      { n: "Ragi semiya upma with peanuts", w: "Complex carbs from ragi keep blood sugar stable throughout the morning." }
+    ];
+    const northBreakfasts = [
+      { n: "Paneer paratha with a side of curd", w: "Complex carbs and high-quality dairy protein to fuel morning workouts." },
+      { n: "Besan chilla with mint chutney", w: "Chickpea flour is rich in protein and fiber, stabilizing blood sugar." },
+      { n: "Poha with peanuts and curry leaves", w: "Light on the stomach but rich in iron and complex carbs." }
+    ];
+    const genVegBreakfasts = [
+      { n: "Spiced tofu scramble with avocado on sourdough toast", w: "Tofu scramble provides clean plant protein and healthy fats to fuel your morning." },
+      { n: "High-protein Greek yogurt with almonds and chia", w: "Probiotics and protein combo enhances gut health and morning recovery." }
+    ];
 
-    breakfastWhy = preference === "South Indian"
-      ? "Fermented idlis are easy on digestion and provide sustained morning stamina."
-      : "Tofu scramble provides clean plant protein and healthy fats to fuel your morning.";
-    lunchWhy = "Lentils and grain combine to provide a complete amino acid profile for recovery.";
-    dinnerWhy = "Complex carbs from ragi or rice help transport tryptophan to support melatonin production.";
+    const southLunches = [
+      { n: "Brown rice with lentils (dal), spinach poriyal and curd", w: "Lentils and grain combine to provide a complete amino acid profile for recovery." },
+      { n: "Bisi bele bath with mixed vegetables", w: "Nutrient-dense one-pot meal rich in fiber and essential vitamins." }
+    ];
+    const northLunches = [
+      { n: "Dal makhani with 2 multigrain rotis and side salad", w: "Slow-cooked lentils provide deep nourishment and sustained energy release." },
+      { n: "Rajma chawal (Kidney beans)", w: "Classic high-protein, high-fiber meal that supports muscle synthesis." }
+    ];
+    const genVegLunches = [
+      { n: "Paneer and chickpea quinoa bowl with lemon tahini", w: "Complete plant protein profile for mid-day muscle recovery." }
+    ];
+
+    const southDinners = [
+      { n: "Ragi dosa with vegetable kurma and roasted chickpeas", w: "Complex carbs from ragi or rice help transport tryptophan to support melatonin production." },
+      { n: "Lemon rice with a side of mixed vegetable stew", w: "Light citrus digestion with anti-inflammatory properties for nighttime recovery." }
+    ];
+    const northDinners = [
+      { n: "Palak paneer with 1 missi roti", w: "Iron-rich spinach and casein protein from paneer support overnight tissue repair." },
+      { n: "Baingan bharta with millet flatbread", w: "Low-calorie, highly nutritious dinner to keep metabolism stable overnight." }
+    ];
+    const genVegDinners = [
+      { n: "Lentil coconut curry with steamed brown rice and broccoli", w: "Anti-inflammatory coconut fats combined with high-fiber lentils." }
+    ];
+
+    let bList = genVegBreakfasts;
+    let lList = genVegLunches;
+    let dList = genVegDinners;
+
+    if (preference === "South Indian") {
+      bList = southBreakfasts; lList = southLunches; dList = southDinners;
+    } else if (preference === "North Indian") {
+      bList = northBreakfasts; lList = northLunches; dList = northDinners;
+    } else if (preference === "Indian" || preference === "Vegetarian") {
+      bList = [...southBreakfasts, ...northBreakfasts, ...genVegBreakfasts];
+      lList = [...southLunches, ...northLunches, ...genVegLunches];
+      dList = [...southDinners, ...northDinners, ...genVegDinners];
+    }
+
+    const selB = bList[Math.floor(Math.random() * bList.length)];
+    const selL = lList[Math.floor(Math.random() * lList.length)];
+    const selD = dList[Math.floor(Math.random() * dList.length)];
+
+    breakfastName = selB.n;
+    breakfastWhy = selB.w;
+    lunchName = selL.n;
+    lunchWhy = selL.w;
+    dinnerName = selD.n;
+    dinnerWhy = selD.w;
+
+    snackName = ["Roasted makhana (foxnuts) and a banana", "Spiced roasted chickpeas", "Greek yogurt with pumpkin seeds"][Math.floor(Math.random() * 3)];
     snackWhy = "Crunchy roasted seeds offer essential minerals to boost focus without sugar crashes.";
   }
 

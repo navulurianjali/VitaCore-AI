@@ -7,10 +7,9 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json(
-        { error: "AI Coach Engine in Simulator Mode. Please set GEMINI_API_KEY." },
-        { status: 400 }
-      );
+      return NextResponse.json({
+        reply: "Hello! I am currently operating in offline Simulator Mode since the Gemini API key is not configured. Based on your current stats, I recommend focusing on consistent sleep and maintaining your hydration targets. Please add the GEMINI_API_KEY to enable full personalized AI coaching!"
+      });
     }
 
     // Formulate system instructions context-aware of user profile biometrics

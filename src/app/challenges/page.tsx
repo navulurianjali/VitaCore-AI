@@ -49,7 +49,16 @@ export default function HealthyHabitsPage() {
         .select("*")
         .order("id", { ascending: false });
       
-      if (allC) setChallenges(allC);
+      if (allC && allC.length > 0) {
+        setChallenges(allC);
+      } else {
+        setChallenges([
+          { id: "c1", title: "30-Day Morning Yoga", description: "Start your day with 15 minutes of mindfulness and flexibility.", duration_days: 30 },
+          { id: "c2", title: "10K Steps Daily", description: "Hit 10,000 steps every day to improve cardiovascular health.", duration_days: 14 },
+          { id: "c3", title: "Hydration Challenge", description: "Drink at least 3 liters of water every day.", duration_days: 7 },
+          { id: "c4", title: "Sleep Cycle Fix", description: "Get at least 8 hours of sleep for 7 consecutive nights.", duration_days: 7 }
+        ]);
+      }
 
       // 2. Fetch user's joined challenges
       if (profile?.id) {

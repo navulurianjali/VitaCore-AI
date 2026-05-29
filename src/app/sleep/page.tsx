@@ -224,6 +224,11 @@ export default function SleepPage() {
     setLoadingLogs(false);
     setShowLogForm(false);
     
+    // Dispatch event so dashboard and other components sync the new data automatically
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("vitalcore-data-updated"));
+    }
+    
     confetti({
       particleCount: 80,
       spread: 60,

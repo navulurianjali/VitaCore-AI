@@ -618,7 +618,7 @@ export default function DashboardPage() {
             )}
 
             {/* Rhythm Gauges Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               
               {/* Burnout Risk Indicator */}
               <div className="bg-[var(--muted-bg)]/40 p-5 rounded-2xl border border-[var(--border)] space-y-2.5">
@@ -662,25 +662,7 @@ export default function DashboardPage() {
                 </span>
               </div>
 
-              {/* Biological Health Age Shift */}
-              <div className="bg-[var(--muted-bg)]/40 p-5 rounded-2xl border border-[var(--border)] space-y-2 flex flex-col justify-between min-h-[110px]">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-[10px] font-semibold text-[var(--muted)] block">Vitality age status</span>
-                    <span className="text-sm font-semibold text-[var(--foreground)] mt-1.5 block">
-                      {metrics.biologicalAge + predictions.biologicalAgeShift} years
-                    </span>
-                  </div>
-                  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${
-                    predictions.biologicalAgeShift < 0 ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-500"
-                  }`}>
-                    {predictions.biologicalAgeShift < 0 ? `${predictions.biologicalAgeShift} yrs` : `+${predictions.biologicalAgeShift} yrs`}
-                  </span>
-                </div>
-                <span className="text-[10px] text-[var(--muted)] block leading-normal">
-                  {predictions.biologicalAgeShift < 0 ? "✨ Aging at deceleration velocity." : "Stable metabolic pace."}
-                </span>
-              </div>
+
 
             </div>
 
