@@ -90,7 +90,7 @@ export default function HealthyHabitsPage() {
                   <span className="text-xs font-bold text-foreground/50">42%</span>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="text-xs font-bold px-4">
+              <Button variant="glass" size="sm" className="text-xs font-bold px-4">
                 View Details
               </Button>
             </GlassCard>
@@ -106,7 +106,7 @@ export default function HealthyHabitsPage() {
                   <span className="text-xs font-bold text-foreground/50">28%</span>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="text-xs font-bold px-4">
+              <Button variant="glass" size="sm" className="text-xs font-bold px-4">
                 View Details
               </Button>
             </GlassCard>
@@ -163,7 +163,7 @@ export default function HealthyHabitsPage() {
                 <Users className="h-5 w-5 text-pink-500" />
                 Community Challenges
               </h2>
-              <Button onClick={() => setShowCreateModal(true)} variant="outline" size="sm" className="text-xs font-bold flex items-center gap-1.5">
+              <Button onClick={() => setShowCreateModal(true)} variant="glass" size="sm" className="text-xs font-bold flex items-center gap-1.5">
                 <Plus className="h-3.5 w-3.5" />
                 Create Challenge
               </Button>
@@ -222,13 +222,13 @@ export default function HealthyHabitsPage() {
                       <p className="text-xs text-foreground/50 font-medium">{g.members}</p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="text-xs font-bold">
+                  <Button variant="glass" size="sm" className="text-xs font-bold">
                     Join Group
                   </Button>
                 </GlassCard>
               ))}
               
-              <Button variant="outline" className="w-full mt-2 border-dashed border-2 py-4 text-sm font-bold text-foreground/60 hover:text-foreground">
+              <Button variant="glass" className="w-full mt-2 border-dashed border-2 py-4 text-sm font-bold text-foreground/60 hover:text-foreground">
                 <Share2 className="h-4 w-4 mr-2 inline" />
                 Invite Friends via Link
               </Button>
@@ -294,7 +294,7 @@ export default function HealthyHabitsPage() {
             </div>
             
             <div className="pt-2 flex gap-3">
-              <Button onClick={() => setShowCreateModal(false)} variant="outline" className="flex-1 font-bold">Cancel</Button>
+              <Button onClick={() => setShowCreateModal(false)} variant="glass" className="flex-1 font-bold">Cancel</Button>
               <Button variant="primary" className="flex-1 font-bold">Publish Challenge</Button>
             </div>
           </GlassCard>
