@@ -564,7 +564,7 @@ export default function FoodScannerPage() {
         });
 
         // 2. Active Sync into daily nutrition_logs (so it updates dashboard total calories/macros immediately!)
-        await supabase.from("nutrition_logs").insert({
+        const nutritionData = {
           user_id: profile.id,
           meal_type: result.mealType.includes("breakfast") ? "breakfast" : result.mealType.includes("lunch") ? "lunch" : result.mealType.includes("dinner") ? "dinner" : "snack",
           food_name: finalFoodName,
@@ -573,7 +573,18 @@ export default function FoodScannerPage() {
           carbs_g: finalCarbs,
           fat_g: finalFat,
           stress_eating: false
-        });
+        };
+        const { error } = await supabase.from("nutrition_logs").insert(nutritionData);
+        if (error) {
+          console.error("Supabase error saving meal, falling back to local storage:", error);
+          const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
+          localLogs.push({
+            ...nutritionData,
+            id: `local-${Date.now()}`,
+            created_at: new Date().toISOString()
+          });
+          localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
+        }
       }
 
       setConfirmStatus("confirmed");

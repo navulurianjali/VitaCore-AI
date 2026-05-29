@@ -875,6 +875,18 @@ export default function FitnessPage() {
       }
     }
 
+    // UPDATE REACT STATE FOR UI WARNINGS AND CORRECTIONS
+    if (coachState === "active" || (activeTab === "posture_check" && postureCheckState === "scanning")) {
+      setPostureScore(currentScore);
+      setAlignmentQuality(quality);
+      setLiveCue(coachCue);
+      setFormAlert(alertMsg);
+      if (coachState === "active") {
+        setStabilityScore(Math.round(92 + Math.sin(Date.now() / 600) * 3));
+        setMobilityScore(Math.round(89 + Math.cos(Date.now() / 900) * 2));
+      }
+    }
+
     const lerp = (start: number, end: number, amt: number) => (1 - amt) * start + amt * end;
     const smoothFactor = 0.15;
 

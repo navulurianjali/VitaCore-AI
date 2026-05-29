@@ -16,7 +16,7 @@ Your tone is friendly, conversational, beginner-friendly, and actionable. Avoid 
 
 Generate a completely personalized, highly detailed nutrition and meal plan based on:
 - User Goal: ${goal}
-- Food Preference: ${preference}
+- Food Preference: ${preference} (IMPORTANT: If Indian, South Indian, or North Indian is selected, you MUST strictly provide authentic regional dishes like idli, dosa, sambar, paneer tikka, dal makhani, etc.)
 - User weight: ${profile?.weight_kg || 72} kg
 - Daily Workouts: ${profile?.fitness_goal || "General wellness"}
 - Daily stress telemetry: ${metrics?.stressLevel || 45}%

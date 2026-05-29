@@ -249,8 +249,9 @@ export default function SmartAINutritionPlansPage() {
         .eq("user_id", profile.id)
         .order("created_at", { ascending: false });
 
+      let dbLogs: any[] = [];
       if (foodData) {
-        setFoodLogs(foodData.map((d: any) => ({
+        dbLogs = foodData.map((d: any) => ({
           id: d.id,
           meal_type: d.meal_type,
           food_name: d.food_name,
@@ -259,8 +260,17 @@ export default function SmartAINutritionPlansPage() {
           carbs_g: Number(d.carbs_g || 0),
           fat_g: Number(d.fat_g || 0),
           created_at: d.created_at
-        })));
+        }));
       }
+
+      // Add local storage fallback
+      const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
+      const userLocalLogs = localLogs.filter((l: any) => l.user_id === profile.id);
+      
+      const allLogs = [...dbLogs, ...userLocalLogs].sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setFoodLogs(allLogs);
 
       const todayStr = new Date().toISOString().split("T")[0];
       const { data: waterData } = await supabase
@@ -431,30 +441,55 @@ export default function SmartAINutritionPlansPage() {
   const handleMarkEaten = async (meal: Meal) => {
     if (!profile) return;
     try {
+      const logData = {
+        user_id: profile.id,
+        meal_type: meal.mealType,
+        food_name: meal.name,
+        calories: Number(meal.calories),
+        protein_g: Number(meal.protein),
+        carbs_g: Number(meal.carbs),
+        fat_g: Number(meal.fat),
+        stress_eating: false
+      };
+
       const { error } = await supabase
         .from("nutrition_logs")
-        .insert({
-          user_id: profile.id,
-          meal_type: meal.mealType,
-          food_name: meal.name,
-          calories: Number(meal.calories),
-          protein_g: Number(meal.protein),
-          carbs_g: Number(meal.carbs),
-          fat_g: Number(meal.fat),
-          stress_eating: false
-        });
+        .insert(logData);
 
-      if (!error) {
-        await fetchLogs();
-        setSelectedMealDetails(null);
-        confetti({
-          particleCount: 50,
-          spread: 40,
-          colors: ["#10b981", "#8b5cf6"]
+      if (error) {
+        console.error("Supabase error saving meal, falling back to local storage:", error);
+        // Fallback to local storage if DB is not configured or RLS fails
+        const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
+        localLogs.push({
+          ...logData,
+          id: `local-${Date.now()}`,
+          created_at: new Date().toISOString()
         });
+        localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error logging meal:", err);
+      // Fallback in catch block as well for complete robustness
+      const logData = {
+        user_id: profile.id, meal_type: meal.mealType, food_name: meal.name,
+        calories: Number(meal.calories), protein_g: Number(meal.protein), carbs_g: Number(meal.carbs),
+        fat_g: Number(meal.fat), stress_eating: false
+      };
+      const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
+      localLogs.push({
+        ...logData,
+        id: `local-${Date.now()}`,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
+    } finally {
+      await fetchLogs();
+      setSelectedMealDetails(null);
+      confetti({
+        particleCount: 50,
+        spread: 40,
+        colors: ["#10b981", "#8b5cf6"]
+      });
     }
   };
 

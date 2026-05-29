@@ -72,8 +72,15 @@ export default function DashboardPage() {
       let kcal = 0;
       if (foodData) {
         kcal = foodData.reduce((sum, log) => sum + Number(log.calories), 0);
-        setTotalCalories(kcal);
       }
+      // Add local storage fallback
+      try {
+        const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
+        const todayLocal = localLogs.filter((l: any) => l.user_id === profile.id && l.created_at >= `${todayStr}T00:00:00Z`);
+        kcal += todayLocal.reduce((sum: number, log: any) => sum + Number(log.calories), 0);
+      } catch(e) {}
+      
+      setTotalCalories(kcal);
 
       const { data: sleepData } = await supabase
         .from("sleep_logs")
