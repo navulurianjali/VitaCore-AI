@@ -14,8 +14,10 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      // Return high-quality fallback simulator response if key is missing or invalid
-      return NextResponse.json({ result: generateFallbackVisionScan() });
+      return NextResponse.json(
+        { error: "Gemini API key is missing. Please configure GEMINI_API_KEY in your environment variables." },
+        { status: 400 }
+      );
     }
 
     // Extract mimeType and base64Data
@@ -100,8 +102,11 @@ DO NOT return any markdown code blocks, backticks, or text outside of the JSON. 
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.warn("Gemini vision endpoint failed, falling back to simulator", errorData);
-      return NextResponse.json({ result: generateFallbackVisionScan() });
+      console.warn("Gemini vision endpoint failed", errorData);
+      return NextResponse.json(
+        { error: "AI Scanner failed to process this image. Please ensure your API key is valid and you have internet connection.", details: errorData },
+        { status: 500 }
+      );
     }
 
     const data = await response.json();
@@ -113,7 +118,10 @@ DO NOT return any markdown code blocks, backticks, or text outside of the JSON. 
       return NextResponse.json({ result: parsedResult });
     } catch (parseError) {
       console.warn("JSON parse error on Gemini reply:", replyText);
-      return NextResponse.json({ result: generateFallbackVisionScan() });
+      return NextResponse.json(
+        { error: "AI returned an invalid response format. Please try scanning the food again." },
+        { status: 500 }
+      );
     }
   } catch (err: any) {
     console.error("Food Scanner API Error:", err);
@@ -124,29 +132,3 @@ DO NOT return any markdown code blocks, backticks, or text outside of the JSON. 
   }
 }
 
-// Fallback high-fidelity scan result to ensure 100% reliability and robust user experience
-function generateFallbackVisionScan() {
-  return {
-    foodName: "Steamed Idli with Sambar & Chutney",
-    confidence: "low_estimated",
-    mealType: "South Indian breakfast",
-    portionSize: "1 plate (3 idlis with bowls of sambar/chutney)",
-    ingredients: ["Fermented rice & black lentil batter", "Pigeon peas (Toor dal)", "Drumstick", "Coconut", "Mustard seeds"],
-    calories: 310,
-    protein: 10,
-    carbs: 58,
-    fat: 4,
-    sugar: 3,
-    sodium: 480,
-    fiber: 5,
-    healthScore: 88,
-    unhealthyAdditives: ["None detected"],
-    alternatives: ["Oats Idli", "Ragi Roti"],
-    insights: [
-      "Likely detected a traditional fermented South Indian plate.",
-      "Idlis are easily digestible and provide steady morning glucose.",
-      "Sambar adds clean plant protein and dietary fiber."
-    ],
-    nutritionRecommendation: "This appears to be a healthy, low-fat meal. The slow-release carbs will keep your morning focus high and sustain recovery."
-  };
-}

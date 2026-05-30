@@ -8,8 +8,8 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json({
-        reply: "Hello! I am currently operating in offline Simulator Mode since a valid `GEMINI_API_KEY` is not configured. Based on your current stats, I recommend focusing on consistent sleep and maintaining your hydration targets. I'll still do my best to assist you!"
-      });
+        error: "Hello! The `GEMINI_API_KEY` is not configured. Please add the API key to enable full personalized AI coaching!"
+      }, { status: 400 });
     }
 
     // Formulate system instructions context-aware of user profile biometrics
@@ -102,8 +102,17 @@ Operational Coach Directives:
       const errorData = await response.json().catch(() => ({}));
       console.error("Gemini API Error:", errorData);
       
-      let friendlyError = "I'm currently operating in offline mode as I couldn't reach the neural core. Based on your profile, I recommend staying hydrated and keeping up your daily activity goals.";
-      return NextResponse.json({ reply: friendlyError });
+      let friendlyError = "I'm having trouble connecting to my neural core. Please try again later.";
+      if (response.status === 401 || response.status === 403) {
+        friendlyError = "My API key seems to be invalid or expired. Please check the GEMINI_API_KEY in your .env.local file.";
+      } else if (response.status === 429) {
+        friendlyError = "I'm receiving too many requests right now. Let's take a quick breather and try again in a moment.";
+      }
+
+      return NextResponse.json(
+        { error: friendlyError, details: errorData },
+        { status: response.status }
+      );
     }
 
     const data = await response.json();
@@ -114,8 +123,9 @@ Operational Coach Directives:
     return NextResponse.json({ reply: replyText });
   } catch (err: any) {
     console.error("AI Coach REST API Error:", err);
-    return NextResponse.json({ 
-      reply: "I am running in local offline mode at the moment. Keep pushing towards your health goals!" 
-    });
+    return NextResponse.json(
+      { error: err.message || "Internal server error during query processing" },
+      { status: 500 }
+    );
   }
 }
