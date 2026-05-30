@@ -293,7 +293,7 @@ export default function TimelinePage() {
                 <div className="p-4 bg-[var(--muted-bg)]/40 rounded-2xl border border-[var(--border)] flex flex-col items-center justify-center text-center group hover:bg-secondary/5 transition-colors">
                   <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mb-1">Recovery</span>
                   <span className="text-2xl font-black text-secondary">
-                    {simulatedPredictions.recoveryPercentage}%
+                    {100 - simulatedPredictions.recoveryDeclineRisk}%
                   </span>
                 </div>
                 <div className="p-4 bg-[var(--muted-bg)]/40 rounded-2xl border border-[var(--border)] flex flex-col items-center justify-center text-center group hover:bg-violet-500/5 transition-colors">
