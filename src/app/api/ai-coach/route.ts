@@ -71,11 +71,6 @@ Operational Coach Directives:
         });
     }
 
-    // Add current user message
-    contents.push({
-      role: "user",
-      parts: [{ text: message }]
-    });
 
     // Make official REST API call to Google Gemini model
     const response = await fetch(
