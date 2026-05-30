@@ -23,7 +23,6 @@ export const Navbar: React.FC = () => {
                       pathname === "/sleep" ||
                       pathname === "/dashboard" || 
                       pathname === "/future-lab" ||
-                      pathname === "/timeline" || 
                       pathname === "/challenges" || 
                       pathname === "/community" ||
                       pathname === "/settings" ||

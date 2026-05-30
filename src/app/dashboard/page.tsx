@@ -547,12 +547,6 @@ export default function DashboardPage() {
                 >
                   🔮 {simulating ? "Close Sandbox" : "Try Lifestyle Simulator"}
                 </button>
-                <Link href="/timeline">
-                  <Button variant="glass" size="sm" className="gap-1 text-xs shrink-0 rounded-xl">
-                    <Milestone className="h-3.5 w-3.5" />
-                    <span>Interactive Engine</span>
-                  </Button>
-                </Link>
               </div>
             </div>
 
