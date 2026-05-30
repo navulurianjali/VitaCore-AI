@@ -1,45 +1,59 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Milestone, TrendingUp, Sparkles, Layers, ShieldAlert, Award, Calendar, Heart } from "lucide-react";
+import { 
+  Milestone, TrendingUp, Sparkles, Layers, ShieldAlert, Award, Calendar, Heart, 
+  Activity, Droplet, Moon, Footprints, Zap, Brain, Leaf, Shield, Flame, Target, Trophy, Clock,
+  ChevronRight, ArrowRight, PlayCircle
+} from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useHealthData } from "@/hooks/useHealthData";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { calculateFutureHealthPredictions, getDigitalTwinForecast, TwinForecastPoint } from "@/utils/predictiveEngine";
+import { calculateFutureHealthPredictions, getLongTermProjections, LongTermProjection } from "@/utils/predictiveEngine";
 
 export default function TimelinePage() {
+  const { profile } = useAuth();
   const { activeMode } = useTheme();
   const { metrics, loading } = useHealthData();
-  const [simulationMonths, setSimulationMonths] = useState(6);
-  const [twinPoints, setTwinPoints] = useState<TwinForecastPoint[]>([]);
+  
+  // Simulator States
+  const [simSleep, setSimSleep] = useState<number>(0);
+  const [simWater, setSimWater] = useState<number>(0);
+  const [simSteps, setSimSteps] = useState<number>(0);
+  const [simScreen, setSimScreen] = useState<number>(0);
+  
+  const [activeProjectionDay, setActiveProjectionDay] = useState(30);
 
   useEffect(() => {
     if (metrics) {
-      setTwinPoints(getDigitalTwinForecast(metrics.stabilityScore, simulationMonths));
+      setSimSleep(metrics.sleepHours || 7.5);
+      setSimWater(metrics.hydrationMl || 2000);
+      setSimSteps(metrics.steps || 5000);
+      setSimScreen(profile?.screen_time_hours || 6);
     }
-  }, [metrics, simulationMonths]);
+  }, [metrics, profile]);
 
   if (loading || !metrics) {
     return (
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
           <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
-            <Milestone className="h-8 w-8 text-primary" />
+            <Sparkles className="h-8 w-8 text-primary animate-pulse" />
           </div>
-          <h2 className="text-xl font-bold">Initializing Timeline</h2>
-          <p className="text-[var(--muted)] text-sm max-w-md text-center animate-pulse">
-            Loading your Future Health Forecast...
+          <h2 className="text-xl font-bold">Initializing Health Future</h2>
+          <p className="text-[var(--muted)] text-sm max-w-md text-center">
+            Synchronizing telemetry...
           </p>
         </div>
       </DashboardLayout>
     );
   }
 
-  const predictions = calculateFutureHealthPredictions({
+  // Current Reality Predictions
+  const currentPredictions = calculateFutureHealthPredictions({
     sleepHours: metrics.sleepHours,
     sleepQuality: metrics.sleepQuality,
     hydrationMl: metrics.hydrationMl,
@@ -51,243 +65,418 @@ export default function TimelinePage() {
     sorenessLevel: 0,
     recoveryPercentage: metrics.recoveryPercentage,
     stabilityScore: metrics.stabilityScore,
-    screenTimeHours: 6,
+    screenTimeHours: profile?.screen_time_hours || 6,
     caffeineIntake: 'moderate'
   });
 
-  // Format milestone logs in a friendly, supportive tone
-  const timelineEvents = [
-    {
-      date: "May 24, 2026",
-      title: "Great Sleep Routine!",
-      description: "Wonderful progress! You went to bed at the same time for 14 nights in a row, which is helping you feel much more energized during the day.",
-      type: "milestone",
-      color: "border-emerald-500 text-emerald-500 bg-emerald-500/10",
-      icon: Award
-    },
-    {
-      date: "May 18, 2026",
-      title: "Bedtime Snack Tip",
-      description: "We noticed your heart rate was slightly higher at night lately, which might be from eating late. Try having your last snack a few hours before bedtime so your body can rest fully.",
-      type: "decline",
-      color: "border-amber-500 text-amber-500 bg-amber-500/10",
-      icon: ShieldAlert
-    },
-    {
-      date: "May 10, 2026",
-      title: "Smart Weather Switch",
-      description: "Smart move! Swapping your outdoor run for an indoor stretch when it's freezing outside helps keep your body warm and protects your lungs.",
-      type: "adaptation",
-      color: "border-primary text-primary bg-primary/10",
-      icon: Sparkles
+  // Simulated Predictions
+  const simulatedPredictions = calculateFutureHealthPredictions({
+    sleepHours: simSleep,
+    sleepQuality: simSleep >= 8 ? 90 : simSleep >= 6 ? 70 : 45,
+    hydrationMl: simWater,
+    hydrationTarget: metrics.hydrationTarget,
+    stressLevel: metrics.stressLevel,
+    fatigueScore: (metrics.stressLevel > 60 || simSleep < 6) ? 70 : 30,
+    physicalFatigue: metrics.physicalFatigue,
+    mentalFatigue: metrics.mentalFatigue,
+    sorenessLevel: 0,
+    recoveryPercentage: simSleep >= 8 ? 85 : 45,
+    stabilityScore: simSleep >= 7 && simWater >= 2000 ? Math.min(100, metrics.stabilityScore + 15) : Math.max(10, metrics.stabilityScore - 15),
+    screenTimeHours: simScreen,
+    caffeineIntake: 'moderate'
+  });
+
+  // Long-term projections based on CURRENT simulated trajectory
+  const projections = getLongTermProjections({
+    ...metrics,
+    sleepHours: simSleep,
+    hydrationMl: simWater,
+    stabilityScore: simulatedPredictions.stabilityScore || metrics.stabilityScore
+  }, profile?.biological_age || 30);
+
+  const activeProjection = projections.find(p => p.day === activeProjectionDay) || projections[1];
+
+  // Story Feed Generator
+  const generateStory = () => {
+    let stories = [];
+    if (metrics.sleepHours > 7) {
+      stories.push("You're prioritizing rest! By sleeping over 7 hours consistently, your body is actively repairing cellular damage overnight.");
+    } else {
+      stories.push("Your sleep has been a bit short lately. Your body is accumulating a slight rest debt which might make afternoons feel harder.");
     }
-  ];
+    
+    if (metrics.hydrationMl >= metrics.hydrationTarget) {
+      stories.push("Excellent hydration today. Your metabolic efficiency is operating at its peak.");
+    } else {
+      stories.push(`You're ${metrics.hydrationTarget - metrics.hydrationMl}ml short of your water goal. This might cause a slight drop in evening energy.`);
+    }
 
-  // Format energy data for Recharts
-  const energyChartData = predictions.futureEnergyTrends.map((val, idx) => ({
-    name: `Day ${idx + 1}`,
-    Energy: val,
-    CircadianPeak: Math.min(98, val + 10),
-    CircadianTrough: Math.max(10, val - 15)
-  }));
+    if (simulatedPredictions.burnoutRisk < 40) {
+      stories.push("If you keep this current rhythm, your stress levels will remain perfectly balanced next month.");
+    }
 
+    return stories;
+  };
+
+  const activeStories = generateStory();
+
+  // Streak Garden Level
+  const gardenLevel = metrics.stabilityScore > 85 ? 4 : metrics.stabilityScore > 70 ? 3 : metrics.stabilityScore > 50 ? 2 : 1;
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 pb-10">
+      <div className="space-y-8 pb-10 max-w-7xl mx-auto">
         
         {/* Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-panel border-foreground/5 bg-gradient-to-r from-primary/10 via-background to-secondary/5 p-6">
-          <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-              <Milestone className="h-6 w-6 text-primary animate-pulse" />
-              Your Health Journey
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-8 rounded-[32px] border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-secondary/10 shadow-lg shadow-primary/5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity duration-700">
+            <Sparkles className="w-32 h-32 text-primary animate-pulse" />
+          </div>
+          <div className="space-y-2 relative z-10">
+            <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full">Interactive AI Dashboard</span>
+            <h1 className="text-2xl sm:text-4xl font-black text-[var(--foreground)] tracking-tight">
+              Your Health Future
             </h1>
-            <p className="text-xs text-foreground/70 font-semibold">
-              See how your sleep, water, and work habits shape your daily energy and future health trends.
+            <p className="text-sm text-[var(--muted)] font-medium max-w-xl leading-relaxed">
+              Explore how your daily habits shape your long-term vitality. Adjust the sliders to see what happens to your energy, stress, and biological age.
             </p>
           </div>
         </div>
 
-        {/* 1. STABILITY & BIOLOGICAL TWIN AGE SHIFT */}
-        <div className="grid grid-cols-1 gap-6">
+        {/* --- 1. FUTURE HEALTH ROADMAP --- */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-2">
+            <Target className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold">Future Health Roadmap</h2>
+          </div>
           
-          {/* Consistency Score Card */}
-          <GlassCard glowColor="violet" className="p-5 flex justify-between items-center min-h-[130px]">
-            <div className="space-y-2 pr-4">
-              <span className="text-xs font-bold text-foreground/60">Your Habit Score</span>
-              <h2 className="text-3xl font-black text-primary">{metrics.stabilityScore}% (Excellent)</h2>
-              <p className="text-xs text-foreground/60 leading-relaxed font-semibold">
-                Your regular sleep routines and water habits are keeping you fully energized and feeling great.
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {projections.map((proj) => (
+              <button 
+                key={proj.day}
+                onClick={() => setActiveProjectionDay(proj.day)}
+                className={`text-left p-5 rounded-3xl border transition-all duration-300 relative overflow-hidden group ${
+                  activeProjectionDay === proj.day 
+                    ? "bg-primary/10 border-primary/50 shadow-md shadow-primary/10" 
+                    : "bg-[var(--card-bg)] border-[var(--border)] hover:border-primary/30 hover:bg-primary/5"
+                }`}
+              >
+                {activeProjectionDay === proj.day && (
+                  <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
+                )}
+                <span className={`text-[10px] font-bold uppercase tracking-widest block mb-1 ${activeProjectionDay === proj.day ? "text-primary" : "text-[var(--muted)]"}`}>
+                  {proj.label}
+                </span>
+                <span className="text-xl font-black text-[var(--foreground)] block mb-2">{proj.wellnessScore} <span className="text-sm font-medium text-[var(--muted)]">Score</span></span>
+                
+                <div className="space-y-1.5 mt-4">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[var(--muted)]">Energy</span>
+                    <span className="font-bold text-secondary">{proj.energy}%</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[var(--muted)]">Vitality Age</span>
+                    <span className="font-bold text-emerald-500">{proj.vitalityAge}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="p-5 sm:p-6 rounded-3xl bg-[var(--muted-bg)]/50 border border-[var(--border)] mt-4 flex gap-4 items-start">
+            <div className="h-10 w-10 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
+              <Brain className="h-5 w-5 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-bold text-sm text-[var(--foreground)]">{activeProjection.label} AI Insight</h3>
+              <p className="text-sm text-[var(--muted)] leading-relaxed font-medium">
+                {activeProjection.insight} With a {activeProjection.consistencyScore}% consistency score, your biological age is tracking towards {activeProjection.vitalityAge} years old.
               </p>
             </div>
-            <div className="h-12 w-12 rounded-2xl bg-primary/15 text-primary flex items-center justify-center font-bold text-lg shrink-0">
-              📈
-            </div>
-          </GlassCard>
-
+          </div>
         </div>
 
-        {/* 2. CORE INTELLIGENCE LAYOUT */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left panel: 7-Day Energy Forecast Chart & Predictions */}
-          <div className="lg:col-span-7 rounded-2xl glass-panel p-6 border-foreground/5 flex flex-col justify-between space-y-6">
-            <div className="space-y-6">
-              
-              <div className="flex justify-between items-center">
-                <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-widest">
-                  <Layers className="h-4.5 w-4.5 text-primary animate-pulse" />
-                  Your 7-Day Energy Forecast
-                </h3>
-                <span className="bg-secondary/15 text-secondary text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">
-                  Active
-                </span>
-              </div>
-              <p className="text-xs text-foreground/75 leading-relaxed font-semibold">
-                A simple weekly outlook to help you see when you'll have the most energy and focus:
-              </p>
-
-              {/* Chart container */}
-              <div className="h-[200px] w-full pt-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={energyChartData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#222" opacity={0.1} />
-                    <XAxis dataKey="name" stroke="#666" fontSize={9} tickLine={false} />
-                    <YAxis stroke="#666" fontSize={9} domain={[0, 100]} tickLine={false} />
-                    <Tooltip contentStyle={{ background: "#111", border: "1px solid #333", fontSize: "10px", borderRadius: "8px" }} />
-                    <Line type="monotone" dataKey="Energy" stroke="#8b5cf6" strokeWidth={2.5} activeDot={{ r: 5 }} name="My Energy" />
-                    <Line type="monotone" dataKey="CircadianPeak" stroke="#10b981" strokeWidth={1.5} strokeDasharray="3 3" name="Best Focus" />
-                    <Line type="monotone" dataKey="CircadianTrough" stroke="#f43f5e" strokeWidth={1.5} strokeDasharray="3 3" name="Wind Down" />
-                  </LineChart>
-                </ResponsiveContainer>
+          {/* --- 2. "WHAT IF?" HEALTH SIMULATOR --- */}
+          <div className="lg:col-span-7 space-y-6">
+            <GlassCard glowColor="violet" className="p-6 sm:p-8 rounded-[32px] space-y-8">
+              <div className="flex justify-between items-center border-b border-[var(--border)] pb-4">
+                <div className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-secondary animate-pulse" />
+                  <h2 className="text-lg font-bold">"What If?" Simulator</h2>
+                </div>
+                <span className="text-[10px] uppercase font-bold bg-secondary/15 text-secondary px-3 py-1 rounded-full">Live Sandbox</span>
               </div>
 
-              {/* Predictive Risk Gauges */}
-              <div className="grid grid-cols-3 gap-3 border-t border-foreground/5 pt-4 text-center">
-                <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 block">TIREDNESS LEVEL</span>
-                  <span className={`text-sm font-black block ${predictions.burnoutRisk > 60 ? "text-rose-400" : "text-emerald-400"}`}>
-                    {predictions.burnoutRisk}%
+              <div className="space-y-8">
+                {/* Sleep Slider */}
+                <div className="space-y-3 group">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
+                      <Moon className="h-4 w-4 text-violet-500" /> Sleep Duration
+                    </label>
+                    <span className="font-black text-violet-500 bg-violet-500/10 px-3 py-1 rounded-lg">{simSleep} hrs</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="4" max="10" step="0.5"
+                    value={simSleep}
+                    onChange={(e) => setSimSleep(Number(e.target.value))}
+                    className="w-full h-2 bg-foreground/10 rounded-full appearance-none cursor-pointer accent-violet-500 transition-all group-hover:h-3"
+                  />
+                </div>
+
+                {/* Water Slider */}
+                <div className="space-y-3 group">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
+                      <Droplet className="h-4 w-4 text-emerald-500" /> Daily Water
+                    </label>
+                    <span className="font-black text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-lg">{simWater} ml</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="500" max="4000" step="250"
+                    value={simWater}
+                    onChange={(e) => setSimWater(Number(e.target.value))}
+                    className="w-full h-2 bg-foreground/10 rounded-full appearance-none cursor-pointer accent-emerald-500 transition-all group-hover:h-3"
+                  />
+                </div>
+
+                {/* Steps Slider */}
+                <div className="space-y-3 group">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
+                      <Footprints className="h-4 w-4 text-amber-500" /> Daily Steps
+                    </label>
+                    <span className="font-black text-amber-500 bg-amber-500/10 px-3 py-1 rounded-lg">{simSteps.toLocaleString()}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1000" max="20000" step="1000"
+                    value={simSteps}
+                    onChange={(e) => setSimSteps(Number(e.target.value))}
+                    className="w-full h-2 bg-foreground/10 rounded-full appearance-none cursor-pointer accent-amber-500 transition-all group-hover:h-3"
+                  />
+                </div>
+
+                {/* Screen Time Slider */}
+                <div className="space-y-3 group">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-bold text-[var(--foreground)] flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-rose-500" /> Screen Time
+                    </label>
+                    <span className="font-black text-rose-500 bg-rose-500/10 px-3 py-1 rounded-lg">{simScreen} hrs</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1" max="14" step="1"
+                    value={simScreen}
+                    onChange={(e) => setSimScreen(Number(e.target.value))}
+                    className="w-full h-2 bg-foreground/10 rounded-full appearance-none cursor-pointer accent-rose-500 transition-all group-hover:h-3"
+                  />
+                </div>
+              </div>
+
+              {/* Simulation Results Mini-Cards */}
+              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-[var(--border)]">
+                <div className="p-4 bg-[var(--muted-bg)]/40 rounded-2xl border border-[var(--border)] flex flex-col items-center justify-center text-center group hover:bg-primary/5 transition-colors">
+                  <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mb-1">Burnout Risk</span>
+                  <span className={`text-2xl font-black ${simulatedPredictions.burnoutRisk > 60 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                    {simulatedPredictions.burnoutRisk}%
                   </span>
                 </div>
-                <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 block">BURNOUT RISK</span>
-                  <span className={`text-sm font-black block ${predictions.fatigueBuildup > 65 ? "text-rose-400" : "text-emerald-400"}`}>
-                    {predictions.fatigueBuildup}%
+                <div className="p-4 bg-[var(--muted-bg)]/40 rounded-2xl border border-[var(--border)] flex flex-col items-center justify-center text-center group hover:bg-secondary/5 transition-colors">
+                  <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mb-1">Recovery</span>
+                  <span className="text-2xl font-black text-secondary">
+                    {simulatedPredictions.recoveryPercentage}%
                   </span>
                 </div>
-                <div className="p-3 bg-foreground/5 rounded-xl border border-foreground/5 space-y-1">
-                  <span className="text-[9px] font-bold text-foreground/50 block">REST QUALITY</span>
-                  <span className={`text-sm font-black block ${predictions.sleepDeteriorationRisk > 60 ? "text-rose-400" : "text-emerald-400"}`}>
-                    {100 - predictions.sleepDeteriorationRisk}%
+                <div className="p-4 bg-[var(--muted-bg)]/40 rounded-2xl border border-[var(--border)] flex flex-col items-center justify-center text-center group hover:bg-violet-500/5 transition-colors">
+                  <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mb-1">Sleep Deterioration</span>
+                  <span className={`text-2xl font-black ${simulatedPredictions.sleepDeteriorationRisk > 50 ? 'text-rose-500' : 'text-violet-500'}`}>
+                    {simulatedPredictions.sleepDeteriorationRisk}%
                   </span>
                 </div>
               </div>
+            </GlassCard>
 
-              {/* AI Longevity insights */}
-              <div className="pt-2">
-                <GlassCard glowColor="violet" className="p-4 border border-primary/10 bg-primary/5">
-                  <h4 className="text-xs font-bold text-primary flex items-center gap-1.5 mb-2 uppercase tracking-widest">
-                    <TrendingUp className="h-4 w-4" />
-                    Friendly Wellness Tips
-                  </h4>
-                  <ul className="space-y-2 text-xs text-foreground/75 leading-relaxed font-semibold">
-                    {predictions.aiInsights.map((insight, idx) => (
-                      <li key={idx} className="flex gap-2 items-start">
-                        <span className="text-primary font-bold mt-0.5">•</span>
-                        <span>{insight}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </GlassCard>
+            {/* --- 4. HEALTH STORY FEED --- */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 px-2">
+                <Layers className="h-5 w-5 text-primary" />
+                <h2 className="text-lg font-bold">Your Health Story</h2>
               </div>
-
-            </div>
-
-            {/* Time mode active selector */}
-            <div className="flex justify-between items-center pt-4 border-t border-foreground/5 shrink-0">
-              <span className="text-xs text-foreground/50 font-semibold flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                Forecast Mode Active
-              </span>
-              <div className="flex gap-2">
-                <Button 
-                  variant="glass" 
-                  size="sm" 
-                  onClick={() => setSimulationMonths(3)} 
-                  className={simulationMonths === 3 ? "border-primary text-primary font-bold text-xs bg-primary/5" : "text-xs font-bold"}
-                >
-                  3 Months View
-                </Button>
-                <Button 
-                  variant="glass" 
-                  size="sm" 
-                  onClick={() => setSimulationMonths(6)} 
-                  className={simulationMonths === 6 ? "border-primary text-primary font-bold text-xs bg-primary/5" : "text-xs font-bold"}
-                >
-                  6 Months View
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right panel: Preventive Warnings & Milestones */}
-          <div className="lg:col-span-5 rounded-2xl glass-panel p-6 border-foreground/5 space-y-6 flex flex-col justify-between">
-            <div className="space-y-6">
-              <h3 className="text-xs font-bold text-foreground uppercase tracking-widest">
-                Reminders & Achievements
-              </h3>
-
-              {/* Warnings panel */}
-              <div className="space-y-2.5">
-                <span className="text-[10px] font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
-                  <ShieldAlert className="h-3.5 w-3.5" />
-                  Today's Notes
-                </span>
-                <div className="space-y-2 text-xs font-semibold text-[var(--foreground)]">
-                  {predictions.preventiveReminders.map((reminder, idx) => (
-                    <div key={idx} className="flex gap-2 items-start p-3 bg-secondary/5 border border-secondary/15 rounded-xl">
-                      <Sparkles className="h-3.5 w-3.5 text-secondary shrink-0 mt-0.5 animate-pulse" />
-                      <span className="leading-snug">{reminder}</span>
+              <div className="space-y-3">
+                {activeStories.map((story, idx) => (
+                  <div key={idx} className="p-5 rounded-3xl border border-[var(--border)] bg-[var(--card-bg)] flex gap-4 group hover:border-primary/40 transition-all">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                      <Sparkles className="h-5 w-5 text-primary" />
                     </div>
-                  ))}
-                </div>
+                    <p className="text-sm text-[var(--foreground)] leading-relaxed font-medium pt-0.5">
+                      {story}
+                    </p>
+                  </div>
+                ))}
               </div>
-
-              {/* Milestones timeline */}
-              <div className="space-y-4 pt-4 border-t border-foreground/5">
-                <span className="text-[10px] font-bold text-foreground/50 uppercase tracking-widest block">
-                  Your Wellness Achievements
-                </span>
-                <div className="space-y-6 relative pl-4 border-l border-foreground/5">
-                  {timelineEvents.map((ev, idx) => {
-                    const IconComponent = ev.icon;
-                    return (
-                      <div key={idx} className="space-y-1.5 relative">
-                        <div className="absolute -left-[27.5px] top-0 h-5 w-5 rounded-full bg-background border border-foreground/10 flex items-center justify-center shrink-0">
-                          <IconComponent className="h-3 w-3 text-foreground/60" />
-                        </div>
-                        
-                        <span className="text-[10px] font-bold text-foreground/45 flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {ev.date}
-                        </span>
-                        <h4 className="text-xs font-bold text-foreground leading-snug">{ev.title}</h4>
-                        <p className="text-xs text-foreground/70 leading-relaxed font-semibold">{ev.description}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
             </div>
 
-            <div className="text-[10px] text-foreground/45 leading-relaxed font-bold border-t border-foreground/5 pt-4">
-              *Predictions are updated continuously based on your daily habit consistency.
-            </div>
+            {/* --- 7. HEALTH TREND REPLAY --- */}
+            <GlassCard glowColor="none" className="p-6 sm:p-8 rounded-[32px]">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-2">
+                  <PlayCircle className="h-5 w-5 text-secondary" />
+                  <h2 className="text-lg font-bold">Health Trend Replay</h2>
+                </div>
+                <span className="text-xs font-bold text-[var(--muted)]">Last Week vs This Week</span>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span className="text-[var(--foreground)]">Deep Sleep Consistency</span>
+                    <span className="text-emerald-500">+12% Improvement</span>
+                  </div>
+                  <div className="w-full h-2 bg-foreground/5 rounded-full overflow-hidden flex">
+                    <div className="h-full bg-[var(--muted)] w-[45%]" />
+                    <div className="h-full bg-emerald-500 w-[12%] animate-[pulse_2s_ease-in-out_infinite]" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span className="text-[var(--foreground)]">Hydration Target Hit</span>
+                    <span className="text-rose-500">-5% Decline</span>
+                  </div>
+                  <div className="w-full h-2 bg-foreground/5 rounded-full overflow-hidden flex">
+                    <div className="h-full bg-primary w-[80%]" />
+                  </div>
+                  <p className="text-[10px] text-[var(--muted)] font-medium">You were more hydrated last week. Grab a glass of water!</p>
+                </div>
+              </div>
+            </GlassCard>
+
           </div>
 
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* --- 3. HEALTH EVOLUTION AVATAR --- */}
+            <GlassCard glowColor="emerald" className="p-6 rounded-[32px] overflow-hidden relative group text-center flex flex-col items-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
+              <h2 className="text-sm font-bold text-[var(--muted)] uppercase tracking-widest mb-6 relative z-10">Health Evolution Avatar</h2>
+              
+              <div className="relative w-32 h-32 mb-4 group-hover:scale-105 transition-transform duration-500">
+                {/* SVG Avatar Representation */}
+                <div className="absolute inset-0 rounded-full border-4 border-emerald-500/20 animate-[spin_10s_linear_infinite]" />
+                <div className="absolute inset-2 rounded-full border-4 border-dashed border-emerald-500/40 animate-[spin_15s_linear_infinite_reverse]" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all duration-700 ${
+                    simulatedPredictions.stabilityScore > 80 ? "bg-emerald-500 shadow-emerald-500/50" : 
+                    simulatedPredictions.stabilityScore > 50 ? "bg-primary shadow-primary/50" : "bg-amber-500 shadow-amber-500/50"
+                  }`}>
+                    <Heart className="h-10 w-10 text-white animate-pulse" />
+                  </div>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-black text-[var(--foreground)] mb-1">
+                {simulatedPredictions.stabilityScore > 80 ? "Peak Vitality" : simulatedPredictions.stabilityScore > 50 ? "Balanced Rhythm" : "Restoration Needed"}
+              </h3>
+              <p className="text-xs text-[var(--muted)] font-medium px-4">
+                This avatar represents your internal state. It evolves dynamically as your habits improve.
+              </p>
+            </GlassCard>
+
+            {/* --- 6. STREAK GARDEN --- */}
+            <GlassCard glowColor="emerald" className="p-6 rounded-[32px]">
+              <div className="flex items-center gap-2 mb-6">
+                <Leaf className="h-5 w-5 text-emerald-500" />
+                <h2 className="text-lg font-bold">Streak Garden</h2>
+              </div>
+              
+              <div className="flex justify-center items-end h-32 border-b-2 border-amber-900/20 mb-4 pb-2">
+                {/* CSS/SVG Tree that grows based on gardenLevel */}
+                <div className="relative w-full flex justify-center items-end">
+                  {/* Base Stem */}
+                  <div className="w-4 bg-emerald-800 rounded-t-lg transition-all duration-1000" style={{ height: `${gardenLevel * 20}px` }} />
+                  
+                  {/* Leaves */}
+                  {gardenLevel >= 2 && (
+                    <div className="absolute bg-emerald-500 w-12 h-12 rounded-full opacity-80 mix-blend-multiply transition-all duration-1000 animate-pulse" style={{ bottom: '30px', left: 'calc(50% - 24px)' }} />
+                  )}
+                  {gardenLevel >= 3 && (
+                    <>
+                      <div className="absolute bg-emerald-400 w-16 h-16 rounded-full opacity-80 mix-blend-multiply transition-all duration-1000" style={{ bottom: '40px', left: 'calc(50% - 35px)' }} />
+                      <div className="absolute bg-emerald-600 w-14 h-14 rounded-full opacity-80 mix-blend-multiply transition-all duration-1000" style={{ bottom: '20px', left: 'calc(50% + 5px)' }} />
+                    </>
+                  )}
+                  {gardenLevel >= 4 && (
+                    <>
+                      <div className="absolute bg-green-400 w-20 h-20 rounded-full opacity-90 mix-blend-multiply transition-all duration-1000" style={{ bottom: '50px', left: 'calc(50% - 40px)' }} />
+                      <div className="absolute bg-emerald-300 w-12 h-12 rounded-full opacity-90 mix-blend-multiply transition-all duration-1000 animate-bounce" style={{ bottom: '80px', left: 'calc(50% - 10px)' }} />
+                    </>
+                  )}
+                </div>
+              </div>
+              <p className="text-center text-xs font-bold text-[var(--muted)]">
+                {gardenLevel === 4 ? "Your garden is flourishing!" : "Keep up your habits to grow your tree."}
+              </p>
+            </GlassCard>
+
+            {/* --- 5. ACHIEVEMENTS & MILESTONES --- */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center px-2">
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-amber-500" />
+                  <h2 className="text-lg font-bold">Trophy Room</h2>
+                </div>
+                <span className="text-xs font-bold text-primary cursor-pointer hover:underline">View All</span>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-4 rounded-3xl bg-[var(--card-bg)] border border-[var(--border)] text-center group hover:bg-amber-500/5 hover:border-amber-500/30 transition-colors">
+                  <div className="h-12 w-12 mx-auto rounded-full bg-amber-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <Flame className="h-6 w-6 text-amber-500" />
+                  </div>
+                  <h4 className="text-xs font-bold text-[var(--foreground)]">7-Day Streak</h4>
+                  <p className="text-[10px] text-[var(--muted)] mt-1">Logged every day</p>
+                </div>
+                
+                <div className="p-4 rounded-3xl bg-[var(--card-bg)] border border-[var(--border)] text-center group hover:bg-emerald-500/5 hover:border-emerald-500/30 transition-colors">
+                  <div className="h-12 w-12 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <Droplet className="h-6 w-6 text-emerald-500" />
+                  </div>
+                  <h4 className="text-xs font-bold text-[var(--foreground)]">Aqua Master</h4>
+                  <p className="text-[10px] text-[var(--muted)] mt-1">Hit target 5x</p>
+                </div>
+              </div>
+            </div>
+
+            {/* --- 9. COMMUNITY CHALLENGES --- */}
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center gap-2 px-2">
+                <Shield className="h-5 w-5 text-primary" />
+                <h2 className="text-lg font-bold">Active Challenges</h2>
+              </div>
+              
+              <div className="p-5 rounded-3xl bg-[var(--card-bg)] border border-[var(--border)] group cursor-pointer hover:border-primary/40 transition-all relative overflow-hidden">
+                <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-primary/5 to-transparent" />
+                <div className="flex justify-between items-center relative z-10">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Public Challenge</span>
+                    <h3 className="text-sm font-bold text-[var(--foreground)]">100k Steps Week</h3>
+                    <p className="text-xs text-[var(--muted)] font-medium">342 people joined • Ends in 2 days</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-[var(--muted)] group-hover:text-primary transition-colors" />
+                </div>
+                <div className="w-full h-1.5 bg-foreground/10 rounded-full mt-4 overflow-hidden relative z-10">
+                  <div className="h-full bg-primary w-[75%]" />
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
 
       </div>

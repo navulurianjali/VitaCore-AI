@@ -138,6 +138,23 @@ export function useHealthData() {
       setError("Failed to load your health telemetry.");
       
       // Fallback zero-state metrics if database tables are missing
+      let localSleep = { sleepHours: 0, sleepQuality: 50 };
+      if (typeof window !== "undefined") {
+        const localData = localStorage.getItem("vitalcore_sleep_logs");
+        if (localData) {
+          try {
+            const parsed = JSON.parse(localData);
+            if (parsed && parsed.length > 0) {
+              const latest = parsed[parsed.length - 1];
+              localSleep = {
+                sleepHours: latest.duration || 0,
+                sleepQuality: (latest.quality || 5) * 10
+              };
+            }
+          } catch (e) {}
+        }
+      }
+
       setMetrics({
         caloriesBurned: 0,
         caloriesTarget: 600,
@@ -146,9 +163,9 @@ export function useHealthData() {
         hydrationTarget: 2500,
         steps: 0,
         stepsTarget: 10000,
-        sleepHours: 0,
+        sleepHours: localSleep.sleepHours,
         sleepTarget: 8.0,
-        sleepQuality: 50,
+        sleepQuality: localSleep.sleepQuality,
         stressLevel: 50,
         mood: "neutral",
         recoveryPercentage: 50,

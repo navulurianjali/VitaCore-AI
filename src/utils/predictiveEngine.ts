@@ -240,3 +240,69 @@ export const getEnvironmentAdjustedRoutine = (
     alerts
   };
 };
+
+export interface LongTermProjection {
+  day: number;
+  label: string;
+  energy: number;
+  recovery: number;
+  vitalityAge: number;
+  burnoutRisk: number;
+  consistencyScore: number;
+  wellnessScore: number;
+  insight: string;
+}
+
+export function getLongTermProjections(data: TelemetryData, baseAge: number = 30): LongTermProjection[] {
+  let currentEnergy = 100 - (data.fatigueScore * 0.5 + data.stressLevel * 0.2);
+  let currentRecovery = data.recoveryPercentage;
+  let currentStability = data.stabilityScore;
+  let currentBurnout = data.stressLevel * 0.45 + (100 - data.sleepQuality) * 0.35 + data.fatigueScore * 0.2;
+  
+  const periods = [
+    { day: 0, label: "Today" },
+    { day: 30, label: "30 Days" },
+    { day: 90, label: "90 Days" },
+    { day: 365, label: "1 Year" }
+  ];
+
+  return periods.map(p => {
+    const multiplier = p.day / 30; // Monthly unit
+    const growth = (currentStability - 60) * 0.1;
+    
+    let simEnergy = currentEnergy + (growth * multiplier * 5);
+    let simRecovery = currentRecovery + (growth * multiplier * 4);
+    let simBurnout = currentBurnout - (growth * multiplier * 8);
+    let simStability = currentStability + (growth > 0 ? 2 : -2) * multiplier;
+    
+    simEnergy = Math.min(98, Math.max(20, simEnergy));
+    simRecovery = Math.min(99, Math.max(15, simRecovery));
+    simBurnout = Math.min(95, Math.max(5, simBurnout));
+    simStability = Math.min(99, Math.max(20, simStability));
+    
+    let simAge = baseAge;
+    if (simStability >= 85) {
+      simAge -= 1.5 * Math.min(3, multiplier);
+    } else if (simStability < 50) {
+      simAge += 1.0 * Math.min(3, multiplier);
+    }
+
+    let insight = "";
+    if (p.day === 0) insight = "Your baseline today.";
+    else if (p.day === 30) insight = growth > 0 ? "Initial adaptations show increased recovery." : "Slight decline if habits aren't adjusted.";
+    else if (p.day === 90) insight = growth > 0 ? "Habits solidifying. Vitality age dropping." : "Risk of burnout increasing. Intervention needed.";
+    else insight = growth > 0 ? "Transformation achieved! Biological age significantly improved." : "Long-term health risks compounded.";
+
+    return {
+      day: p.day,
+      label: p.label,
+      energy: Math.round(simEnergy),
+      recovery: Math.round(simRecovery),
+      vitalityAge: Math.round(simAge * 10) / 10,
+      burnoutRisk: Math.round(simBurnout),
+      consistencyScore: Math.round(simStability),
+      wellnessScore: Math.round((simEnergy + simRecovery + simStability) / 3),
+      insight
+    };
+  });
+}
