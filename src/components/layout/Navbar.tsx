@@ -20,8 +20,8 @@ export const Navbar: React.FC = () => {
   const isDashboard = pathname.startsWith("/dashboard") || 
                       pathname === "/ai-coach" || 
                       pathname === "/nutrition" || 
-                      pathname === "/sleep" || 
-                      pathname === "/recovery" || 
+                      pathname === "/sleep" ||
+                      pathname === "/dashboard" || 
                       pathname === "/timeline" || 
                       pathname === "/challenges" || 
                       pathname === "/community" ||

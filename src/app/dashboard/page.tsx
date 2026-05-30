@@ -286,18 +286,12 @@ export default function DashboardPage() {
                 <div className="text-[10px] text-[var(--muted)] mt-0.5">Quality: {metrics.sleepQuality}%</div>
               </div>
               <div className="flex gap-1.5 mt-2">
-                <button
-                  onClick={(e) => { e.preventDefault(); handleLogSleep(8, 90); }}
-                  className="flex-1 py-1 rounded bg-violet-500/10 border border-violet-500/15 hover:bg-violet-500/20 text-violet-400 font-bold text-[9px] cursor-pointer"
+                <Link
+                  href="/sleep"
+                  className="flex-1 py-1 rounded bg-violet-500/10 border border-violet-500/15 hover:bg-violet-500/20 text-violet-400 font-bold text-[9px] cursor-pointer text-center block"
                 >
-                  Log 8h
-                </button>
-                <button
-                  onClick={(e) => { e.preventDefault(); handleLogSleep(6, 60); }}
-                  className="flex-1 py-1 rounded bg-violet-500/10 border border-violet-500/15 hover:bg-violet-500/20 text-violet-400 font-bold text-[9px] cursor-pointer"
-                >
-                  Log 6h
-                </button>
+                  Manage Sleep Data
+                </Link>
               </div>
               <div className="progress-bar mt-3">
                 <div className="progress-bar-fill bg-violet-500/80" style={{ width: `${sleepPct}%` }} />
