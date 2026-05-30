@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/context/AuthContext";
 
-export interface DailyMetrics {
+export interface HealthDigitalTwin {
   caloriesBurned: number;
   caloriesTarget: number;
   caloriesConsumed: number;
@@ -31,7 +31,7 @@ export interface DailyMetrics {
 
 export function useHealthData() {
   const { profile } = useAuth();
-  const [metrics, setMetrics] = useState<DailyMetrics | null>(null);
+  const [metrics, setMetrics] = useState<HealthDigitalTwin | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,7 +105,7 @@ export function useHealthData() {
         .limit(1);
       const lastMood = moodData?.[0] || { stress_level: 50, mood: 'neutral' };
 
-      const realMetrics: DailyMetrics = {
+      const realMetrics: HealthDigitalTwin = {
         caloriesBurned,
         caloriesTarget: 600,
         caloriesConsumed,

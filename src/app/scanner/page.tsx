@@ -603,6 +603,7 @@ export default function FoodScannerPage() {
         saveToLocalStorage(localData);
       }
 
+      window.dispatchEvent(new Event("vitalcore-data-updated"));
       setConfirmStatus("confirmed");
       confetti({
         particleCount: 120,

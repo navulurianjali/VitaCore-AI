@@ -1,11 +1,11 @@
-import { DailyMetrics } from "@/hooks/useHealthData";
+import { HealthDigitalTwin } from "@/hooks/useHealthData";
 
 export interface FutureHealthScore {
   direction: 'Improving' | 'Stable' | 'Declining';
   explanation: string;
 }
 
-export function getFutureHealthScore(data: DailyMetrics): FutureHealthScore {
+export function getFutureHealthScore(data: HealthDigitalTwin): FutureHealthScore {
   const consistencyScore = data.stabilityScore;
   const recoveryScore = data.recoveryPercentage;
 
@@ -32,7 +32,7 @@ export interface HabitEvolution {
   status: 'Growing' | 'Stable' | 'Declining';
 }
 
-export function getHabitEvolution(data: DailyMetrics): HabitEvolution[] {
+export function getHabitEvolution(data: HealthDigitalTwin): HabitEvolution[] {
   const habits: HabitEvolution[] = [];
 
   // Sleep
@@ -62,7 +62,7 @@ export interface FoodEvolution {
   isPositive: boolean;
 }
 
-export function getFoodEvolution(data: DailyMetrics): FoodEvolution[] {
+export function getFoodEvolution(data: HealthDigitalTwin): FoodEvolution[] {
   const trends: FoodEvolution[] = [];
   
   if (data.stabilityScore > 75) {
@@ -85,7 +85,7 @@ export interface EarlyWarning {
   type: string;
 }
 
-export function getEarlyWarnings(data: DailyMetrics): EarlyWarning[] {
+export function getEarlyWarnings(data: HealthDigitalTwin): EarlyWarning[] {
   const warnings: EarlyWarning[] = [];
   
   if (data.sleepHours < 6) {
@@ -133,7 +133,7 @@ export interface FutureTimelineProjection {
   vitalityAge: number;
 }
 
-export function getFutureTimeline(data: DailyMetrics, currentAge: number): FutureTimelineProjection[] {
+export function getFutureTimeline(data: HealthDigitalTwin, currentAge: number): FutureTimelineProjection[] {
   const baseAge = currentAge;
   const isDeclining = data.stabilityScore < 50;
   const isImproving = data.stabilityScore > 80;
@@ -178,7 +178,7 @@ export function getFutureTimeline(data: DailyMetrics, currentAge: number): Futur
   ];
 }
 
-export function getHealthMilestoneForecast(data: DailyMetrics): string[] {
+export function getHealthMilestoneForecast(data: HealthDigitalTwin): string[] {
   const milestones: string[] = [];
   
   if (data.hydrationMl >= 2000) milestones.push('Potential 30-day hydration streak');
@@ -191,7 +191,7 @@ export function getHealthMilestoneForecast(data: DailyMetrics): string[] {
   return milestones;
 }
 
-export function getPersonalizedStory(data: DailyMetrics): string[] {
+export function getPersonalizedStory(data: HealthDigitalTwin): string[] {
   const story: string[] = [];
   
   if (data.stabilityScore > 75) {
@@ -211,7 +211,7 @@ export function getPersonalizedStory(data: DailyMetrics): string[] {
 }
 
 // Decision Impact Tool (Simulator)
-export function simulateDecisionImpact(baseData: DailyMetrics, sleepAdd: number, waterAdd: number, stepsAdd: number): any {
+export function simulateDecisionImpact(baseData: HealthDigitalTwin, sleepAdd: number, waterAdd: number, stepsAdd: number): any {
   const newSleep = (baseData.sleepHours || 7) + sleepAdd;
   const newWater = (baseData.hydrationMl || 2000) + waterAdd;
   const newSteps = (baseData.steps || 5000) + stepsAdd;

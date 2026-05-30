@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import { useAuth } from "@/context/AuthContext";
-import { useHealthData } from "@/hooks/useHealthData";
+import { useHealthData, HealthDigitalTwin } from "@/hooks/useHealthData";
 import {
   Activity, ArrowRight, Brain, Clock, Droplet, Flame, Heart, 
   Leaf, Milestone, Moon, ShieldAlert, Sparkles, Target, 

@@ -478,6 +478,7 @@ export default function SmartAINutritionPlansPage() {
         });
         localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
       }
+      window.dispatchEvent(new Event("vitalcore-data-updated"));
     } catch (err) {
       console.error("Error logging meal:", err);
       // Fallback in catch block as well for complete robustness
@@ -494,6 +495,7 @@ export default function SmartAINutritionPlansPage() {
         created_at: new Date().toISOString()
       });
       localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
+      window.dispatchEvent(new Event("vitalcore-data-updated"));
     } finally {
       await fetchLogs();
       setSelectedMealDetails(null);
@@ -516,6 +518,7 @@ export default function SmartAINutritionPlansPage() {
         });
       
       if (!error) {
+        window.dispatchEvent(new Event("vitalcore-data-updated"));
         await fetchLogs();
         confetti({
           particleCount: 20,

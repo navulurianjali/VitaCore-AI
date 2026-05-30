@@ -609,6 +609,7 @@ export default function FitnessPage() {
           notes: `Score: ${postureScore}%. Spine: ${postureScore < 85 ? "Sag/Slouch detected (12.4 lbs load)" : "Stable stance (3.1 lbs load)"}.`
         }).then(({ error }) => {
           if (error) console.error("Error inserting posture scan to database:", error);
+          else window.dispatchEvent(new Event("vitalcore-data-updated"));
         });
       } catch (e) {
         console.warn("DB Posture insertion error. Saved locally.");
@@ -1341,6 +1342,7 @@ export default function FitnessPage() {
           adaptive_adapted: recoveryWarning !== "",
           notes: feedback
         });
+        window.dispatchEvent(new Event("vitalcore-data-updated"));
       } catch (err) {
         console.error("Database save failed. Local session cached successfully.");
       }

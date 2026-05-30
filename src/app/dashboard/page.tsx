@@ -25,7 +25,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme, ActiveMode } from "@/context/ThemeContext";
-import { useHealthData, DailyMetrics } from "@/hooks/useHealthData";
+import { useHealthData, HealthDigitalTwin } from "@/hooks/useHealthData";
 import { supabase } from "@/utils/supabase";
 import { calculateFutureHealthPredictions } from "@/utils/predictiveEngine";
 
@@ -80,6 +80,7 @@ export default function DashboardPage() {
         if (error) throw error;
         
         await refetch();
+        window.dispatchEvent(new Event("vitalcore-data-updated"));
       } else {
         // Fallback for unauthenticated/offline
         setWaterLogged(w => w + amount);
@@ -109,6 +110,7 @@ export default function DashboardPage() {
         if (error) throw error;
         
         await refetch();
+        window.dispatchEvent(new Event("vitalcore-data-updated"));
       } else {
         setSleepHrs(hours);
       }
