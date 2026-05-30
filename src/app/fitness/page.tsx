@@ -15,6 +15,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { useHealthData } from "@/hooks/useHealthData";
 import { supabase } from "@/utils/supabase";
 import confetti from "canvas-confetti";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 // Curated exercise library
 interface Exercise {
@@ -2231,6 +2232,41 @@ export default function FitnessPage() {
                   <div className="text-2xl font-bold text-amber-500">92.4%</div>
                 </GlassCard>
 
+              </div>
+
+              {/* Progress Visualization Chart */}
+              <div className="rounded-2xl glass-panel p-6 border-foreground/5 space-y-5">
+                <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <Activity className="h-4.5 w-4.5 text-rose-500" />
+                  Recent Workout Trends
+                </h3>
+                <div className="h-64 w-full">
+                  {workoutHistory.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={[...workoutHistory].reverse()} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorCalories" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#fb7185" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#fb7185" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "var(--foreground)", opacity: 0.5 }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "var(--foreground)", opacity: 0.5 }} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--foreground)" opacity={0.05} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: "var(--background)", borderColor: "var(--border)", borderRadius: "12px", fontSize: "12px" }}
+                          itemStyle={{ color: "#fb7185", fontWeight: "bold" }}
+                          labelStyle={{ color: "var(--foreground)", opacity: 0.6, marginBottom: "4px" }}
+                        />
+                        <Area type="monotone" dataKey="calories" stroke="#fb7185" strokeWidth={3} fillOpacity={1} fill="url(#colorCalories)" name="Calories Burned" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-xs text-foreground/50 font-bold">
+                      Not enough data to display trends. Keep logging workouts!
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
