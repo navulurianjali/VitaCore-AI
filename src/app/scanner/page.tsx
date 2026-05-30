@@ -1380,8 +1380,8 @@ export default function FoodScannerPage() {
                       <span className="text-sm font-bold block mt-0.5">{result.protein}g</span>
                     </div>
                     <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
-                      <span className="text-secondary block font-bold">Carbs</span>
-                      <span className="text-sm font-bold block mt-0.5">{result.carbs}g</span>
+                      <span className="text-blue-500 block font-bold">Carbs</span>
+                      <span className="text-sm font-bold block mt-0.5 text-blue-500">{result.carbs}g</span>
                     </div>
                     <div className="bg-foreground/5 p-2.5 rounded-xl border border-foreground/5">
                       <span className="text-amber-500 block font-bold">Fats</span>
