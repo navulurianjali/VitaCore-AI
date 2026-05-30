@@ -89,6 +89,7 @@ export default function TimelinePage() {
   // Long-term projections based on CURRENT simulated trajectory
   const projections = getLongTermProjections({
     ...metrics,
+    sorenessLevel: 0,
     sleepHours: simSleep,
     hydrationMl: simWater,
     stabilityScore: simulatedPredictions.stabilityScore || metrics.stabilityScore
