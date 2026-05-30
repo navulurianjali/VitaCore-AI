@@ -28,6 +28,7 @@ import { useTheme, ActiveMode } from "@/context/ThemeContext";
 import { useHealthData, HealthDigitalTwin } from "@/hooks/useHealthData";
 import { supabase } from "@/utils/supabase";
 import { calculateFutureHealthPredictions } from "@/utils/predictiveEngine";
+import { usePedometer } from "@/hooks/usePedometer";
 
 export default function DashboardPage() {
   const { profile } = useAuth();
@@ -59,6 +60,26 @@ export default function DashboardPage() {
     { name: "Joint Strength Vitamin D", time: "12:00 PM", taken: false },
     { name: "Glucosamine Tablet", time: "6:00 PM", taken: false }
   ]);
+
+  // Live Pedometer integration
+  const pedometer = usePedometer();
+  const prevSessionSteps = React.useRef(0);
+
+  useEffect(() => {
+    if (pedometer.isTracking) {
+      const diff = pedometer.sessionSteps - prevSessionSteps.current;
+      if (diff > 0) {
+        setStepsLogged(prev => {
+          const updated = prev + diff;
+          localStorage.setItem("vitalcore_daily_steps", updated.toString());
+          return updated;
+        });
+      }
+      prevSessionSteps.current = pedometer.sessionSteps;
+    } else {
+      prevSessionSteps.current = 0;
+    }
+  }, [pedometer.sessionSteps, pedometer.isTracking]);
 
   useEffect(() => {
     if (metrics) {
@@ -319,11 +340,13 @@ export default function DashboardPage() {
             </GlassCard>
 
             {/* Steps */}
-            <GlassCard glowColor="amber" className="p-5 flex flex-col justify-between min-h-[140px] hover:scale-[1.01]">
+            <GlassCard glowColor="amber" className={`p-5 flex flex-col justify-between min-h-[140px] hover:scale-[1.01] ${pedometer.isTracking ? 'ring-2 ring-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : ''}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">Steps</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+                  Steps {pedometer.isTracking && <span className="text-amber-500 animate-pulse ml-1">(Live)</span>}
+                </span>
                 <div className="h-6 w-6 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <Footprints className="h-3.5 w-3.5 text-amber-500" />
+                  <Footprints className={`h-3.5 w-3.5 text-amber-500 ${pedometer.isTracking ? 'animate-bounce' : ''}`} />
                 </div>
               </div>
               <div>
@@ -331,21 +354,32 @@ export default function DashboardPage() {
                 <div className="text-[10px] text-[var(--muted)] mt-0.5">/ {metrics.stepsTarget.toLocaleString()} goal</div>
               </div>
               <div className="flex gap-1.5 mt-2">
-                <button
-                  onClick={(e) => { e.preventDefault(); handleLogSteps(1000); }}
-                  className="flex-1 py-1 rounded bg-amber-500/10 border border-amber-500/15 hover:bg-amber-500/20 text-amber-500 font-bold text-[9px] cursor-pointer"
-                >
-                  +1k
-                </button>
-                <button
-                  onClick={(e) => { e.preventDefault(); handleLogSteps(5000); }}
-                  className="flex-1 py-1 rounded bg-amber-500/10 border border-amber-500/15 hover:bg-amber-500/20 text-amber-500 font-bold text-[9px] cursor-pointer"
-                >
-                  +5k
-                </button>
+                {!pedometer.isTracking ? (
+                  <>
+                    <button
+                      onClick={(e) => { e.preventDefault(); handleLogSteps(1000); }}
+                      className="flex-1 py-1 rounded bg-amber-500/10 border border-amber-500/15 hover:bg-amber-500/20 text-amber-500 font-bold text-[9px] cursor-pointer"
+                    >
+                      +1k
+                    </button>
+                    <button
+                      onClick={(e) => { e.preventDefault(); pedometer.requestPermission(); }}
+                      className="flex-1 py-1 rounded bg-amber-500 text-white hover:bg-amber-600 font-bold text-[9px] cursor-pointer flex items-center justify-center gap-1 shadow-sm shadow-amber-500/20"
+                    >
+                      <Activity className="h-3 w-3" /> Live Track
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={(e) => { e.preventDefault(); pedometer.stopTracking(); }}
+                    className="w-full py-1 rounded bg-red-500/10 border border-red-500/15 hover:bg-red-500/20 text-red-500 font-bold text-[9px] cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    Stop Tracking ({pedometer.sessionSteps} steps this session)
+                  </button>
+                )}
               </div>
               <div className="progress-bar mt-3">
-                <div className="progress-bar-fill bg-amber-500/80" style={{ width: `${stepsPct}%` }} />
+                <div className="progress-bar-fill bg-amber-500/80 transition-all duration-300" style={{ width: `${stepsPct}%` }} />
               </div>
             </GlassCard>
 
