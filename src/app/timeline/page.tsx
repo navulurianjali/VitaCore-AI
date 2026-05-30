@@ -69,6 +69,8 @@ export default function TimelinePage() {
     caffeineIntake: 'moderate'
   });
 
+  const simulatedStabilityScore = simSleep >= 7 && simWater >= 2000 ? Math.min(100, metrics.stabilityScore + 15) : Math.max(10, metrics.stabilityScore - 15);
+
   // Simulated Predictions
   const simulatedPredictions = calculateFutureHealthPredictions({
     sleepHours: simSleep,
@@ -81,7 +83,7 @@ export default function TimelinePage() {
     mentalFatigue: metrics.mentalFatigue,
     sorenessLevel: 0,
     recoveryPercentage: simSleep >= 8 ? 85 : 45,
-    stabilityScore: simSleep >= 7 && simWater >= 2000 ? Math.min(100, metrics.stabilityScore + 15) : Math.max(10, metrics.stabilityScore - 15),
+    stabilityScore: simulatedStabilityScore,
     screenTimeHours: simScreen,
     caffeineIntake: 'moderate'
   });
@@ -92,7 +94,7 @@ export default function TimelinePage() {
     sorenessLevel: 0,
     sleepHours: simSleep,
     hydrationMl: simWater,
-    stabilityScore: simulatedPredictions.stabilityScore || metrics.stabilityScore
+    stabilityScore: simulatedStabilityScore
   }, profile?.biological_age || 30);
 
   const activeProjection = projections.find(p => p.day === activeProjectionDay) || projections[1];
@@ -373,8 +375,8 @@ export default function TimelinePage() {
                 <div className="absolute inset-2 rounded-full border-4 border-dashed border-emerald-500/40 animate-[spin_15s_linear_infinite_reverse]" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className={`w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all duration-700 ${
-                    simulatedPredictions.stabilityScore > 80 ? "bg-emerald-500 shadow-emerald-500/50" : 
-                    simulatedPredictions.stabilityScore > 50 ? "bg-primary shadow-primary/50" : "bg-amber-500 shadow-amber-500/50"
+                    simulatedStabilityScore > 80 ? "bg-emerald-500 shadow-emerald-500/50" : 
+                    simulatedStabilityScore > 50 ? "bg-primary shadow-primary/50" : "bg-amber-500 shadow-amber-500/50"
                   }`}>
                     <Heart className="h-10 w-10 text-white animate-pulse" />
                   </div>
@@ -382,7 +384,7 @@ export default function TimelinePage() {
               </div>
               
               <h3 className="text-xl font-black text-[var(--foreground)] mb-1">
-                {simulatedPredictions.stabilityScore > 80 ? "Peak Vitality" : simulatedPredictions.stabilityScore > 50 ? "Balanced Rhythm" : "Restoration Needed"}
+                {simulatedStabilityScore > 80 ? "Peak Vitality" : simulatedStabilityScore > 50 ? "Balanced Rhythm" : "Restoration Needed"}
               </h3>
               <p className="text-xs text-[var(--muted)] font-medium px-4">
                 This avatar represents your internal state. It evolves dynamically as your habits improve.
