@@ -105,13 +105,25 @@ export function useHealthData() {
         .limit(1);
       const lastMood = moodData?.[0] || { stress_level: 50, mood: 'neutral' };
 
+      let localSteps = 0;
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("vitalcore_daily_steps");
+        const storedDate = localStorage.getItem("vitalcore_daily_steps_date");
+        if (storedDate === today && stored) {
+          localSteps = Number(stored);
+        } else {
+          localStorage.setItem("vitalcore_daily_steps_date", today);
+          localStorage.setItem("vitalcore_daily_steps", "0");
+        }
+      }
+
       const realMetrics: HealthDigitalTwin = {
         caloriesBurned,
         caloriesTarget: 600,
         caloriesConsumed,
         hydrationMl,
         hydrationTarget: 2500,
-        steps: 0,
+        steps: localSteps,
         stepsTarget: 10000,
         sleepHours: Number(lastSleep.sleep_hours),
         sleepTarget: 8.0,

@@ -37,6 +37,7 @@ export default function DashboardPage() {
   const [waterLogged, setWaterLogged] = useState(0);
   const [totalCalories, setTotalCalories] = useState(0);
   const [sleepHrs, setSleepHrs] = useState(0);
+  const [stepsLogged, setStepsLogged] = useState(0);
 
   // Simulation states
   const [simulating, setSimulating] = useState(false);
@@ -64,6 +65,7 @@ export default function DashboardPage() {
       setWaterLogged(metrics.hydrationMl);
       setTotalCalories(metrics.caloriesConsumed);
       setSleepHrs(metrics.sleepHours);
+      setStepsLogged(metrics.steps);
     }
   }, [metrics]);
 
@@ -95,6 +97,22 @@ export default function DashboardPage() {
     } finally {
       setLoggingInProgress(false);
     }
+  };
+
+  const handleLogSteps = (amount: number) => {
+    setLoggingInProgress(true);
+    setLogStatus("Logging steps...");
+    const newSteps = stepsLogged + amount;
+    setStepsLogged(newSteps);
+    localStorage.setItem("vitalcore_daily_steps", newSteps.toString());
+    
+    // Simulate updating global state
+    setTimeout(() => {
+      window.dispatchEvent(new Event("vitalcore-data-updated"));
+      setLogStatus("Steps logged! Keep moving! 🚶");
+      setTimeout(() => setLogStatus(null), 3000);
+      setLoggingInProgress(false);
+    }, 500);
   };
 
   const handleLogSleep = async (hours: number, quality: number) => {
@@ -180,7 +198,7 @@ export default function DashboardPage() {
   const hydrationPct = Math.min(100, (waterLogged / metrics.hydrationTarget) * 100);
   const caloriePct = Math.min(100, (totalCalories / calorieTarget) * 100);
   const sleepPct = Math.min(100, (sleepHrs / metrics.sleepTarget) * 100);
-  const stepsPct = Math.min(100, (metrics.steps / metrics.stepsTarget) * 100);
+  const stepsPct = Math.min(100, (stepsLogged / metrics.stepsTarget) * 100);
 
   const predictions = calculateFutureHealthPredictions({
     sleepHours: simulating ? simSleep : (sleepHrs || metrics.sleepHours),
@@ -309,8 +327,22 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div>
-                <div className="analytics-number text-[var(--foreground)]">{metrics.steps.toLocaleString()}</div>
+                <div className="analytics-number text-[var(--foreground)]">{stepsLogged.toLocaleString()}</div>
                 <div className="text-[10px] text-[var(--muted)] mt-0.5">/ {metrics.stepsTarget.toLocaleString()} goal</div>
+              </div>
+              <div className="flex gap-1.5 mt-2">
+                <button
+                  onClick={(e) => { e.preventDefault(); handleLogSteps(1000); }}
+                  className="flex-1 py-1 rounded bg-amber-500/10 border border-amber-500/15 hover:bg-amber-500/20 text-amber-500 font-bold text-[9px] cursor-pointer"
+                >
+                  +1k
+                </button>
+                <button
+                  onClick={(e) => { e.preventDefault(); handleLogSteps(5000); }}
+                  className="flex-1 py-1 rounded bg-amber-500/10 border border-amber-500/15 hover:bg-amber-500/20 text-amber-500 font-bold text-[9px] cursor-pointer"
+                >
+                  +5k
+                </button>
               </div>
               <div className="progress-bar mt-3">
                 <div className="progress-bar-fill bg-amber-500/80" style={{ width: `${stepsPct}%` }} />
