@@ -175,17 +175,7 @@ export default function LandingPage() {
                     {/* Dark gradient visual layer for professional depth */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
                     
-                    {/* Floating elegant glass panel */}
-                    <div className="absolute bottom-4 left-4 right-4 p-4 rounded-[16px] bg-background/70 backdrop-blur-xl border border-white/5 text-left space-y-1 shadow-xl max-w-xs">
-                      <div className="flex items-center gap-1.5">
-                        <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                        <span className="text-[8px] font-bold text-foreground/75 uppercase tracking-widest">Wellness Twin</span>
-                      </div>
-                      <h3 className="text-xs font-bold text-foreground">Today's Energy Balance</h3>
-                      <p className="text-[10px] text-foreground/60 leading-normal font-semibold">
-                        Rest routine successfully applied. Your body is recharging beautifully today.
-                      </p>
-                    </div>
+
                   </div>
                 </div>
               </motion.div>
