@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey || apiKey.startsWith("AQ.")) {
+    if (!apiKey) {
       // Return high-quality fallback simulator response if key is missing or invalid
       return NextResponse.json({ result: generateFallbackVisionScan() });
     }

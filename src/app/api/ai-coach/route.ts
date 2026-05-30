@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const { message, history, profile, metrics } = body;
 
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey || apiKey.startsWith("AQ.")) {
+    if (!apiKey) {
       return NextResponse.json({
         reply: "Hello! I am currently operating in offline Simulator Mode since a valid `GEMINI_API_KEY` is not configured. Based on your current stats, I recommend focusing on consistent sleep and maintaining your hydration targets. I'll still do my best to assist you!"
       });
