@@ -175,12 +175,18 @@ export default function FitnessPage() {
     if (mediaPipeLoadedRef.current) return true;
     try {
       setLiveCue("Priming computer vision AI... 🧠");
-      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js");
-      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js");
+      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1620228100/camera_utils.js");
+      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose.js");
+      
+      // Wait for window.Pose to be defined (can take a few ms after script loads)
+      for (let i = 0; i < 20; i++) {
+        if (typeof window !== "undefined" && (window as any).Pose) break;
+        await new Promise(r => setTimeout(r, 100));
+      }
       
       if (typeof window !== "undefined" && (window as any).Pose) {
         const pose = new (window as any).Pose({
-          locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+          locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/${file}`
         });
         
         pose.setOptions({

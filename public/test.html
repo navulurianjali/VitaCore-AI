@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <script>
+    setTimeout(() => {
+      console.log(window.Pose ? "Pose is defined" : "Pose is undefined");
+      document.body.innerText = window.Pose ? "Pose is defined" : "Pose is undefined";
+    }, 1000);
+  </script>
+</body>
+</html>
