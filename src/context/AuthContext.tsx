@@ -181,7 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           biological_age: 28.5,
           stability_score: 95.0,
         };
-        const { error: profileError } = await supabase.from("profiles").insert(newProfile);
+        const { error: profileError } = await supabase.from("profiles").upsert(newProfile);
         if (profileError) {
           console.error("Error creating user profile:", profileError);
         } else {

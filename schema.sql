@@ -357,7 +357,7 @@ begin
     coalesce(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
     coalesce(new.raw_user_meta_data->>'full_name', 'Wellness Explorer'),
     new.raw_user_meta_data->>'avatar_url',
-    'standard',
+    'wellness',
     0,
     30.0,
     100.0
