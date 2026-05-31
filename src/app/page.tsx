@@ -69,26 +69,12 @@ export default function LandingPage() {
   ];
 
 
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
-
-  const faqs = [
-    {
-      question: "How does VitalCore predict future health changes?",
-      answer: "VitalCore looks at your daily habits – like sleep quality, heart rate trends, active steps, stress levels, and meals. By noticing small changes in these numbers over time, we can show you how your energy is trending and help you stay ahead of burnout before you even start feeling tired."
-    },
-    {
-      question: "What is the Burnout Warning Radar?",
-      answer: "It's easy to miss tiny daily shifts, like sleeping 15 minutes less each night or having slightly higher stress. The warning radar spots these slow, creeping patterns early, letting you know with friendly tips (like: 'Your sleep has been a little short this week, let's take it easy today!') so you can recharge before feeling drained."
-    },
-    {
-      question: "How do the Elderly and Beginner Modes work?",
-      answer: "You can easily switch modes in the top navigation bar! Beginner Mode makes charts simpler and offers daily activity tips, while Elderly Mode uses larger, high-contrast text, simplifies the screen, and focuses entirely on easy, important goals like gentle stretching, water reminders, and daily walks."
-    },
-    {
-      question: "How secure is my wellness data?",
-      answer: "Your privacy is our top priority. If you're using our standard Mock Mode, everything you track stays completely private on your own device – none of your data ever leaves your browser. If you choose to connect an account to our secure cloud, your personal logs are strictly locked to you, ensuring nobody else can ever access them."
-    }
-  ];
+  // Interactive Simulator State
+  const [sleep, setSleep] = useState(7);
+  const [steps, setSteps] = useState(5000);
+  
+  // Calculate dynamic energy score
+  const energyScore = Math.min(100, Math.round((sleep / 8) * 50 + (steps / 10000) * 50));
 
   return (
     <div className="flex-1 flex flex-col bg-background relative overflow-hidden">
@@ -158,27 +144,64 @@ export default function LandingPage() {
               </motion.div>
             </div>
 
-            {/* RIGHT SIDE: Visual representation */}
-            <div className="lg:col-span-6">
+            {/* RIGHT SIDE: Interactive Wellness Simulator Widget */}
+            <div className="lg:col-span-6 relative z-20 mt-8 lg:mt-0">
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, type: "spring", stiffness: 80 }}
-                className="relative mx-auto max-w-xl lg:max-w-none"
+                className="relative mx-auto max-w-sm w-full"
               >
-                <div className="rounded-[28px] overflow-hidden border border-foreground/5 bg-[var(--card-bg)] shadow-[0_12px_40px_rgba(0,0,0,0.03)] p-2 relative group">
-                  {/* Subtle soft gradient */}
-                  <div className="absolute -inset-1 bg-gradient-to-tr from-primary/8 via-secondary/8 to-accent/5 rounded-[30px] blur-lg opacity-40" />
+                <div className="rounded-3xl border border-[var(--border)] bg-[var(--card-bg)] shadow-2xl shadow-primary/10 p-6 sm:p-8 space-y-8 relative overflow-hidden group">
                   
+                  {/* Decorative background glow that reacts to score */}
                   <div 
-                    className="relative rounded-[22px] overflow-hidden border border-foreground/5 aspect-[16/10] bg-cover bg-center"
-                    style={{ backgroundImage: "url('/images/saas_background.png')" }}
-                  >
-                    {/* Dark gradient visual layer for professional depth */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
-                    
+                    className="absolute -top-20 -right-20 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-500"
+                    style={{ backgroundColor: energyScore > 80 ? 'rgba(16, 185, 129, 0.15)' : energyScore > 50 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(244, 63, 94, 0.15)' }}
+                  />
 
+                  <div className="text-center space-y-2 relative z-10">
+                    <h3 className="text-xl font-bold text-[var(--foreground)] tracking-tight">Daily Energy Simulator</h3>
+                    <p className="text-xs text-[var(--muted)] font-medium">Adjust habits to see your live score.</p>
                   </div>
+
+                  {/* Reactive Score Display */}
+                  <div className="flex justify-center relative z-10">
+                    <div className="relative flex flex-col items-center justify-center w-32 h-32 rounded-full shadow-[0_0_40px_rgba(0,0,0,0.05)] bg-gradient-to-br from-background to-[var(--muted-bg)] border-4 border-[var(--border)] group-hover:border-primary/50 transition-colors duration-500">
+                      <span className={`text-5xl font-black ${energyScore > 80 ? 'text-primary' : energyScore > 50 ? 'text-secondary' : 'text-accent'}`}>
+                        {energyScore}
+                      </span>
+                      <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest mt-1">Score</span>
+                    </div>
+                  </div>
+
+                  {/* Interactive Sliders */}
+                  <div className="space-y-6 relative z-10 pt-2">
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-xs font-bold text-[var(--foreground)]">
+                        <span className="flex items-center gap-1.5"><Moon className="w-3.5 h-3.5 text-secondary" /> Sleep</span>
+                        <span className="text-secondary">{sleep} hrs</span>
+                      </div>
+                      <input 
+                        type="range" min="2" max="12" step="0.5" 
+                        value={sleep} onChange={(e) => setSleep(parseFloat(e.target.value))}
+                        className="w-full h-2 bg-[var(--muted-bg)] rounded-lg appearance-none cursor-pointer accent-secondary"
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-xs font-bold text-[var(--foreground)]">
+                        <span className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-primary" /> Steps</span>
+                        <span className="text-primary">{steps} steps</span>
+                      </div>
+                      <input 
+                        type="range" min="0" max="20000" step="500" 
+                        value={steps} onChange={(e) => setSteps(parseInt(e.target.value))}
+                        className="w-full h-2 bg-[var(--muted-bg)] rounded-lg appearance-none cursor-pointer accent-primary"
+                      />
+                    </div>
+                  </div>
+
                 </div>
               </motion.div>
             </div>
@@ -322,97 +345,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. TESTIMONIALS SLIDER SECTION */}
-      <section className="py-20 bg-background/50 relative border-t border-foreground/5">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14 space-y-3">
-            <h2 className="text-3xl font-bold">Real Success Stories</h2>
-            <p className="text-sm text-foreground/60 font-semibold">what our members say</p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            <GlassCard glowColor="violet" className="flex flex-col justify-between min-h-[220px]">
-              <p className="text-xs text-foreground/75 leading-relaxed font-medium italic">
-                "As a lead software developer working long hours, I was always feeling tired. VitalCore's fatigue checks noticed when my energy was dropping and gently suggested a lighter routine. Swapping to active recovery saved my energy!"
-              </p>
-              <div className="border-t border-foreground/5 pt-4 mt-6 flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-primary/25 font-bold text-xs flex items-center justify-center text-primary">DR</div>
-                <div>
-                  <h4 className="text-xs font-bold">David R.</h4>
-                  <p className="text-xs text-foreground/50">Lead Developer</p>
-                </div>
-              </div>
-            </GlassCard>
-
-            <GlassCard glowColor="emerald" className="flex flex-col justify-between min-h-[220px]">
-              <p className="text-xs text-foreground/75 leading-relaxed font-medium italic">
-                "I turned on the Elderly Mode for my grandfather. The large text, bright water meters, and gentle joint stretching routines are perfect for him. It's so easy to read, and it helps our family stay connected and look out for him."
-              </p>
-              <div className="border-t border-foreground/5 pt-4 mt-6 flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-secondary/25 font-bold text-xs flex items-center justify-center text-secondary">LK</div>
-                <div>
-                  <h4 className="text-xs font-bold">Linda K.</h4>
-                  <p className="text-xs text-foreground/50">Family Circle Administrator</p>
-                </div>
-              </div>
-            </GlassCard>
-
-            <GlassCard glowColor="rose" className="flex flex-col justify-between min-h-[220px]">
-              <p className="text-xs text-foreground/75 leading-relaxed font-medium italic">
-                "The Environmental AI is magical. On days with poor AQI air quality or high heat warnings in Arizona, VitalCore instantly recalculates my running schedule to suggest respiratory-safe indoor resistance workouts. Absolute game changer!"
-              </p>
-              <div className="border-t border-foreground/5 pt-4 mt-6 flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-accent/25 font-bold text-xs flex items-center justify-center text-accent">SM</div>
-                <div>
-                  <h4 className="text-xs font-bold">Sarah M.</h4>
-                  <p className="text-xs text-foreground/50">Competitive Triathlete</p>
-                </div>
-              </div>
-            </GlassCard>
-
-          </div>
-        </div>
-      </section>
-
-
-      {/* 6. FAQ COLLAPSIBLE ACCORDION */}
-      <section className="py-20 bg-background/30 relative border-t border-foreground/5">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <div className="text-center mb-14 space-y-3">
-            <h2 className="text-3xl font-bold">Frequently Asked Questions</h2>
-            <p className="text-sm text-foreground/60 font-semibold">answers to common questions</p>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => {
-              const isOpen = activeFaq === idx;
-              return (
-                <div 
-                  key={idx} 
-                  className="rounded-2xl glass-panel border border-foreground/5 overflow-hidden transition-all duration-300"
-                >
-                  <button
-                    onClick={() => setActiveFaq(isOpen ? null : idx)}
-                    className="w-full flex items-center justify-between p-5 text-left font-bold text-xs sm:text-sm text-foreground hover:bg-foreground/5 transition-colors focus:outline-none"
-                  >
-                    <span>{faq.question}</span>
-                    <ChevronDown className={`h-4 w-4 text-foreground/60 transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
-                    }`} />
-                  </button>
-
-                  {isOpen && (
-                    <div className="px-5 pb-5 pt-1 text-xs text-foreground/75 leading-relaxed font-medium border-t border-foreground/5">
-                      {faq.answer}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* 7. PRE-FOOTER CTA CONSOLE BLOCK */}
       <section className="py-20 bg-background relative border-t border-foreground/5">
