@@ -69,12 +69,7 @@ export default function LandingPage() {
   ];
 
 
-  // Interactive Simulator State
-  const [sleep, setSleep] = useState(7);
-  const [steps, setSteps] = useState(5000);
-  
-  // Calculate dynamic energy score
-  const energyScore = Math.min(100, Math.round((sleep / 8) * 50 + (steps / 10000) * 50));
+
 
   return (
     <div className="flex-1 flex flex-col bg-background relative overflow-hidden">
@@ -150,58 +145,16 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, type: "spring", stiffness: 80 }}
-                className="relative mx-auto max-w-sm w-full"
+                className="relative mx-auto max-w-lg lg:max-w-none w-full"
               >
-                <div className="rounded-3xl border border-[var(--border)] bg-[var(--card-bg)] shadow-2xl shadow-primary/10 p-6 sm:p-8 space-y-8 relative overflow-hidden group">
-                  
-                  {/* Decorative background glow that reacts to score */}
-                  <div 
-                    className="absolute -top-20 -right-20 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-500"
-                    style={{ backgroundColor: energyScore > 80 ? 'rgba(16, 185, 129, 0.15)' : energyScore > 50 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(244, 63, 94, 0.15)' }}
+                <div className="relative group p-4">
+                  {/* Subtle glow effect behind the image */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 via-accent/10 to-secondary/30 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
+                  <img 
+                    src="/images/hero_wellness.png" 
+                    alt="VitalCore Wellness Tracking" 
+                    className="relative z-10 w-full h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-transform duration-700 hover:scale-[1.02]" 
                   />
-
-                  <div className="text-center space-y-2 relative z-10">
-                    <h3 className="text-xl font-bold text-[var(--foreground)] tracking-tight">Daily Energy Simulator</h3>
-                    <p className="text-xs text-[var(--muted)] font-medium">Adjust habits to see your live score.</p>
-                  </div>
-
-                  {/* Reactive Score Display */}
-                  <div className="flex justify-center relative z-10">
-                    <div className="relative flex flex-col items-center justify-center w-32 h-32 rounded-full shadow-[0_0_40px_rgba(0,0,0,0.05)] bg-gradient-to-br from-background to-[var(--muted-bg)] border-4 border-[var(--border)] group-hover:border-primary/50 transition-colors duration-500">
-                      <span className={`text-5xl font-black ${energyScore > 80 ? 'text-primary' : energyScore > 50 ? 'text-secondary' : 'text-accent'}`}>
-                        {energyScore}
-                      </span>
-                      <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest mt-1">Score</span>
-                    </div>
-                  </div>
-
-                  {/* Interactive Sliders */}
-                  <div className="space-y-6 relative z-10 pt-2">
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-xs font-bold text-[var(--foreground)]">
-                        <span className="flex items-center gap-1.5"><Moon className="w-3.5 h-3.5 text-secondary" /> Sleep</span>
-                        <span className="text-secondary">{sleep} hrs</span>
-                      </div>
-                      <input 
-                        type="range" min="2" max="12" step="0.5" 
-                        value={sleep} onChange={(e) => setSleep(parseFloat(e.target.value))}
-                        className="w-full h-2 bg-[var(--muted-bg)] rounded-lg appearance-none cursor-pointer accent-secondary"
-                      />
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-xs font-bold text-[var(--foreground)]">
-                        <span className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-primary" /> Steps</span>
-                        <span className="text-primary">{steps} steps</span>
-                      </div>
-                      <input 
-                        type="range" min="0" max="20000" step="500" 
-                        value={steps} onChange={(e) => setSteps(parseInt(e.target.value))}
-                        className="w-full h-2 bg-[var(--muted-bg)] rounded-lg appearance-none cursor-pointer accent-primary"
-                      />
-                    </div>
-                  </div>
-
                 </div>
               </motion.div>
             </div>
