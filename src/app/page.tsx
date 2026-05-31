@@ -19,7 +19,9 @@ import {
   Smile,
   Compass,
   Layers,
-  ChevronDown
+  ChevronDown,
+  CheckCircle,
+  Scan
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import GlassCard from "@/components/ui/GlassCard";
@@ -205,6 +207,84 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* 2. HOW IT WORKS TIMELINE */}
+      <section className="py-20 md:py-28 bg-[var(--card-bg)] relative z-10 border-b border-[var(--border)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-20">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-[var(--foreground)]">
+              How It Works
+            </h2>
+            <p className="text-[15px] font-medium text-[var(--muted)] leading-relaxed">
+              Four simple steps to transform your wellness journey.
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Horizontal Line connecting steps (hidden on mobile) */}
+            <div className="hidden md:block absolute top-[44px] left-[12%] right-[12%] h-[2px] bg-[var(--muted-bg)] z-0" />
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-4 relative z-10">
+              
+              {/* STEP 1 */}
+              <div className="flex flex-col items-center text-center space-y-5">
+                <div className="h-[88px] w-[88px] rounded-3xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Scan className="h-8 w-8 text-white" />
+                </div>
+                <div className="space-y-2.5 pt-2">
+                  <span className="text-[11px] font-bold text-primary uppercase tracking-widest">Step 1</span>
+                  <h3 className="text-base font-bold text-[var(--foreground)]">Log Your Data</h3>
+                  <p className="text-[13px] font-medium text-[var(--muted)] max-w-[220px] mx-auto leading-relaxed">
+                    Track your daily meals, sleep duration, and physical activity easily.
+                  </p>
+                </div>
+              </div>
+
+              {/* STEP 2 */}
+              <div className="flex flex-col items-center text-center space-y-5">
+                <div className="h-[88px] w-[88px] rounded-3xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Brain className="h-8 w-8 text-white" />
+                </div>
+                <div className="space-y-2.5 pt-2">
+                  <span className="text-[11px] font-bold text-primary uppercase tracking-widest">Step 2</span>
+                  <h3 className="text-base font-bold text-[var(--foreground)]">Get AI Insights</h3>
+                  <p className="text-[13px] font-medium text-[var(--muted)] max-w-[220px] mx-auto leading-relaxed">
+                    Our system identifies patterns in your health metrics and rest quality.
+                  </p>
+                </div>
+              </div>
+
+              {/* STEP 3 */}
+              <div className="flex flex-col items-center text-center space-y-5">
+                <div className="h-[88px] w-[88px] rounded-3xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <TrendingUp className="h-8 w-8 text-white" />
+                </div>
+                <div className="space-y-2.5 pt-2">
+                  <span className="text-[11px] font-bold text-primary uppercase tracking-widest">Step 3</span>
+                  <h3 className="text-base font-bold text-[var(--foreground)]">Predict Trends</h3>
+                  <p className="text-[13px] font-medium text-[var(--muted)] max-w-[220px] mx-auto leading-relaxed">
+                    Use the Future Health Lab to see where your habits will lead you.
+                  </p>
+                </div>
+              </div>
+
+              {/* STEP 4 */}
+              <div className="flex flex-col items-center text-center space-y-5">
+                <div className="h-[88px] w-[88px] rounded-3xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <CheckCircle className="h-8 w-8 text-white" />
+                </div>
+                <div className="space-y-2.5 pt-2">
+                  <span className="text-[11px] font-bold text-primary uppercase tracking-widest">Step 4</span>
+                  <h3 className="text-base font-bold text-[var(--foreground)]">Achieve Goals</h3>
+                  <p className="text-[13px] font-medium text-[var(--muted)] max-w-[220px] mx-auto leading-relaxed">
+                    Follow personalized daily recommendations to optimize your energy.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* 3. KEY CORE FEATURES GRID */}
       <section className="py-20 bg-background relative z-10">
