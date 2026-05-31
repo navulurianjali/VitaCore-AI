@@ -287,30 +287,35 @@ export default function LandingPage() {
       </section>
 
       {/* 3. KEY CORE FEATURES GRID */}
-      <section className="py-20 bg-background relative z-10">
+      <section className="py-24 bg-background relative z-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <motion.h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              AI Preventive Architecture Features
-            </motion.h2>
-            <p className="text-sm text-foreground/75 leading-relaxed">
-              VitalCore replaces complicated trackers with a single, simple wellness companion designed to help you stay healthy and feel energized.
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-[var(--foreground)]">
+              Why Use VitalCore?
+            </h2>
+            <p className="text-[15px] font-medium text-[var(--muted)] leading-relaxed">
+              Wellness management shouldn't be complicated. We empower you with the simple, actionable insights you need to stay energized and healthy.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feat, index) => {
               const Icon = feat.icon;
               return (
-                <GlassCard key={index} glowColor={feat.color as any} className="space-y-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
-                    <Icon className="h-5 w-5" />
+                <div 
+                  key={index} 
+                  className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 hover:border-primary/30 transition-colors flex flex-col items-start space-y-5"
+                >
+                  <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                    <Icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="text-sm font-bold text-foreground">{feat.title}</h3>
-                  <p className="text-xs text-foreground/70 leading-relaxed font-medium">
-                    {feat.description}
-                  </p>
-                </GlassCard>
+                  <div className="space-y-2.5">
+                    <h3 className="text-base sm:text-lg font-bold text-[var(--foreground)]">{feat.title}</h3>
+                    <p className="text-[14px] text-[var(--muted)] leading-relaxed font-medium">
+                      {feat.description}
+                    </p>
+                  </div>
+                </div>
               );
             })}
           </div>
