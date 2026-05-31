@@ -512,12 +512,29 @@ export default function DashboardPage() {
                 <p className="text-xs text-[var(--muted)] leading-relaxed mt-2">Consistent rest schedules protect your cardiovascular rhythm.</p>
               </GlassCard>
 
-              <GlassCard glowColor="rose" className="p-5 flex flex-col justify-between min-h-[120px]">
-                <div>
-                  <span className="text-[10px] font-semibold text-[var(--muted)] block uppercase tracking-wider">Daily Health Observations</span>
-                  <p className="text-xs font-semibold text-rose-500 leading-snug mt-2">{metrics.micronutrientDeficiencies[0]}</p>
+              <GlassCard glowColor="amber" className="p-5 flex flex-col justify-between min-h-[120px] border border-amber-500/20 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <ShieldAlert className="w-16 h-16 text-amber-500" />
                 </div>
-                <p className="text-xs text-[var(--muted)] leading-relaxed mt-2">Spend 15 minutes in natural afternoon sunlight today.</p>
+                <div className="relative z-10 space-y-3">
+                  <span className="text-[10px] font-bold text-amber-500 block uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="animate-pulse">🚨</span> Daily Health Triggers
+                  </span>
+                  
+                  <div className="bg-amber-500/10 text-amber-600 p-3 rounded-xl border border-amber-500/10 shadow-inner">
+                    <p className="text-[11px] font-black leading-snug flex items-start gap-1.5">
+                      <span className="mt-0.5">⚠️</span>
+                      <span>{metrics.micronutrientDeficiencies?.[0] || "Vitamin D optimization needed"}</span>
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="relative z-10 mt-4 pt-3 border-t border-[var(--border)]">
+                  <p className="text-[11px] font-bold text-foreground/80 leading-relaxed flex items-start gap-2">
+                    <span className="text-amber-500 mt-0.5 text-sm">☀️</span> 
+                    <span className="flex-1">Action: Spend 15 minutes in natural afternoon sunlight today to recalibrate your circadian rhythm.</span>
+                  </p>
+                </div>
               </GlassCard>
             </div>
 
