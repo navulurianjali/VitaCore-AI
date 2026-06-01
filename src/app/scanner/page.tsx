@@ -371,6 +371,7 @@ export default function FoodScannerPage() {
             <Scan className="h-4 w-4" />
             <span>Barcode Auditing Console</span>
           </button>
+        </div>
 
         {/* CONDITIONAL RENDER BY ACTIVE TAB */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
