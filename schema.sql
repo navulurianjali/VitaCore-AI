@@ -424,3 +424,45 @@ alter table public.ai_conversations enable row level security;
 
 create policy "Users can manage their own AI conversations." on public.ai_conversations
     for all using (auth.uid() = user_id);
+
+-- CONTACT INQUIRIES
+create table public.contact_inquiries (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid references public.profiles(id) on delete set null,
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    name text not null,
+    email text not null,
+    message text not null,
+    status text default 'pending'
+);
+
+alter table public.contact_inquiries enable row level security;
+
+create policy "Anyone can insert inquiries." on public.contact_inquiries
+    for insert with check (true);
+
+create policy "Users can view their own inquiries." on public.contact_inquiries
+    for select using (auth.uid() = user_id);
+
+-- COMMUNITY POSTS
+create table public.community_posts (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid references public.profiles(id) on delete cascade not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    content text not null,
+    streak integer default 0,
+    stability_score integer default 0,
+    likes integer default 0
+);
+
+alter table public.community_posts enable row level security;
+
+create policy "Anyone can read community posts." on public.community_posts
+    for select to authenticated using (true);
+
+create policy "Authenticated users can insert community posts" on public.community_posts
+    for insert to authenticated with check (auth.uid() = user_id);
+
+create policy "Users can update their own community posts." on public.community_posts
+    for update to authenticated using (auth.uid() = user_id);
+

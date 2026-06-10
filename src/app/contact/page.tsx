@@ -6,29 +6,51 @@ import confetti from "canvas-confetti";
 import Button from "@/components/ui/Button";
 import GlassCard from "@/components/ui/GlassCard";
 import Footer from "@/components/layout/Footer";
+import { supabase } from "@/utils/supabase";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ContactPage() {
+  const { profile } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
 
-    setSubmitted(true);
-    setName("");
-    setEmail("");
-    setMessage("");
+    setSubmitting(true);
+    try {
+      if (supabase) {
+        const { error } = await supabase.from("contact_inquiries").insert({
+          user_id: profile?.id || null,
+          name,
+          email,
+          message
+        });
+        if (error) {
+          console.error("Error submitting inquiry:", error);
+          return;
+        }
+      }
+      
+      setSubmitted(true);
+      setName("");
+      setEmail("");
+      setMessage("");
 
-    // Success confetti
-    confetti({
-      particleCount: 50,
-      spread: 40,
-      origin: { y: 0.8 },
-      colors: ["#8b5cf6", "#10b981"],
-    });
+      // Success confetti
+      confetti({
+        particleCount: 50,
+        spread: 40,
+        origin: { y: 0.8 },
+        colors: ["#8b5cf6", "#10b981"],
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -120,7 +142,7 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <Button variant="primary" type="submit" className="w-full py-3.5">
+                <Button variant="primary" type="submit" isLoading={submitting} className="w-full py-3.5">
                   Submit Encrypted Inquiry
                 </Button>
 

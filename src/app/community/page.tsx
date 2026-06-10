@@ -6,6 +6,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/utils/supabase";
 
 interface CircleMember {
   id: string;
@@ -24,38 +25,60 @@ export default function CommunityPage() {
   const [inviteSent, setInviteSent] = useState(false);
   const [statusUpdate, setStatusUpdate] = useState("");
   const [cheeredMembers, setCheeredMembers] = useState<Record<string, boolean>>({});
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    // Generate initial simulated circle members
-    setMembers([
-      {
-        id: "member-1",
-        name: "Grandfather Charles",
-        avatar: "C",
-        streak: 14,
-        stabilityScore: 92,
-        lastActive: "4 mins ago",
-        status: "Completed stretching routine. Stayed hydrated today!"
-      },
-      {
-        id: "member-2",
-        name: "Sarah M. (Arizona)",
-        avatar: "S",
-        streak: 8,
-        stabilityScore: 84,
-        lastActive: "1 hr ago",
-        status: "Taking it easy today because of the summer heatwave (35°C)."
-      },
-      {
-        id: "member-3",
-        name: "Dev Leader David",
-        avatar: "D",
-        streak: 2,
-        stabilityScore: 58,
-        lastActive: "Just now",
-        status: "Worked late on programming projects tonight. Got a bit less sleep."
+    async function fetchPosts() {
+      if (!supabase) return;
+      const { data, error } = await supabase
+        .from("community_posts")
+        .select("*, profiles(full_name, username)")
+        .order("created_at", { ascending: false });
+
+      if (data && data.length > 0) {
+        setMembers(data.map((post: any) => ({
+          id: post.id,
+          name: post.profiles?.full_name || post.profiles?.username || "Unknown Explorer",
+          avatar: post.profiles?.full_name ? post.profiles.full_name[0].toUpperCase() : "U",
+          streak: post.streak || 0,
+          stabilityScore: post.stability_score || 0,
+          lastActive: new Date(post.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          status: post.content
+        })));
+      } else {
+        // Fallback simulated data if empty
+        setMembers([
+          {
+            id: "member-1",
+            name: "Grandfather Charles",
+            avatar: "C",
+            streak: 14,
+            stabilityScore: 92,
+            lastActive: "4 mins ago",
+            status: "Completed stretching routine. Stayed hydrated today!"
+          },
+          {
+            id: "member-2",
+            name: "Sarah M. (Arizona)",
+            avatar: "S",
+            streak: 8,
+            stabilityScore: 84,
+            lastActive: "1 hr ago",
+            status: "Taking it easy today because of the summer heatwave (35°C)."
+          },
+          {
+            id: "member-3",
+            name: "Dev Leader David",
+            avatar: "D",
+            streak: 2,
+            stabilityScore: 58,
+            lastActive: "Just now",
+            status: "Worked late on programming projects tonight. Got a bit less sleep."
+          }
+        ]);
       }
-    ]);
+    }
+    fetchPosts();
   }, []);
 
   const handleSendInvite = (e: React.FormEvent) => {
@@ -70,22 +93,35 @@ export default function CommunityPage() {
     }, 4000);
   };
 
-  const handlePostUpdate = (e: React.FormEvent) => {
+  const handlePostUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!statusUpdate.trim()) return;
+    if (!statusUpdate.trim() || submitting || !profile?.id || !supabase) return;
 
-    const newMember: CircleMember = {
-      id: "member-self-" + Date.now(),
-      name: profile?.email ? profile.email.split('@')[0] : "You",
-      avatar: profile?.email ? profile.email[0].toUpperCase() : "Y",
-      streak: 5,
-      stabilityScore: 90,
-      lastActive: "Just now",
-      status: statusUpdate,
-    };
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.from("community_posts").insert({
+        user_id: profile.id,
+        content: statusUpdate,
+        streak: 5,
+        stability_score: profile.stability_score || 90
+      }).select("*, profiles(full_name, username)").single();
 
-    setMembers([newMember, ...members]);
-    setStatusUpdate("");
+      if (data && !error) {
+        const newMember: CircleMember = {
+          id: data.id,
+          name: data.profiles?.full_name || profile.full_name || "You",
+          avatar: (data.profiles?.full_name || profile.full_name || "Y")[0].toUpperCase(),
+          streak: data.streak || 5,
+          stabilityScore: data.stability_score || 90,
+          lastActive: "Just now",
+          status: data.content,
+        };
+        setMembers([newMember, ...members]);
+        setStatusUpdate("");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCheer = (id: string) => {
@@ -130,7 +166,7 @@ export default function CommunityPage() {
                   placeholder="Share how you're feeling today..."
                   className="flex-1 bg-background/50 border border-foreground/10 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-primary/50 text-foreground"
                 />
-                <Button variant="primary" type="submit" className="py-2.5 px-4 flex items-center gap-2 text-xs">
+                <Button variant="primary" type="submit" isLoading={submitting} className="py-2.5 px-4 flex items-center gap-2 text-xs">
                   <Send className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Post</span>
                 </Button>

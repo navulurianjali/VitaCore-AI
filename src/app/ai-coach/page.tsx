@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useHealthData } from "@/hooks/useHealthData";
+import { supabase } from "@/utils/supabase";
 
 interface ChatMessage {
   id: string;
@@ -23,10 +24,33 @@ export default function AICoachPage() {
   const { metrics, loading } = useHealthData();
   const [inputVal, setInputVal] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (metrics && messages.length === 0) {
+    async function loadHistory() {
+      if (!profile?.id || !supabase || historyLoaded) return;
+      const { data } = await supabase
+        .from("ai_conversations")
+        .select("*")
+        .eq("user_id", profile.id)
+        .order("created_at", { ascending: true });
+        
+      if (data && data.length > 0) {
+        setMessages(data.map((row: any) => ({
+          id: row.id,
+          sender: row.sender as "user" | "ai",
+          text: row.message,
+          timestamp: new Date(row.created_at)
+        })));
+      }
+      setHistoryLoaded(true);
+    }
+    loadHistory();
+  }, [profile, historyLoaded]);
+
+  useEffect(() => {
+    if (metrics && messages.length === 0 && historyLoaded) {
       setMessages([
         {
           id: "msg-welcome",
@@ -36,7 +60,7 @@ export default function AICoachPage() {
         }
       ]);
     }
-  }, [metrics, profile]);
+  }, [metrics, profile, historyLoaded, messages.length]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,6 +76,14 @@ export default function AICoachPage() {
       text: inputVal,
       timestamp: new Date()
     };
+
+    if (supabase && profile?.id) {
+      await supabase.from("ai_conversations").insert({
+        user_id: profile.id,
+        sender: "user",
+        message: inputVal
+      });
+    }
 
     const currentInput = inputVal;
     setMessages(prev => [...prev, userMsg]);
@@ -90,6 +122,14 @@ export default function AICoachPage() {
 
       const resData = await response.json();
       fullResponse = resData.reply || resData.error;
+
+      if (supabase && profile?.id && !resData.error) {
+        await supabase.from("ai_conversations").insert({
+          user_id: profile.id,
+          sender: "ai",
+          message: fullResponse
+        });
+      }
     } catch (err: any) {
       console.error("AI Coach API failed:", err);
       fullResponse = err.message || "I'm having trouble connecting to my neural core right now.";
