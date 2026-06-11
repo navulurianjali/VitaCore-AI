@@ -7,6 +7,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { useTheme } from "@/context/ThemeContext";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/utils/supabase";
 import confetti from "canvas-confetti";
 
 export default function SettingsPage() {
@@ -15,11 +16,14 @@ export default function SettingsPage() {
   
   const [cleared, setCleared] = useState(false);
 
-  const handleWipeCache = () => {
+  const handleWipeCache = async () => {
     if (confirm("Are you absolutely sure you want to delete all of your logged data? This action is permanent and cannot be undone.")) {
-      if (typeof window !== "undefined") {
-        // Clear mock database
-        localStorage.clear();
+      if (typeof window !== "undefined" && supabase && profile?.id) {
+        // Clear real database data for user
+        await supabase.from("hydration_logs").delete().eq("user_id", profile.id);
+        await supabase.from("workouts").delete().eq("user_id", profile.id);
+        await supabase.from("sleep_logs").delete().eq("user_id", profile.id);
+        await supabase.from("user_challenges").delete().eq("user_id", profile.id);
       }
       setCleared(true);
       

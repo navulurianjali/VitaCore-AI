@@ -77,8 +77,7 @@ export default function SleepPage() {
     setLoadingLogs(true);
     setDbError("");
     
-    // First try Supabase if configured
-    if (supabase && profile && isSupabaseConfigured) {
+    if (supabase && profile) {
       try {
         const { data, error } = await supabase
           .from("sleep_logs")
@@ -99,39 +98,18 @@ export default function SleepPage() {
             stress: Math.max(1, 10 - Number(d.sleep_rating || 0)),
             muscleRepair: Number(d.recovery_quality || 0)
           })));
-          setLoadingLogs(false);
-          return;
-        }
-        if (error) {
-          console.warn("Supabase sleep_logs fetch error, falling back to LocalStorage:", error.message);
+        } else if (error) {
+          console.error("Supabase sleep_logs fetch error:", error.message);
+          setDbError(error.message);
+        } else {
+          setLogs([]);
         }
       } catch (e: any) {
-        console.warn("Supabase sleep_logs exception, falling back to LocalStorage:", e.message);
+        console.error("Supabase sleep_logs exception:", e.message);
+        setDbError(e.message);
       }
-    }
-
-    // Fallback: LocalStorage mock data
-    if (typeof window !== "undefined") {
-      const localData = localStorage.getItem("vitalcore_sleep_logs");
-      if (localData) {
-        try {
-          setLogs(JSON.parse(localData));
-        } catch (err) {
-          console.error("Failed to parse local sleep logs:", err);
-        }
-      } else {
-        // Seed default sleep logs so the page doesn't look empty initially
-        const defaultLogs = [
-          { date: "05/22", duration: 7.2, quality: 8, wakings: 1, refreshment: 7, mood: 8, energy: 7, stress: 3, muscleRepair: 85 },
-          { date: "05/23", duration: 6.8, quality: 7, wakings: 2, refreshment: 6, mood: 7, energy: 6, stress: 4, muscleRepair: 72 },
-          { date: "05/24", duration: 8.0, quality: 9, wakings: 0, refreshment: 9, mood: 9, energy: 9, stress: 2, muscleRepair: 95 },
-          { date: "05/25", duration: 6.5, quality: 6, wakings: 2, refreshment: 5, mood: 6, energy: 5, stress: 5, muscleRepair: 60 },
-          { date: "05/26", duration: 7.5, quality: 8, wakings: 1, refreshment: 8, mood: 8, energy: 8, stress: 3, muscleRepair: 88 },
-          { date: "05/27", duration: 7.0, quality: 7.5, wakings: 1, refreshment: 7.5, mood: 8, energy: 7, stress: 3, muscleRepair: 80 }
-        ];
-        localStorage.setItem("vitalcore_sleep_logs", JSON.stringify(defaultLogs));
-        setLogs(defaultLogs);
-      }
+    } else {
+      setLogs([]);
     }
     setLoadingLogs(false);
   };
@@ -185,9 +163,8 @@ export default function SleepPage() {
 
     setLoadingLogs(true);
 
-    // Try Supabase first if configured
-    let savedInDb = false;
-    if (supabase && profile && isSupabaseConfigured) {
+    // Save strictly to Supabase
+    if (supabase && profile) {
       try {
         const { error } = await supabase
           .from("sleep_logs")
@@ -205,21 +182,19 @@ export default function SleepPage() {
           });
         
         if (!error) {
-          savedInDb = true;
+          // Update local state directly so UI reflects immediately
+          const currentLogs = [...logs, newLogItem];
+          setLogs(currentLogs);
         } else {
-          console.warn("Failed to save sleep log to Supabase, falling back to LocalStorage:", error.message);
+          console.error("Failed to save sleep log to Supabase:", error.message);
+          setDbError(error.message);
         }
       } catch (err: any) {
-        console.warn("Exception during Supabase save, falling back to LocalStorage:", err.message);
+        console.error("Exception during Supabase save:", err.message);
+        setDbError(err.message);
       }
     }
 
-    // Always save to LocalStorage as backup or primary mock store
-    if (typeof window !== "undefined") {
-      const currentLogs = [...logs, newLogItem];
-      localStorage.setItem("vitalcore_sleep_logs", JSON.stringify(currentLogs));
-      setLogs(currentLogs);
-    }
 
     setLoadingLogs(false);
     setShowLogForm(false);

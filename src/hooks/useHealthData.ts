@@ -105,17 +105,24 @@ export function useHealthData() {
         .limit(1);
       const lastMood = moodData?.[0] || { stress_level: 50, mood: 'neutral' };
 
-      let localSteps = 0;
-      if (typeof window !== "undefined") {
-        const stored = localStorage.getItem("vitalcore_daily_steps");
-        const storedDate = localStorage.getItem("vitalcore_daily_steps_date");
-        if (storedDate === today && stored) {
-          localSteps = Number(stored);
-        } else {
-          localStorage.setItem("vitalcore_daily_steps_date", today);
-          localStorage.setItem("vitalcore_daily_steps", "0");
-        }
-      }
+      // 6. Fetch Steps (using workouts table)
+      const { data: stepsData } = await supabase
+        .from("workouts")
+        .select("calories_burned")
+        .eq("user_id", profile.id)
+        .eq("type", "steps")
+        .gte("created_at", `${today}T00:00:00Z`);
+      
+      // We stored steps as duration_minutes or calories_burned. Let's assume we store steps count in duration_minutes for type 'steps'.
+      const { data: stepCountData } = await supabase
+        .from("workouts")
+        .select("duration_minutes")
+        .eq("user_id", profile.id)
+        .eq("type", "steps")
+        .gte("created_at", `${today}T00:00:00Z`);
+        
+      const realSteps = stepCountData?.reduce((sum, item) => sum + item.duration_minutes, 0) || 0;
+
 
       const realMetrics: HealthDigitalTwin = {
         caloriesBurned,
@@ -123,7 +130,7 @@ export function useHealthData() {
         caloriesConsumed,
         hydrationMl,
         hydrationTarget: 2500,
-        steps: localSteps,
+        steps: realSteps,
         stepsTarget: 10000,
         sleepHours: Number(lastSleep.sleep_hours),
         sleepTarget: 8.0,
@@ -149,23 +156,8 @@ export function useHealthData() {
       console.error("Error fetching health data:", err);
       setError("Failed to load your health telemetry.");
       
-      // Fallback zero-state metrics if database tables are missing
-      let localSleep = { sleepHours: 0, sleepQuality: 50 };
-      if (typeof window !== "undefined") {
-        const localData = localStorage.getItem("vitalcore_sleep_logs");
-        if (localData) {
-          try {
-            const parsed = JSON.parse(localData);
-            if (parsed && parsed.length > 0) {
-              const latest = parsed[parsed.length - 1];
-              localSleep = {
-                sleepHours: latest.duration || 0,
-                sleepQuality: (latest.quality || 5) * 10
-              };
-            }
-          } catch (e) {}
-        }
-      }
+      // We don't use localStorage fallbacks anymore. Just throw or return zeros.
+      const localSleep = { sleepHours: 0, sleepQuality: 50 };
 
       setMetrics({
         caloriesBurned: 0,

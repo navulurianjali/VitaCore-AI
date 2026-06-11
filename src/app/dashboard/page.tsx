@@ -72,14 +72,36 @@ export default function DashboardPage() {
     if (pedometer.isTracking) {
       const diff = pedometer.sessionSteps - prevSessionSteps.current;
       if (diff > 0) {
-        setStepsLogged(prev => {
-          const updated = prev + diff;
-          localStorage.setItem("vitalcore_daily_steps", updated.toString());
-          return updated;
-        });
+        setStepsLogged(prev => prev + diff);
+        
+        // Optimistically sync to DB in chunks to avoid spamming
+        if (diff > 50 && profile && supabase) {
+          supabase.from("workouts").insert({
+            user_id: profile.id,
+            name: "Live Pedometer Sync",
+            type: "steps",
+            duration_minutes: diff,
+            calories_burned: Math.round(diff * 0.04)
+          }).then(() => {
+            window.dispatchEvent(new Event("vitalcore-data-updated"));
+          });
+        }
       }
       prevSessionSteps.current = pedometer.sessionSteps;
     } else {
+      // Sync remaining steps on stop
+      const finalDiff = pedometer.sessionSteps - prevSessionSteps.current;
+      if (finalDiff > 0 && profile && supabase) {
+        supabase.from("workouts").insert({
+          user_id: profile.id,
+          name: "Live Pedometer Sync",
+          type: "steps",
+          duration_minutes: finalDiff,
+          calories_burned: Math.round(finalDiff * 0.04)
+        }).then(() => {
+          window.dispatchEvent(new Event("vitalcore-data-updated"));
+        });
+      }
       prevSessionSteps.current = 0;
     }
   }, [pedometer.sessionSteps, pedometer.isTracking]);
@@ -107,36 +129,46 @@ export default function DashboardPage() {
         
         await refetch();
         window.dispatchEvent(new Event("vitalcore-data-updated"));
-      } else {
-        // Fallback for unauthenticated/offline
-        setWaterLogged(w => w + amount);
       }
       setLogStatus("Hydration logged! Enjoy your day! 💧");
       setTimeout(() => setLogStatus(null), 3000);
     } catch (e) {
       console.error("Hydration logging error:", e);
-      setWaterLogged(w => w + amount);
-      setLogStatus("Logged locally.");
+      setLogStatus("Error logging hydration.");
       setTimeout(() => setLogStatus(null), 3000);
     } finally {
       setLoggingInProgress(false);
     }
   };
 
-  const handleLogSteps = (amount: number) => {
+  const handleLogSteps = async (amount: number) => {
     setLoggingInProgress(true);
     setLogStatus("Logging steps...");
-    const newSteps = stepsLogged + amount;
-    setStepsLogged(newSteps);
-    localStorage.setItem("vitalcore_daily_steps", newSteps.toString());
     
-    // Simulate updating global state
-    setTimeout(() => {
-      window.dispatchEvent(new Event("vitalcore-data-updated"));
+    try {
+      if (supabase && profile) {
+        const { error } = await supabase.from("workouts").insert({
+          user_id: profile.id,
+          name: "Manual Steps Log",
+          type: "steps",
+          duration_minutes: amount,
+          calories_burned: Math.round(amount * 0.04)
+        });
+        if (error) throw error;
+        
+        setStepsLogged(prev => prev + amount);
+        await refetch();
+        window.dispatchEvent(new Event("vitalcore-data-updated"));
+      }
       setLogStatus("Steps logged! Keep moving! 🚶");
       setTimeout(() => setLogStatus(null), 3000);
+    } catch (e) {
+      console.error("Steps logging error:", e);
+      setLogStatus("Error logging steps.");
+      setTimeout(() => setLogStatus(null), 3000);
+    } finally {
       setLoggingInProgress(false);
-    }, 500);
+    }
   };
 
   const handleLogSleep = async (hours: number, quality: number) => {
@@ -153,15 +185,12 @@ export default function DashboardPage() {
         
         await refetch();
         window.dispatchEvent(new Event("vitalcore-data-updated"));
-      } else {
-        setSleepHrs(hours);
       }
       setLogStatus("Sleep logged successfully! 🛌");
       setTimeout(() => setLogStatus(null), 3000);
     } catch (e) {
       console.error("Sleep logging error:", e);
-      setSleepHrs(hours);
-      setLogStatus("Logged locally.");
+      setLogStatus("Error logging sleep.");
       setTimeout(() => setLogStatus(null), 3000);
     } finally {
       setLoggingInProgress(false);

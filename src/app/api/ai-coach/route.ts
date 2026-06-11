@@ -1,8 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    // 1. Authenticate Request
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "Unauthorized access. Valid Supabase session required." },
+        { status: 401 }
+      );
+    }
+
+    // 2. Parse Payload securely
+    let body;
+    try {
+      body = await req.json();
+    } catch (parseError) {
+      return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
+    }
+    
     const { message, history, profile, metrics } = body;
 
     const apiKey = process.env.GEMINI_API_KEY;

@@ -266,11 +266,7 @@ export default function SmartAINutritionPlansPage() {
         }
       }
 
-      // Add local storage fallback
-      const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
-      const userLocalLogs = localLogs.filter((l: any) => l.user_id === userId);
-      
-      const allLogs = [...dbLogs, ...userLocalLogs].sort((a, b) => 
+      const allLogs = [...dbLogs].sort((a, b) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
       setFoodLogs(allLogs);
@@ -459,43 +455,14 @@ export default function SmartAINutritionPlansPage() {
           .insert(logData);
 
         if (error) {
-          console.error("Supabase error saving meal, falling back to local storage:", error);
-          const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
-          localLogs.push({
-            ...logData,
-            id: `local-${Date.now()}`,
-            created_at: new Date().toISOString()
-          });
-          localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
+          console.error("Supabase error saving meal:", error);
         }
       } else {
-        // Guest user local storage log
-        const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
-        localLogs.push({
-          ...logData,
-          id: `local-${Date.now()}`,
-          created_at: new Date().toISOString()
-        });
-        localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
+        console.error("User not logged in, cannot save meal.");
       }
       window.dispatchEvent(new Event("vitalcore-data-updated"));
     } catch (err) {
       console.error("Error logging meal:", err);
-      // Fallback in catch block as well for complete robustness
-      const userId = profile?.id || "guest_user";
-      const logData = {
-        user_id: userId, meal_type: meal.mealType, food_name: meal.name,
-        calories: Number(meal.calories), protein_g: Number(meal.protein), carbs_g: Number(meal.carbs),
-        fat_g: Number(meal.fat), stress_eating: false
-      };
-      const localLogs = JSON.parse(localStorage.getItem("vitalcore_nutrition_logs") || "[]");
-      localLogs.push({
-        ...logData,
-        id: `local-${Date.now()}`,
-        created_at: new Date().toISOString()
-      });
-      localStorage.setItem("vitalcore_nutrition_logs", JSON.stringify(localLogs));
-      window.dispatchEvent(new Event("vitalcore-data-updated"));
     } finally {
       await fetchLogs();
       setSelectedMealDetails(null);

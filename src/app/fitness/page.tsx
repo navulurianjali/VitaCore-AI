@@ -597,11 +597,7 @@ export default function FitnessPage() {
       type: postureScore < 85 ? "Postural Strain Detected" : "Excellent Alignment Check"
     };
 
-    const stored = localStorage.getItem("vitalcore_posture_history");
-    const parsed = stored ? JSON.parse(stored) : [];
-    parsed.unshift(newScan);
-    setScanScoreHistory(parsed);
-    localStorage.setItem("vitalcore_posture_history", JSON.stringify(parsed));
+    setScanScoreHistory(prev => [newScan, ...prev]);
 
     if (supabase && profile?.id) {
       try {
@@ -1068,12 +1064,7 @@ export default function FitnessPage() {
       { id: "r2", name: "Hamstring Recovery Flow", focus: "mobility", duration: 20, exercisesCount: 3 }
     ]);
 
-    if (typeof window !== "undefined") {
-      const storedScans = localStorage.getItem("vitalcore_posture_history");
-      if (storedScans) {
-        setScanScoreHistory(JSON.parse(storedScans));
-      }
-    }
+    // We fetch all history from the DB via fetchDBWorkouts below
   }, [activeMode]);
 
   // Fetch Supabase workouts if possible
@@ -1087,7 +1078,7 @@ export default function FitnessPage() {
             .eq("user_id", profile.id)
             .order("created_at", { ascending: false });
           if (data && !error) {
-            const merged = data.map((w: any) => ({
+            const wHistory = data.filter((w: any) => w.type !== "POSTURE" && w.type !== "steps").map((w: any) => ({
               date: new Date(w.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
               focus: w.type,
               duration: w.duration_minutes,
@@ -1095,18 +1086,17 @@ export default function FitnessPage() {
               completed: w.completed,
               rating: w.intensity
             }));
-            setWorkoutHistory(prev => {
-              const unique = [...merged];
-              prev.forEach(p => {
-                if (!unique.some(u => u.date === p.date && u.focus === p.focus)) {
-                  unique.push(p);
-                }
-              });
-              return unique;
-            });
+            const pHistory = data.filter((w: any) => w.type === "POSTURE").map((w: any) => ({
+              date: new Date(w.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+              score: parseInt(w.notes?.match(/Score: (\d+)%/)?.[1] || "95"),
+              cervicalLoad: w.notes?.includes("Sag") ? 12.4 : 3.1,
+              type: w.notes?.includes("Sag") ? "Postural Strain Detected" : "Excellent Alignment Check"
+            }));
+            setWorkoutHistory(wHistory);
+            setScanScoreHistory(pHistory);
           }
         } catch (e) {
-          console.warn("Could not retrieve online workouts. Fallback to local logs active.");
+          console.error("Could not retrieve online workouts:", e);
         }
       }
     }
@@ -1330,12 +1320,7 @@ export default function FitnessPage() {
       rating: intensity.toUpperCase()
     };
 
-    const stored = localStorage.getItem("vitalcore_workout_history");
-    const parsed = stored ? JSON.parse(stored) : [];
-    parsed.unshift(newLog);
-    setWorkoutHistory(parsed);
-    localStorage.setItem("vitalcore_workout_history", JSON.stringify(parsed));
-
+    setWorkoutHistory(prev => [newLog, ...prev]);
     if (supabase && profile?.id) {
       try {
         await supabase.from("workouts").insert({
@@ -1351,7 +1336,7 @@ export default function FitnessPage() {
         });
         window.dispatchEvent(new Event("vitalcore-data-updated"));
       } catch (err) {
-        console.error("Database save failed. Local session cached successfully.");
+        console.error("Database save failed.");
       }
     }
 
